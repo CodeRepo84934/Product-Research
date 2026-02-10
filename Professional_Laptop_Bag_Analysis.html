@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Laptop Bag Analysis</title>
+    <style>
+        :root {
+            --primary: #028090;
+            --primary-dark: #026670;
+            --secondary: #00A896;
+            --accent: #02C39A;
+            --dark: #1B263B;
+            --dark-lighter: #2d3e50;
+            --light: #F7F9FC;
+            --light-alt: #EEF2F7;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --text-light: #475569;
+            --muted: #64748B;
+            --danger: #DC2626;
+            --danger-light: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --purple: #7C3AED;
+            --purple-light: #EDE9FE;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-lighter) 100%);
+            color: white;
+            padding: 60px 20px 80px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.8rem; margin-bottom: 12px; font-weight: 700; }
+        .header .subtitle { color: var(--accent); font-size: 1.3rem; margin-bottom: 8px; }
+        .header .meta { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+        .stat-item { text-align: center; padding: 0 20px; }
+        .stat-number { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 8px; }
+
+        .nav-container {
+            background: var(--white);
+            border-bottom: 1px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+        .nav a {
+            padding: 16px;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .products-grid-section { background: var(--white); padding: 40px 20px; border-bottom: 1px solid #E2E8F0; }
+        .products-grid-title { text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+        .products-grid-subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 30px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .product-card { background: var(--light); border-radius: 12px; overflow: hidden; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .product-card-img { width: 100%; aspect-ratio: 1; object-fit: contain; background: white; padding: 12px; }
+        .product-card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .product-card-asin { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+        .product-card-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .product-card-title { font-size: 0.8rem; color: var(--text-light); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Keyword Clusters Section */
+        .keyword-clusters-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 50px 20px;
+            color: white;
+        }
+        .keyword-clusters-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 8px; }
+        .clusters-subtitle { text-align: center; color: #a0aec0; margin-bottom: 30px; font-size: 0.95rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-container { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; }
+        .chart-container h3 { font-size: 1rem; margin-bottom: 16px; color: #e2e8f0; text-align: center; }
+        .chart { min-height: 280px; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .bar-label { width: 120px; font-size: 0.75rem; color: #e2e8f0; text-align: right; padding-right: 10px; cursor: pointer; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-label:hover { color: #63b3ed; text-decoration: underline; }
+        .bar-wrapper { flex: 1; background: rgba(255,255,255,0.1); border-radius: 4px; height: 24px; position: relative; overflow: hidden; }
+        .bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; font-weight: 600; color: white; transition: width 0.5s ease; }
+        .bar-volume { background: linear-gradient(90deg, #4299e1, #3182ce); }
+        .bar-count { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+        .bar-identity { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .bar-feature { background: linear-gradient(90deg, #9f7aea, #805ad5); }
+
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; animation: modalSlide 0.3s ease; }
+        @keyframes modalSlide { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #718096; transition: color 0.2s; }
+        .modal-close:hover { color: #e53e3e; }
+        .modal-content h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.4rem; }
+        .modal-stats { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .modal-stat { text-align: center; }
+        .modal-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .modal-stat-label { font-size: 0.75rem; color: var(--muted); }
+        .modal-keywords { max-height: 400px; overflow-y: auto; }
+        .keyword-item { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 6px; margin-bottom: 4px; background: #f7fafc; }
+        .keyword-item:nth-child(odd) { background: #edf2f7; }
+        .keyword-text { color: var(--dark); font-size: 0.9rem; }
+        .keyword-volume { color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 60px; }
+        .section { background: var(--white); border-radius: 16px; padding: 40px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .section-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--light-alt); }
+        .section-label { display: inline-block; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-title { font-size: 1.8rem; color: var(--dark); font-weight: 700; margin-bottom: 8px; }
+        .section-subtitle { color: var(--muted); font-size: 1.05rem; }
+
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+        th { background: var(--light); font-weight: 600; color: var(--dark); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { font-size: 0.95rem; }
+        tr:hover { background: var(--light); }
+        .highlight-zero { color: var(--danger); font-weight: 600; }
+
+        .insight-box { background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); color: white; padding: 20px 25px; border-radius: 12px; margin: 25px 0; font-size: 1rem; }
+
+        .pain-grid, .segment-grid, .feature-grid, .innovation-grid { display: grid; gap: 20px; margin-top: 20px; }
+        .pain-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .segment-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .feature-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .innovation-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+        .pain-card, .segment-card, .feature-card, .innovation-card { background: var(--light); border-radius: 12px; padding: 20px; border-left: 4px solid var(--primary); }
+        .pain-card { border-left-color: var(--danger); }
+        .segment-card { border-left-color: var(--secondary); }
+        .feature-card { border-left-color: var(--warning); }
+        .innovation-card { border-left-color: var(--purple); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-title { font-weight: 600; color: var(--dark); font-size: 1.05rem; }
+        .card-badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+        .badge-critical { background: var(--danger-light); color: var(--danger); }
+        .badge-high { background: var(--warning-light); color: var(--warning); }
+        .badge-medium { background: var(--light-alt); color: var(--muted); }
+        .badge-count { background: var(--primary); color: white; }
+
+        .card-quote { font-style: italic; color: var(--text-light); font-size: 0.9rem; padding: 12px; background: white; border-radius: 8px; margin: 12px 0; border-left: 3px solid var(--muted); }
+        .card-solution, .card-jobs, .card-features, .card-description { font-size: 0.9rem; color: var(--text-light); margin-top: 10px; }
+        .card-solution strong, .card-jobs strong, .card-features strong { color: var(--dark); }
+
+        .priority-section { margin-top: 30px; }
+        .priority-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .priority-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .priority-dot.critical { background: var(--danger); }
+        .priority-dot.high { background: var(--warning); }
+        .priority-dot.medium { background: var(--muted); }
+        .priority-title { font-weight: 600; font-size: 1.1rem; color: var(--dark); }
+
+        .footer { background: var(--dark); color: rgba(255,255,255,0.8); padding: 40px 20px; text-align: center; font-size: 0.9rem; }
+        .footer p { margin: 6px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Professional Laptop Bag Analysis</h1>
+        <p class="subtitle">Customer Review & Keyword Analysis</p>
+        <p class="meta">Data-driven insights for product optimization</p>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">2849</div>
+                <div class="stat-label">Reviews Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">9</div>
+                <div class="stat-label">Products</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">526</div>
+                <div class="stat-label">Keywords</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3.5</div>
+                <div class="stat-label">Avg Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#keyword-clusters">Keywords</a>
+            <a href="#hidden-drivers">Hidden Drivers</a>
+            <a href="#pain-points">Pain Points</a>
+            <a href="#segments">Segments</a>
+            <a href="#features">Features</a>
+            <a href="#innovations">Innovations</a>
+        </nav>
+    </div>
+
+    <div class="products-grid-section">
+        <h2 class="products-grid-title">Analyzed Products</h2>
+        <p class="products-grid-subtitle">Click any product to view on Amazon</p>
+        <div class="products-grid">
+            <a href="https://www.amazon.com/dp/B01N18UU4X" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/816xNhRMcCL._AC_SX500_.jpg" alt="sqlp Large Work Tote Bag" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B01N18UU4X</span>
+                    <span class="product-card-price">$38.99</span>
+                    <span class="product-card-title">sqlp Large Work Tote Bag</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09QSVL5LS" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/713Q4cAWaPL._AC_SY500_.jpg" alt="Oversize Pu Leather Tote" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09QSVL5LS</span>
+                    <span class="product-card-price">$26.00</span>
+                    <span class="product-card-title">Oversize Pu Leather Tote</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0BWF6ZQVT" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71UWL+J2yaL._AC_SX425_.jpg" alt="LOVEVOOK Laptop Bag 15.6" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0BWF6ZQVT</span>
+                    <span class="product-card-price">$26.99</span>
+                    <span class="product-card-title">LOVEVOOK Laptop Bag 15.6</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0CG9FZX57" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61MmVCWeI2L._AC_SX425_.jpg" alt="LOVEVOOK Laptop Bag Lightweight" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0CG9FZX57</span>
+                    <span class="product-card-price">$37.99</span>
+                    <span class="product-card-title">LOVEVOOK Laptop Bag Lightweight</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0CNZHFYLC" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71ZZ4d6uBlL._AC_SY500_.jpg" alt="Hobo Bags for Women" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0CNZHFYLC</span>
+                    <span class="product-card-price">$25.43</span>
+                    <span class="product-card-title">Hobo Bags for Women</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0CP812CH6" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81BCwzfdf-L._AC_SX522_.jpg" alt="Canvas Tote Bag for Women" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0CP812CH6</span>
+                    <span class="product-card-price">$18.98</span>
+                    <span class="product-card-title">Canvas Tote Bag for Women</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0CQC7P5HH" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81TRlGbS0SL._AC_SY500_.jpg" alt="KALIDI Tote Bag Zipper" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0CQC7P5HH</span>
+                    <span class="product-card-price">$17.99</span>
+                    <span class="product-card-title">KALIDI Tote Bag Zipper</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0D9811MDC" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81iJlACSU3L._AC_SY500_.jpg" alt="FIORETTO Canvas Tote Bag" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0D9811MDC</span>
+                    <span class="product-card-price">$17.59</span>
+                    <span class="product-card-title">FIORETTO Canvas Tote Bag</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0F2TF9X6F" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/817VZ-ks71L._AC_SX425_.jpg" alt="LOVEVOOK Laptop Tote Bag" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22>📦</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0F2TF9X6F</span>
+                    <span class="product-card-price">$41.99</span>
+                    <span class="product-card-title">LOVEVOOK Laptop Tote Bag</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Keyword Clusters Section -->
+    <section id="keyword-clusters" class="keyword-clusters-section">
+        <h2>Search Keyword Clusters</h2>
+        <p class="clusters-subtitle">Click any cluster label to view the keywords and search volumes</p>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>Top Clusters by Total Search Volume</h3>
+                <div id="chart-volume" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Top Clusters by Number of Keywords</h3>
+                <div id="chart-count" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Identity-Based Clusters</h3>
+                <div id="chart-identity" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Feature-Based Clusters</h3>
+                <div id="chart-feature" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <div id="keywords-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-title">Keywords</h3>
+            <div id="modal-stats" class="modal-stats"></div>
+            <div id="modal-keywords" class="modal-keywords"></div>
+        </div>
+    </div>
+
+    <div class="container">
+
+<section id="hidden-drivers" class="section">
+    <div class="section-header">
+        <span class="section-label">Part 1</span>
+        <h2 class="section-title">Hidden Purchase Drivers</h2>
+        <p class="section-subtitle">Features customers love but don't actively search for</p>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Review Mentions</th>
+                    <th>Keyword Volume</th>
+                    <th>Opportunity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Organization/Pockets</strong></td>
+                    <td>152 reviews</td>
+                    <td class="highlight-zero">~0</td>
+                    <td>🎯 High - Zero search volume despite high satisfaction</td>
+                </tr>
+                <tr>
+                    <td><strong>Stylish/Professional Look</strong></td>
+                    <td>127 reviews</td>
+                    <td>~3.4K ("professional tote")</td>
+                    <td>🎯 Medium - Undercommunicated aesthetic appeal</td>
+                </tr>
+                <tr>
+                    <td><strong>Spacious Interior</strong></td>
+                    <td>203 reviews</td>
+                    <td>225K ("large" keywords)</td>
+                    <td>✅ Well-matched with search intent</td>
+                </tr>
+                <tr>
+                    <td><strong>Water Bottle Holder</strong></td>
+                    <td>47 reviews</td>
+                    <td class="highlight-zero">~0</td>
+                    <td>🎯 High - Hidden differentiator</td>
+                </tr>
+                <tr>
+                    <td><strong>Laptop Compartment</strong></td>
+                    <td>189 reviews</td>
+                    <td>626K ("laptop" keywords)</td>
+                    <td>✅ Strong keyword-review alignment</td>
+                </tr>
+                <tr>
+                    <td><strong>Lightweight</strong></td>
+                    <td>63 reviews</td>
+                    <td class="highlight-zero">~0</td>
+                    <td>🎯 High - Unexpected benefit not searched</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="insight-box">
+        <strong>💡 Key Insight:</strong> Customers repeatedly praise organization features, professional appearance, and lightweight design, yet these receive minimal search volume. Opportunity exists to educate buyers on these hidden benefits through listing optimization and advertising. The "lunch compartment" keyword (21K volume) suggests buyers search for specific features when they know to look for them.
+    </div>
+</section>
+\n
+<section id="pain-points" class="section">
+    <div class="section-header">
+        <span class="section-label">Part 2</span>
+        <h2 class="section-title">Critical Pain Points</h2>
+        <p class="section-subtitle">Top issues from 788 negative reviews (1-3 stars)</p>
+    </div>
+    
+    <div class="priority-section">
+        <div class="priority-header">
+            <div class="priority-dot critical"></div>
+            <span class="priority-title">Critical Issues (150+ mentions)</span>
+        </div>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <div class="card-header">
+                    <span class="card-title">Quality/Durability Concerns</span>
+                    <span class="card-badge badge-critical">267 mentions</span>
+                </div>
+                <div class="card-quote">"After 3 months of daily use, the stitching came apart at the handles and the material started to peel. Very disappointed given the price point."</div>
+                <div class="card-solution"><strong>Solution:</strong> Reinforce stress points (handles, bottom), use higher-grade materials, offer longer warranty period to build confidence.</div>
+            </div>
+            <div class="pain-card">
+                <div class="card-header">
+                    <span class="card-title">Strap Issues</span>
+                    <span class="card-badge badge-critical">184 mentions</span>
+                </div>
+                <div class="card-quote">"The straps slide off my shoulder constantly. I have to readjust every few minutes. Makes carrying this bag frustrating on my commute."</div>
+                <div class="card-solution"><strong>Solution:</strong> Add non-slip padding, adjust strap width/placement, or offer adjustable strap lengths. Consider removable shoulder pad accessory.</div>
+            </div>
+            <div class="pain-card">
+                <div class="card-header">
+                    <span class="card-title">Zipper Failures</span>
+                    <span class="card-badge badge-critical">152 mentions</span>
+                </div>
+                <div class="card-quote">"The main zipper broke after just 2 weeks. Now I can't close my bag and my laptop is exposed. This is a major design flaw."</div>
+                <div class="card-solution"><strong>Solution:</strong> Upgrade to YKK or similar premium zippers, reinforce zipper attachment points, consider magnetic closures as backup.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="priority-section" style="margin-top: 30px;">
+        <div class="priority-header">
+            <div class="priority-dot high"></div>
+            <span class="priority-title">High Priority Issues (50-150 mentions)</span>
+        </div>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <div class="card-header">
+                    <span class="card-title">Heavy When Loaded</span>
+                    <span class="card-badge badge-high">118 mentions</span>
+                </div>
+                <div class="card-quote">"Once I put my laptop, water bottle, and lunch in, this bag is way too heavy. My shoulder aches after carrying it."</div>
+                <div class="card-solution"><strong>Solution:</strong> Use lighter-weight materials, redesign with ergonomic weight distribution, add padded back panel.</div>
+            </div>
+            <div class="pain-card">
+                <div class="card-header">
+                    <span class="card-title">Size Misrepresentation</span>
+                    <span class="card-badge badge-high">94 mentions</span>
+                </div>
+                <div class="card-quote">"The pictures made it look much bigger. My 15-inch laptop barely fits and I can't fit my charger and notebooks comfortably."</div>
+                <div class="card-solution"><strong>Solution:</strong> Add accurate dimension photos with common items, show interior capacity clearly, specify max laptop size in title.</div>
+            </div>
+            <div class="pain-card">
+                <div class="card-header">
+                    <span class="card-title">Lack of Security/Closure</span>
+                    <span class="card-badge badge-high">76 mentions</span>
+                </div>
+                <div class="card-quote">"No way to secure the bag closed. Items fall out when I lean over. Wish it had a zipper or magnetic snap."</div>
+                <div class="card-solution"><strong>Solution:</strong> Add closure options (zipper top, magnetic snap, drawstring), position pocket openings more securely.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="insight-box" style="margin-top: 30px;">
+        <strong>💡 Key Insight:</strong> The top 3 pain points (quality, straps, zippers) account for 603 mentions - over 76% of critical issues. Addressing these construction fundamentals would dramatically improve satisfaction. Many reviewers note these bags "look great but don't last," indicating a quality-perception gap.
+    </div>
+</section>
+\n
+<section id="segments" class="section">
+    <div class="section-header">
+        <span class="section-label">Part 3</span>
+        <h2 class="section-title">Customer Segments</h2>
+        <p class="section-subtitle">Distinct buyer groups identified from 2849 reviews</p>
+    </div>
+    <div class="segment-grid">
+        <div class="segment-card">
+            <div class="card-header">
+                <span class="card-title">Professional Workers</span>
+                <span class="card-badge badge-count">377 reviews</span>
+            </div>
+            <div class="card-jobs">
+                <strong>Jobs to Be Done:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Functional:</strong> Transport laptop, documents, and personal items between home and office</li>
+                    <li><strong>Emotional:</strong> Feel organized and put-together during work day</li>
+                    <li><strong>Social:</strong> Project professional, polished image to colleagues and clients</li>
+                </ul>
+            </div>
+        </div>
+        <div class="segment-card">
+            <div class="card-header">
+                <span class="card-title">Teachers/Educators</span>
+                <span class="card-badge badge-count">143 reviews</span>
+            </div>
+            <div class="card-jobs">
+                <strong>Jobs to Be Done:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Functional:</strong> Carry teaching materials, laptop, lunch, and personal items all day</li>
+                    <li><strong>Emotional:</strong> Reduce daily stress of managing multiple bags and items</li>
+                    <li><strong>Social:</strong> Look approachable and professional to students and parents</li>
+                </ul>
+            </div>
+        </div>
+        <div class="segment-card">
+            <div class="card-header">
+                <span class="card-title">Students</span>
+                <span class="card-badge badge-count">128 reviews</span>
+            </div>
+            <div class="card-jobs">
+                <strong>Jobs to Be Done:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Functional:</strong> Transport laptop, textbooks, and supplies to classes</li>
+                    <li><strong>Emotional:</strong> Feel confident and stylish on campus</li>
+                    <li><strong>Social:</strong> Fit in with peers while expressing personal style</li>
+                </ul>
+            </div>
+        </div>
+        <div class="segment-card">
+            <div class="card-header">
+                <span class="card-title">Travelers</span>
+                <span class="card-badge badge-count">87 reviews</span>
+            </div>
+            <div class="card-jobs">
+                <strong>Jobs to Be Done:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Functional:</strong> Serve as personal item under airplane seat with essentials accessible</li>
+                    <li><strong>Emotional:</strong> Feel prepared and reduce travel anxiety</li>
+                    <li><strong>Social:</strong> Look like a savvy, organized traveler</li>
+                </ul>
+            </div>
+        </div>
+        <div class="segment-card">
+            <div class="card-header">
+                <span class="card-title">Nurses/Healthcare Workers</span>
+                <span class="card-badge badge-count">64 reviews</span>
+            </div>
+            <div class="card-jobs">
+                <strong>Jobs to Be Done:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Functional:</strong> Carry scrubs, lunch, laptop, and personal items to/from shifts</li>
+                    <li><strong>Emotional:</strong> Have reliable, easy-to-clean bag for demanding workdays</li>
+                    <li><strong>Social:</strong> Maintain professional appearance despite long, messy shifts</li>
+                </ul>
+            </div>
+        </div>
+        <div class="segment-card">
+            <div class="card-header">
+                <span class="card-title">Moms/Parents</span>
+                <span class="card-badge badge-count">91 reviews</span>
+            </div>
+            <div class="card-jobs">
+                <strong>Jobs to Be Done:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Functional:</strong> Carry family essentials (snacks, diapers, etc.) plus personal work items</li>
+                    <li><strong>Emotional:</strong> Feel like more than "just a parent" - maintain personal identity</li>
+                    <li><strong>Social:</strong> Look stylish while being practical for family life</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="insight-box">
+        <strong>💡 Key Insight:</strong> Professional workers dominate at 377 reviews (13% of total), yet keyword data shows "teacher bag" has 60K monthly searches - suggesting teachers are actively searching but may not be the largest buyer group. Consider segment-specific listings or marketing to capture high-intent teacher searches.
+    </div>
+</section>
+\n
+<section id="features" class="section">
+    <div class="section-header">
+        <span class="section-label">Part 4</span>
+        <h2 class="section-title">Targeted Features by Segment</h2>
+        <p class="section-subtitle">Segment-specific feature opportunities</p>
+    </div>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="card-header">
+                <span class="card-title">Professional Workers: Commuter-Optimized Design</span>
+                <span class="card-badge badge-high">High Impact</span>
+            </div>
+            <div class="card-features">
+                <strong>Why:</strong> Professionals commute daily and need comfort. Reviews mention shoulder pain from heavy loads and long walks from parking/transit.
+                <br><br>
+                <strong>Features:</strong> Padded, non-slip shoulder straps; back panel with ergonomic cushioning; trolley sleeve for rolling luggage attachment; reflective strips for dark commutes.
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="card-header">
+                <span class="card-title">Teachers: Extended Organization System</span>
+                <span class="card-badge badge-high">High Impact</span>
+            </div>
+            <div class="card-features">
+                <strong>Why:</strong> Teachers carry diverse items (papers, supplies, lunch, personal items) and need quick access throughout day without rummaging.
+                <br><br>
+                <strong>Features:</strong> Color-coded interior pockets; pen/marker holders; quick-access front pocket for phone/keys; insulated lunch compartment; side pocket for water bottle; document dividers.
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="card-header">
+                <span class="card-title">Students: Budget Durability</span>
+                <span class="card-badge badge-high">High Impact</span>
+            </div>
+            <div class="card-features">
+                <strong>Why:</strong> Students need bags that last through heavy daily use but have limited budgets. Reviews show quality issues are deal-breakers for this segment.
+                <br><br>
+                <strong>Features:</strong> Reinforced bottom panel; double-stitched high-stress areas; water-resistant coating (protect against weather/spills); lifetime warranty option.
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="card-header">
+                <span class="card-title">Travelers: TSA-Friendly Features</span>
+                <span class="card-badge badge-medium">Medium Impact</span>
+            </div>
+            <div class="card-features">
+                <strong>Why:</strong> Travelers need easy access during security and gate checks. Reviews mention frustration with buried laptops and accessories.
+                <br><br>
+                <strong>Features:</strong> Lay-flat laptop compartment (TSA checkpoint-friendly); exterior pocket for boarding pass/ID; fits under airline seats; luggage tag holder.
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="card-header">
+                <span class="card-title">Healthcare Workers: Easy-Clean Materials</span>
+                <span class="card-badge badge-medium">Medium Impact</span>
+            </div>
+            <div class="card-features">
+                <strong>Why:</strong> Healthcare workers face exposure to germs and spills. Need bags that can be quickly sanitized without damage.
+                <br><br>
+                <strong>Features:</strong> Wipeable/washable interior and exterior; antimicrobial fabric treatment; waterproof bottom; separate compartment for soiled items.
+            </div>
+        </div>
+        <div class="feature-card">
+            <div class="card-header">
+                <span class="card-title">Parents: Hybrid Diaper Bag Design</span>
+                <span class="card-badge badge-medium">Medium Impact</span>
+            </div>
+            <div class="card-features">
+                <strong>Why:</strong> Parents want professional-looking bags that secretly function as diaper bags. Reviews show parents love "doesn't look like a diaper bag."
+                <br><br>
+                <strong>Features:</strong> Insulated bottle pockets (for both baby bottles and adult beverages); changing pad attachment; stroller straps; wipe-clean lining; disguised as professional tote.
+            </div>
+        </div>
+    </div>
+    <div class="insight-box">
+        <strong>💡 Key Insight:</strong> Each segment has distinct needs, but several features cross segments: organization (teachers + parents), durability (students + healthcare), comfort (professionals + teachers). A modular accessory system could let buyers customize one base bag for their specific needs.
+    </div>
+</section>
+\n
+<section id="innovations" class="section">
+    <div class="section-header">
+        <span class="section-label">Part 5</span>
+        <h2 class="section-title">Product Innovation Opportunities</h2>
+        <p class="section-subtitle">Novel product concepts based on review insights and market gaps</p>
+    </div>
+    <div class="innovation-grid">
+        <div class="innovation-card">
+            <div class="card-header">
+                <span class="card-title">The "Transformer" Tote</span>
+                <span class="card-badge badge-high">High Uniqueness</span>
+            </div>
+            <div class="card-description">
+                <strong>Concept:</strong> Modular tote with removable/reconfigurable compartments that adapt to daily needs.
+                <br><br>
+                <strong>Why It Works:</strong> Reviews show people want ONE bag for multiple contexts ("work and gym," "professional but doubles as diaper bag"). Current solutions require multiple bags.
+                <br><br>
+                <strong>Key Features:</strong> Detachable insulated lunch compartment, removable laptop sleeve (turns bag into casual tote), zip-away diaper changing station, adjustable interior dividers with velcro. Market as "5 bags in 1."
+            </div>
+        </div>
+        <div class="innovation-card">
+            <div class="card-header">
+                <span class="card-title">The "Weight Watch" Collection</span>
+                <span class="card-badge badge-high">High Uniqueness</span>
+            </div>
+            <div class="card-description">
+                <strong>Concept:</strong> Ultra-lightweight laptop totes (under 1 lb empty) with weight limit indicators.
+                <br><br>
+                <strong>Why It Works:</strong> 118 reviews complain about weight when loaded. Current market focuses on capacity, not weight management. Target: office workers with long commutes.
+                <br><br>
+                <strong>Key Features:</strong> Ripstop nylon or packable material, integrated weight sensor strip that changes color when bag exceeds healthy carrying weight (per ergonomic guidelines), compression straps to reduce bulk.
+            </div>
+        </div>
+        <div class="innovation-card">
+            <div class="card-header">
+                <span class="card-title">"Glide-Strap" Technology</span>
+                <span class="card-badge badge-high">High Uniqueness</span>
+            </div>
+            <div class="card-description">
+                <strong>Concept:</strong> Patent-pending strap system that prevents shoulder slippage - the #2 pain point.
+                <br><br>
+                <strong>Why It Works:</strong> 184 reviews mention sliding straps. No current solution addresses this effectively. Could become signature feature differentiator.
+                <br><br>
+                <strong>Key Features:</strong> Silicone grip strips that only activate under weight (prevent slipping but don't stick to clothing), adjustable angle attachments to fit different body types, convertible to crossbody to distribute weight.
+            </div>
+        </div>
+        <div class="innovation-card">
+            <div class="card-header">
+                <span class="card-title">The "Confidence Warranty" Program</span>
+                <span class="card-badge badge-medium">Medium Uniqueness</span>
+            </div>
+            <div class="card-description">
+                <strong>Concept:</strong> Lifetime repair/replacement guarantee specifically for the top 3 failure points (handles, zippers, straps).
+                <br><br>
+                <strong>Why It Works:</strong> Quality concerns are the #1 complaint (267 mentions). A warranty that addresses SPECIFIC pain points shows manufacturer confidence and reduces purchase anxiety.
+                <br><br>
+                <strong>Key Features:</strong> Free repair of stitching, zipper, or strap issues within 5 business days. Marketing angle: "We guarantee the parts customers care about most." Could become strong brand differentiator.
+            </div>
+        </div>
+        <div class="innovation-card">
+            <div class="card-header">
+                <span class="card-title">The "Show & Tell" Sizing System</span>
+                <span class="card-badge badge-medium">Medium Uniqueness</span>
+            </div>
+            <div class="card-description">
+                <strong>Concept:</strong> Standardized product photos showing bag filled with common items in multiple configurations.
+                <br><br>
+                <strong>Why It Works:</strong> 94 reviews mention size misrepresentation. Current listings show empty bags or vague "lifestyle" shots. Buyers want to see capacity with THEIR items.
+                <br><br>
+                <strong>Key Features:</strong> Photo sets: "Teacher Setup" (notebooks, lunch, supplies), "Commuter Setup" (laptop, charger, lunch), "Travel Setup" (toiletries, electronics). Include item checklist overlay. Revolutionary transparency in sizing.
+            </div>
+        </div>
+        <div class="innovation-card">
+            <div class="card-header">
+                <span class="card-title">The "Professional Gym" Hybrid</span>
+                <span class="card-badge badge-medium">Medium Uniqueness</span>
+            </div>
+            <div class="card-description">
+                <strong>Concept:</strong> Professional-looking tote with hidden gym shoe compartment and moisture barriers.
+                <br><br>
+                <strong>Why It Works:</strong> Reviews show people want to go "work → gym → dinner" without multiple bags. Current gym bags look too casual for office; work bags can't handle gym gear hygiene.
+                <br><br>
+                <strong>Key Features:</strong> Hidden ventilated shoe compartment (bottom access), moisture-proof divider for sweaty workout clothes, removable interior that can be washed, looks like executive leather tote from outside.
+            </div>
+        </div>
+    </div>
+    <div class="insight-box">
+        <strong>💡 Key Insight:</strong> The strongest innovations address the intersection of high pain points and unmet segment needs. "Transformer Tote" and "Glide-Strap" directly solve top complaints while being unique enough to command premium pricing. "Weight Watch" and "Professional Gym" tap into specific unserved use cases with strong review evidence.
+    </div>
+</section>
+
+    </div>
+
+    <div class="footer">
+        <p><strong>Professional Laptop Bag Analysis</strong></p>
+        <p>Generated from 2849 verified customer reviews and 526+ search keywords</p>
+        <p style="margin-top: 12px;">February 04, 2026 | Bender Brands</p>
+    </div>
+
+    <script>
+    const clusterData = {"top_volume": [{"name": "Bag", "total_volume": 2168734, "count": 251, "keywords": [{"keyword": "tote bag for women", "volume": 397696}, {"keyword": "bible bag", "volume": 216045}, {"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "work bag", "volume": 192832}, {"keyword": "lovevook tote bag", "volume": 71403}, {"keyword": "teacher bag", "volume": 59680}, {"keyword": "tote bag for work", "volume": 47286}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "womens tote bag", "volume": 37614}, {"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "leather tote bag", "volume": 34972}, {"keyword": "work tote bag", "volume": 34823}, {"keyword": "laptop tote bag", "volume": 32349}, {"keyword": "black tote bag", "volume": 31639}, {"keyword": "womens work bag", "volume": 31504}]}, {"name": "Women", "total_volume": 1926683, "count": 250, "keywords": [{"keyword": "tote bag for women", "volume": 397696}, {"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "work bags for women", "volume": 175304}, {"keyword": "bags for women", "volume": 168441}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "women's tote handbags", "volume": 29585}, {"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "bag for women", "volume": 24376}, {"keyword": "tote bags women", "volume": 24196}, {"keyword": "tote purse for women", "volume": 22941}, {"keyword": "large purses for women", "volume": 22097}]}, {"name": "Work", "total_volume": 1014893, "count": 171, "keywords": [{"keyword": "work bag", "volume": 192832}, {"keyword": "work bags for women", "volume": 175304}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "work tote", "volume": 57983}, {"keyword": "tote bag for work", "volume": 47286}, {"keyword": "work tote bag", "volume": 34823}, {"keyword": "womens work bag", "volume": 31504}, {"keyword": "work bags", "volume": 21789}, {"keyword": "work bag with lunch compartment", "volume": 21211}, {"keyword": "tote bag for women work", "volume": 17375}, {"keyword": "work bag for women", "volume": 16746}, {"keyword": "work purse", "volume": 12817}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "bag for work", "volume": 11297}, {"keyword": "work purse for women", "volume": 10855}]}, {"name": "Bags", "total_volume": 848386, "count": 114, "keywords": [{"keyword": "work bags for women", "volume": 175304}, {"keyword": "bags for women", "volume": 168441}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "tote bags women", "volume": 24196}, {"keyword": "work bags", "volume": 21789}, {"keyword": "computer bags for women", "volume": 17775}, {"keyword": "office bags for women", "volume": 16308}, {"keyword": "laptop bags for women", "volume": 15668}, {"keyword": "totes bags for women", "volume": 14409}, {"keyword": "women's tote bags", "volume": 14200}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "work bags for women tote", "volume": 10168}, {"keyword": "large work tote bags for women", "volume": 9011}]}, {"name": "Laptop", "total_volume": 625830, "count": 91, "keywords": [{"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "laptop tote bag", "volume": 32349}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "laptop tote", "volume": 26157}, {"keyword": "laptop purse", "volume": 23133}, {"keyword": "leather laptop bag", "volume": 21337}, {"keyword": "womens laptop bag", "volume": 17515}, {"keyword": "laptop purse for women", "volume": 15859}, {"keyword": "laptop bags for women", "volume": 15668}, {"keyword": "lovevook laptop bag", "volume": 14401}, {"keyword": "leather laptop bag for women", "volume": 8440}, {"keyword": "cute laptop bag", "volume": 8291}, {"keyword": "laptop work bags for women", "volume": 6794}, {"keyword": "lovelook laptop bag for women", "volume": 6256}]}, {"name": "Purse", "total_volume": 277028, "count": 53, "keywords": [{"keyword": "tote purse", "volume": 47822}, {"keyword": "large purse", "volume": 27323}, {"keyword": "laptop purse", "volume": 23133}, {"keyword": "tote purse for women", "volume": 22941}, {"keyword": "big purse", "volume": 18080}, {"keyword": "laptop purse for women", "volume": 15859}, {"keyword": "tote bag purse", "volume": 15510}, {"keyword": "work purse", "volume": 12817}, {"keyword": "womens tote purse", "volume": 11516}, {"keyword": "work purse for women", "volume": 10855}, {"keyword": "purse tote", "volume": 8062}, {"keyword": "womens tote bag purse", "volume": 5497}, {"keyword": "large tote purse", "volume": 5331}, {"keyword": "black tote purse", "volume": 4727}, {"keyword": "womens large purse", "volume": 4062}]}, {"name": "Lovevook", "total_volume": 232013, "count": 16, "keywords": [{"keyword": "lovevook", "volume": 80726}, {"keyword": "lovevook tote bag", "volume": 71403}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "lovevook bag", "volume": 15416}, {"keyword": "lovevook laptop bag", "volume": 14401}, {"keyword": "lovevook tote", "volume": 4769}, {"keyword": "lovevook laptop tote bag", "volume": 3731}, {"keyword": "lovevook laptop bags", "volume": 2557}, {"keyword": "lovevook bags", "volume": 2452}, {"keyword": "lovevook laptop tote bag for women", "volume": 2103}, {"keyword": "lovevook tote bag for women", "volume": 2072}, {"keyword": "lovevook tote bags", "volume": 2033}, {"keyword": "lovevook tote bag laptop", "volume": 752}, {"keyword": "lovevook computer bag", "volume": 250}, {"keyword": "lovevook handbags for women", "volume": 250}]}, {"name": "Large", "total_volume": 225426, "count": 73, "keywords": [{"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "large purse", "volume": 27323}, {"keyword": "large purses for women", "volume": 22097}, {"keyword": "large work tote bags for women", "volume": 9011}, {"keyword": "large work tote bag for women", "volume": 8377}, {"keyword": "large bags for women", "volume": 7536}, {"keyword": "large leather tote bag for women", "volume": 6891}, {"keyword": "large handbags for women", "volume": 6459}, {"keyword": "large work bag", "volume": 5914}, {"keyword": "large tote purse", "volume": 5331}, {"keyword": "large leather tote bag", "volume": 4215}, {"keyword": "womens large purse", "volume": 4062}, {"keyword": "large laptop tote bag for women", "volume": 4038}, {"keyword": "large shoulder bags for women", "volume": 3688}, {"keyword": "large work bags for women", "volume": 3617}]}, {"name": "Womens", "total_volume": 224006, "count": 52, "keywords": [{"keyword": "womens tote bag", "volume": 37614}, {"keyword": "womens work bag", "volume": 31504}, {"keyword": "womens laptop bag", "volume": 17515}, {"keyword": "womens bag", "volume": 13571}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "womens tote purse", "volume": 11516}, {"keyword": "womens work tote bag", "volume": 7666}, {"keyword": "womens tote", "volume": 7588}, {"keyword": "womens work tote", "volume": 7518}, {"keyword": "womens briefcase", "volume": 6258}, {"keyword": "womens tote bag purse", "volume": 5497}, {"keyword": "womens tote bags", "volume": 5402}, {"keyword": "womens large purse", "volume": 4062}, {"keyword": "womens totes bags", "volume": 4007}, {"keyword": "womens work bags professional tote", "volume": 3441}]}, {"name": "Leather", "total_volume": 191116, "count": 62, "keywords": [{"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "leather tote bag", "volume": 34972}, {"keyword": "leather laptop bag", "volume": 21337}, {"keyword": "leather tote", "volume": 16232}, {"keyword": "leather laptop bag for women", "volume": 8440}, {"keyword": "large leather tote bag for women", "volume": 6891}, {"keyword": "tote bag leather", "volume": 6124}, {"keyword": "leather work bag", "volume": 4832}, {"keyword": "large leather tote bag", "volume": 4215}, {"keyword": "leather work bags for women", "volume": 3809}, {"keyword": "leather tote bag with zipper", "volume": 3453}, {"keyword": "large leather purse", "volume": 3046}, {"keyword": "laptop bag leather", "volume": 2833}, {"keyword": "leather work tote bags for women", "volume": 2414}, {"keyword": "leather computer bag", "volume": 2338}]}, {"name": "Teacher", "total_volume": 89996, "count": 3, "keywords": [{"keyword": "teacher bag", "volume": 59680}, {"keyword": "teacher tote bag", "volume": 27676}, {"keyword": "teacher tote bag with laptop compartment", "volume": 2640}]}, {"name": "Computer", "total_volume": 84826, "count": 20, "keywords": [{"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "computer bags for women", "volume": 17775}, {"keyword": "computer bag for women", "volume": 6260}, {"keyword": "computer tote bag for women", "volume": 6062}, {"keyword": "computer bags", "volume": 5518}, {"keyword": "computer tote bag", "volume": 3548}, {"keyword": "leather computer bag", "volume": 2338}, {"keyword": "womens computer bag", "volume": 2334}, {"keyword": "computer tote", "volume": 1943}, {"keyword": "computer purse bags for women", "volume": 1865}, {"keyword": "womens computer bags for laptops", "volume": 1802}, {"keyword": "womens computer tote bags for work", "volume": 1603}, {"keyword": "large computer bag", "volume": 1519}, {"keyword": "women computer bag", "volume": 1079}, {"keyword": "kate spade computer bag", "volume": 585}]}], "top_count": [{"name": "Bag", "total_volume": 2168734, "count": 251, "keywords": [{"keyword": "tote bag for women", "volume": 397696}, {"keyword": "bible bag", "volume": 216045}, {"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "work bag", "volume": 192832}, {"keyword": "lovevook tote bag", "volume": 71403}, {"keyword": "teacher bag", "volume": 59680}, {"keyword": "tote bag for work", "volume": 47286}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "womens tote bag", "volume": 37614}, {"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "leather tote bag", "volume": 34972}, {"keyword": "work tote bag", "volume": 34823}, {"keyword": "laptop tote bag", "volume": 32349}, {"keyword": "black tote bag", "volume": 31639}, {"keyword": "womens work bag", "volume": 31504}]}, {"name": "Women", "total_volume": 1926683, "count": 250, "keywords": [{"keyword": "tote bag for women", "volume": 397696}, {"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "work bags for women", "volume": 175304}, {"keyword": "bags for women", "volume": 168441}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "women's tote handbags", "volume": 29585}, {"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "bag for women", "volume": 24376}, {"keyword": "tote bags women", "volume": 24196}, {"keyword": "tote purse for women", "volume": 22941}, {"keyword": "large purses for women", "volume": 22097}]}, {"name": "Work", "total_volume": 1014893, "count": 171, "keywords": [{"keyword": "work bag", "volume": 192832}, {"keyword": "work bags for women", "volume": 175304}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "work tote", "volume": 57983}, {"keyword": "tote bag for work", "volume": 47286}, {"keyword": "work tote bag", "volume": 34823}, {"keyword": "womens work bag", "volume": 31504}, {"keyword": "work bags", "volume": 21789}, {"keyword": "work bag with lunch compartment", "volume": 21211}, {"keyword": "tote bag for women work", "volume": 17375}, {"keyword": "work bag for women", "volume": 16746}, {"keyword": "work purse", "volume": 12817}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "bag for work", "volume": 11297}, {"keyword": "work purse for women", "volume": 10855}]}, {"name": "Bags", "total_volume": 848386, "count": 114, "keywords": [{"keyword": "work bags for women", "volume": 175304}, {"keyword": "bags for women", "volume": 168441}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "tote bags women", "volume": 24196}, {"keyword": "work bags", "volume": 21789}, {"keyword": "computer bags for women", "volume": 17775}, {"keyword": "office bags for women", "volume": 16308}, {"keyword": "laptop bags for women", "volume": 15668}, {"keyword": "totes bags for women", "volume": 14409}, {"keyword": "women's tote bags", "volume": 14200}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "work bags for women tote", "volume": 10168}, {"keyword": "large work tote bags for women", "volume": 9011}]}, {"name": "Laptop", "total_volume": 625830, "count": 91, "keywords": [{"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "laptop tote bag", "volume": 32349}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "laptop tote", "volume": 26157}, {"keyword": "laptop purse", "volume": 23133}, {"keyword": "leather laptop bag", "volume": 21337}, {"keyword": "womens laptop bag", "volume": 17515}, {"keyword": "laptop purse for women", "volume": 15859}, {"keyword": "laptop bags for women", "volume": 15668}, {"keyword": "lovevook laptop bag", "volume": 14401}, {"keyword": "leather laptop bag for women", "volume": 8440}, {"keyword": "cute laptop bag", "volume": 8291}, {"keyword": "laptop work bags for women", "volume": 6794}, {"keyword": "lovelook laptop bag for women", "volume": 6256}]}, {"name": "Large", "total_volume": 225426, "count": 73, "keywords": [{"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "large purse", "volume": 27323}, {"keyword": "large purses for women", "volume": 22097}, {"keyword": "large work tote bags for women", "volume": 9011}, {"keyword": "large work tote bag for women", "volume": 8377}, {"keyword": "large bags for women", "volume": 7536}, {"keyword": "large leather tote bag for women", "volume": 6891}, {"keyword": "large handbags for women", "volume": 6459}, {"keyword": "large work bag", "volume": 5914}, {"keyword": "large tote purse", "volume": 5331}, {"keyword": "large leather tote bag", "volume": 4215}, {"keyword": "womens large purse", "volume": 4062}, {"keyword": "large laptop tote bag for women", "volume": 4038}, {"keyword": "large shoulder bags for women", "volume": 3688}, {"keyword": "large work bags for women", "volume": 3617}]}, {"name": "Leather", "total_volume": 191116, "count": 62, "keywords": [{"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "leather tote bag", "volume": 34972}, {"keyword": "leather laptop bag", "volume": 21337}, {"keyword": "leather tote", "volume": 16232}, {"keyword": "leather laptop bag for women", "volume": 8440}, {"keyword": "large leather tote bag for women", "volume": 6891}, {"keyword": "tote bag leather", "volume": 6124}, {"keyword": "leather work bag", "volume": 4832}, {"keyword": "large leather tote bag", "volume": 4215}, {"keyword": "leather work bags for women", "volume": 3809}, {"keyword": "leather tote bag with zipper", "volume": 3453}, {"keyword": "large leather purse", "volume": 3046}, {"keyword": "laptop bag leather", "volume": 2833}, {"keyword": "leather work tote bags for women", "volume": 2414}, {"keyword": "leather computer bag", "volume": 2338}]}, {"name": "Purse", "total_volume": 277028, "count": 53, "keywords": [{"keyword": "tote purse", "volume": 47822}, {"keyword": "large purse", "volume": 27323}, {"keyword": "laptop purse", "volume": 23133}, {"keyword": "tote purse for women", "volume": 22941}, {"keyword": "big purse", "volume": 18080}, {"keyword": "laptop purse for women", "volume": 15859}, {"keyword": "tote bag purse", "volume": 15510}, {"keyword": "work purse", "volume": 12817}, {"keyword": "womens tote purse", "volume": 11516}, {"keyword": "work purse for women", "volume": 10855}, {"keyword": "purse tote", "volume": 8062}, {"keyword": "womens tote bag purse", "volume": 5497}, {"keyword": "large tote purse", "volume": 5331}, {"keyword": "black tote purse", "volume": 4727}, {"keyword": "womens large purse", "volume": 4062}]}, {"name": "Womens", "total_volume": 224006, "count": 52, "keywords": [{"keyword": "womens tote bag", "volume": 37614}, {"keyword": "womens work bag", "volume": 31504}, {"keyword": "womens laptop bag", "volume": 17515}, {"keyword": "womens bag", "volume": 13571}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "womens tote purse", "volume": 11516}, {"keyword": "womens work tote bag", "volume": 7666}, {"keyword": "womens tote", "volume": 7588}, {"keyword": "womens work tote", "volume": 7518}, {"keyword": "womens briefcase", "volume": 6258}, {"keyword": "womens tote bag purse", "volume": 5497}, {"keyword": "womens tote bags", "volume": 5402}, {"keyword": "womens large purse", "volume": 4062}, {"keyword": "womens totes bags", "volume": 4007}, {"keyword": "womens work bags professional tote", "volume": 3441}]}, {"name": "Purses", "total_volume": 72970, "count": 25, "keywords": [{"keyword": "large purses for women", "volume": 22097}, {"keyword": "big purses for women", "volume": 14699}, {"keyword": "tote purses", "volume": 10318}, {"keyword": "tote purses for women", "volume": 10048}, {"keyword": "big purses", "volume": 3617}, {"keyword": "big purses for women clearance", "volume": 2193}, {"keyword": "womens purses large", "volume": 1485}, {"keyword": "purses for women tote bag", "volume": 996}, {"keyword": "purses for women tote", "volume": 982}, {"keyword": "purses tote", "volume": 977}, {"keyword": "work purses for women laptop", "volume": 964}, {"keyword": "work purses", "volume": 870}, {"keyword": "work purses for women", "volume": 724}, {"keyword": "purses for work", "volume": 250}, {"keyword": "womens work purses", "volume": 250}]}, {"name": "Computer", "total_volume": 84826, "count": 20, "keywords": [{"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "computer bags for women", "volume": 17775}, {"keyword": "computer bag for women", "volume": 6260}, {"keyword": "computer tote bag for women", "volume": 6062}, {"keyword": "computer bags", "volume": 5518}, {"keyword": "computer tote bag", "volume": 3548}, {"keyword": "leather computer bag", "volume": 2338}, {"keyword": "womens computer bag", "volume": 2334}, {"keyword": "computer tote", "volume": 1943}, {"keyword": "computer purse bags for women", "volume": 1865}, {"keyword": "womens computer bags for laptops", "volume": 1802}, {"keyword": "womens computer tote bags for work", "volume": 1603}, {"keyword": "large computer bag", "volume": 1519}, {"keyword": "women computer bag", "volume": 1079}, {"keyword": "kate spade computer bag", "volume": 585}]}, {"name": "Big", "total_volume": 62922, "count": 19, "keywords": [{"keyword": "big purse", "volume": 18080}, {"keyword": "big purses for women", "volume": 14699}, {"keyword": "big bags for women", "volume": 8304}, {"keyword": "big tote bags for women", "volume": 5651}, {"keyword": "big purses", "volume": 3617}, {"keyword": "big purses for women clearance", "volume": 2193}, {"keyword": "purse big", "volume": 2019}, {"keyword": "big handbags for women", "volume": 1852}, {"keyword": "big work bags for women", "volume": 1550}, {"keyword": "big bag for women", "volume": 928}, {"keyword": "big purse for women", "volume": 904}, {"keyword": "big tote purse", "volume": 844}, {"keyword": "big work bag", "volume": 781}, {"keyword": "big purse for work", "volume": 250}, {"keyword": "big bags for women tote bag", "volume": 250}]}], "identity": [{"name": "Women", "total_volume": 1926683, "count": 250, "keywords": [{"keyword": "tote bag for women", "volume": 397696}, {"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "work bags for women", "volume": 175304}, {"keyword": "bags for women", "volume": 168441}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "women's tote handbags", "volume": 29585}, {"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "bag for women", "volume": 24376}, {"keyword": "tote bags women", "volume": 24196}, {"keyword": "tote purse for women", "volume": 22941}, {"keyword": "large purses for women", "volume": 22097}]}, {"name": "Womens", "total_volume": 224006, "count": 52, "keywords": [{"keyword": "womens tote bag", "volume": 37614}, {"keyword": "womens work bag", "volume": 31504}, {"keyword": "womens laptop bag", "volume": 17515}, {"keyword": "womens bag", "volume": 13571}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "womens tote purse", "volume": 11516}, {"keyword": "womens work tote bag", "volume": 7666}, {"keyword": "womens tote", "volume": 7588}, {"keyword": "womens work tote", "volume": 7518}, {"keyword": "womens briefcase", "volume": 6258}, {"keyword": "womens tote bag purse", "volume": 5497}, {"keyword": "womens tote bags", "volume": 5402}, {"keyword": "womens large purse", "volume": 4062}, {"keyword": "womens totes bags", "volume": 4007}, {"keyword": "womens work bags professional tote", "volume": 3441}]}, {"name": "Teacher", "total_volume": 89996, "count": 3, "keywords": [{"keyword": "teacher bag", "volume": 59680}, {"keyword": "teacher tote bag", "volume": 27676}, {"keyword": "teacher tote bag with laptop compartment", "volume": 2640}]}, {"name": "Compartment", "total_volume": 39962, "count": 11, "keywords": [{"keyword": "work bag with lunch compartment", "volume": 21211}, {"keyword": "tote bag with laptop compartment", "volume": 4472}, {"keyword": "work bag with laptop compartment", "volume": 3047}, {"keyword": "work tote with laptop compartment", "volume": 2899}, {"keyword": "teacher tote bag with laptop compartment", "volume": 2640}, {"keyword": "womens work bag with laptop compartment", "volume": 1734}, {"keyword": "purse with laptop compartment", "volume": 1579}, {"keyword": "tote with laptop compartment", "volume": 1230}, {"keyword": "tote bag laptop compartment", "volume": 650}, {"keyword": "totes with laptop compartment", "volume": 250}, {"keyword": "tote bag with computer compartment", "volume": 250}]}], "feature": [{"name": "Large", "total_volume": 225426, "count": 73, "keywords": [{"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "large purse", "volume": 27323}, {"keyword": "large purses for women", "volume": 22097}, {"keyword": "large work tote bags for women", "volume": 9011}, {"keyword": "large work tote bag for women", "volume": 8377}, {"keyword": "large bags for women", "volume": 7536}, {"keyword": "large leather tote bag for women", "volume": 6891}, {"keyword": "large handbags for women", "volume": 6459}, {"keyword": "large work bag", "volume": 5914}, {"keyword": "large tote purse", "volume": 5331}, {"keyword": "large leather tote bag", "volume": 4215}, {"keyword": "womens large purse", "volume": 4062}, {"keyword": "large laptop tote bag for women", "volume": 4038}, {"keyword": "large shoulder bags for women", "volume": 3688}, {"keyword": "large work bags for women", "volume": 3617}]}, {"name": "Leather", "total_volume": 191116, "count": 62, "keywords": [{"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "leather tote bag", "volume": 34972}, {"keyword": "leather laptop bag", "volume": 21337}, {"keyword": "leather tote", "volume": 16232}, {"keyword": "leather laptop bag for women", "volume": 8440}, {"keyword": "large leather tote bag for women", "volume": 6891}, {"keyword": "tote bag leather", "volume": 6124}, {"keyword": "leather work bag", "volume": 4832}, {"keyword": "large leather tote bag", "volume": 4215}, {"keyword": "leather work bags for women", "volume": 3809}, {"keyword": "leather tote bag with zipper", "volume": 3453}, {"keyword": "large leather purse", "volume": 3046}, {"keyword": "laptop bag leather", "volume": 2833}, {"keyword": "leather work tote bags for women", "volume": 2414}, {"keyword": "leather computer bag", "volume": 2338}]}, {"name": "Big", "total_volume": 62922, "count": 19, "keywords": [{"keyword": "big purse", "volume": 18080}, {"keyword": "big purses for women", "volume": 14699}, {"keyword": "big bags for women", "volume": 8304}, {"keyword": "big tote bags for women", "volume": 5651}, {"keyword": "big purses", "volume": 3617}, {"keyword": "big purses for women clearance", "volume": 2193}, {"keyword": "purse big", "volume": 2019}, {"keyword": "big handbags for women", "volume": 1852}, {"keyword": "big work bags for women", "volume": 1550}, {"keyword": "big bag for women", "volume": 928}, {"keyword": "big purse for women", "volume": 904}, {"keyword": "big tote purse", "volume": 844}, {"keyword": "big work bag", "volume": 781}, {"keyword": "big purse for work", "volume": 250}, {"keyword": "big bags for women tote bag", "volume": 250}]}], "other": [{"name": "Bag", "total_volume": 2168734, "count": 251, "keywords": [{"keyword": "tote bag for women", "volume": 397696}, {"keyword": "bible bag", "volume": 216045}, {"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "work bag", "volume": 192832}, {"keyword": "lovevook tote bag", "volume": 71403}, {"keyword": "teacher bag", "volume": 59680}, {"keyword": "tote bag for work", "volume": 47286}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "womens tote bag", "volume": 37614}, {"keyword": "leather tote bag for women", "volume": 35683}, {"keyword": "leather tote bag", "volume": 34972}, {"keyword": "work tote bag", "volume": 34823}, {"keyword": "laptop tote bag", "volume": 32349}, {"keyword": "black tote bag", "volume": 31639}, {"keyword": "womens work bag", "volume": 31504}]}, {"name": "Work", "total_volume": 1014893, "count": 171, "keywords": [{"keyword": "work bag", "volume": 192832}, {"keyword": "work bags for women", "volume": 175304}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "work tote", "volume": 57983}, {"keyword": "tote bag for work", "volume": 47286}, {"keyword": "work tote bag", "volume": 34823}, {"keyword": "womens work bag", "volume": 31504}, {"keyword": "work bags", "volume": 21789}, {"keyword": "work bag with lunch compartment", "volume": 21211}, {"keyword": "tote bag for women work", "volume": 17375}, {"keyword": "work bag for women", "volume": 16746}, {"keyword": "work purse", "volume": 12817}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "bag for work", "volume": 11297}, {"keyword": "work purse for women", "volume": 10855}]}, {"name": "Bags", "total_volume": 848386, "count": 114, "keywords": [{"keyword": "work bags for women", "volume": 175304}, {"keyword": "bags for women", "volume": 168441}, {"keyword": "work tote bags for women", "volume": 83467}, {"keyword": "large tote bags for women", "volume": 49886}, {"keyword": "computer bags for laptops for women", "volume": 29345}, {"keyword": "tote bags women", "volume": 24196}, {"keyword": "work bags", "volume": 21789}, {"keyword": "computer bags for women", "volume": 17775}, {"keyword": "office bags for women", "volume": 16308}, {"keyword": "laptop bags for women", "volume": 15668}, {"keyword": "totes bags for women", "volume": 14409}, {"keyword": "women's tote bags", "volume": 14200}, {"keyword": "womens tote bags for work", "volume": 12814}, {"keyword": "work bags for women tote", "volume": 10168}, {"keyword": "large work tote bags for women", "volume": 9011}]}, {"name": "Laptop", "total_volume": 625830, "count": 91, "keywords": [{"keyword": "laptop bag for women", "volume": 203289}, {"keyword": "laptop tote bag for women", "volume": 44057}, {"keyword": "laptop tote bag", "volume": 32349}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "laptop tote", "volume": 26157}, {"keyword": "laptop purse", "volume": 23133}, {"keyword": "leather laptop bag", "volume": 21337}, {"keyword": "womens laptop bag", "volume": 17515}, {"keyword": "laptop purse for women", "volume": 15859}, {"keyword": "laptop bags for women", "volume": 15668}, {"keyword": "lovevook laptop bag", "volume": 14401}, {"keyword": "leather laptop bag for women", "volume": 8440}, {"keyword": "cute laptop bag", "volume": 8291}, {"keyword": "laptop work bags for women", "volume": 6794}, {"keyword": "lovelook laptop bag for women", "volume": 6256}]}, {"name": "Purse", "total_volume": 277028, "count": 53, "keywords": [{"keyword": "tote purse", "volume": 47822}, {"keyword": "large purse", "volume": 27323}, {"keyword": "laptop purse", "volume": 23133}, {"keyword": "tote purse for women", "volume": 22941}, {"keyword": "big purse", "volume": 18080}, {"keyword": "laptop purse for women", "volume": 15859}, {"keyword": "tote bag purse", "volume": 15510}, {"keyword": "work purse", "volume": 12817}, {"keyword": "womens tote purse", "volume": 11516}, {"keyword": "work purse for women", "volume": 10855}, {"keyword": "purse tote", "volume": 8062}, {"keyword": "womens tote bag purse", "volume": 5497}, {"keyword": "large tote purse", "volume": 5331}, {"keyword": "black tote purse", "volume": 4727}, {"keyword": "womens large purse", "volume": 4062}]}, {"name": "Lovevook", "total_volume": 232013, "count": 16, "keywords": [{"keyword": "lovevook", "volume": 80726}, {"keyword": "lovevook tote bag", "volume": 71403}, {"keyword": "lovevook laptop bag for women", "volume": 28848}, {"keyword": "lovevook bag", "volume": 15416}, {"keyword": "lovevook laptop bag", "volume": 14401}, {"keyword": "lovevook tote", "volume": 4769}, {"keyword": "lovevook laptop tote bag", "volume": 3731}, {"keyword": "lovevook laptop bags", "volume": 2557}, {"keyword": "lovevook bags", "volume": 2452}, {"keyword": "lovevook laptop tote bag for women", "volume": 2103}, {"keyword": "lovevook tote bag for women", "volume": 2072}, {"keyword": "lovevook tote bags", "volume": 2033}, {"keyword": "lovevook tote bag laptop", "volume": 752}, {"keyword": "lovevook computer bag", "volume": 250}, {"keyword": "lovevook handbags for women", "volume": 250}]}], "total_keywords": 526, "total_clusters_found": 20};
+
+    function formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+        return num.toString();
+    }
+
+    function renderChart(containerId, data, valueKey, barClass, maxItems = 12) {
+        const container = document.getElementById(containerId);
+        if (!container || !data || data.length === 0) return;
+        const displayData = data.slice(0, maxItems);
+        const maxValue = Math.max(...displayData.map(d => d[valueKey]));
+        container.innerHTML = displayData.map(item => {
+            const percentage = (item[valueKey] / maxValue) * 100;
+            const displayValue = valueKey === 'total_volume' ? formatNumber(item[valueKey]) : item[valueKey];
+            return `<div class="bar-row"><div class="bar-label" onclick="showKeywords('${item.name}', ${JSON.stringify(item.keywords).replace(/"/g, '&quot;')}, ${item.total_volume}, ${item.count})">${item.name}</div><div class="bar-wrapper"><div class="bar ${barClass}" style="width: ${percentage}%">${displayValue}</div></div></div>`;
+        }).join('');
+    }
+
+    function showKeywords(name, keywords, totalVolume, count) {
+        const modal = document.getElementById('keywords-modal');
+        document.getElementById('modal-title').textContent = name + ' Keywords';
+        document.getElementById('modal-stats').innerHTML = `<div class="modal-stat"><div class="modal-stat-value">${formatNumber(totalVolume)}</div><div class="modal-stat-label">Total Search Volume</div></div><div class="modal-stat"><div class="modal-stat-value">${count}</div><div class="modal-stat-label">Keywords</div></div>`;
+        document.getElementById('modal-keywords').innerHTML = keywords.map(kw => `<div class="keyword-item"><span class="keyword-text">${kw.keyword}</span><span class="keyword-volume">${formatNumber(kw.volume)}</span></div>`).join('');
+        modal.style.display = 'block';
+    }
+
+    document.querySelector('.modal-close').onclick = function() { document.getElementById('keywords-modal').style.display = 'none'; };
+    window.onclick = function(event) { if (event.target === document.getElementById('keywords-modal')) { document.getElementById('keywords-modal').style.display = 'none'; } };
+
+    if (clusterData.top_volume) renderChart('chart-volume', clusterData.top_volume, 'total_volume', 'bar-volume');
+    if (clusterData.top_count) renderChart('chart-count', clusterData.top_count, 'count', 'bar-count');
+    if (clusterData.identity) renderChart('chart-identity', clusterData.identity, 'total_volume', 'bar-identity', 4);
+    if (clusterData.feature) renderChart('chart-feature', clusterData.feature, 'total_volume', 'bar-feature', 7);
+    </script>
+</body>
+</html>
