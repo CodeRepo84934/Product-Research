@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids + Baby Magnesium Lotion Customer Analysis Report</title>
+    <style>
+        :root {
+            --primary: #028090;
+            --primary-dark: #026670;
+            --secondary: #00A896;
+            --accent: #02C39A;
+            --dark: #1B263B;
+            --dark-lighter: #2d3e50;
+            --light: #F7F9FC;
+            --light-alt: #EEF2F7;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --text-light: #475569;
+            --muted: #64748B;
+            --danger: #DC2626;
+            --danger-light: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --purple: #7C3AED;
+            --purple-light: #EDE9FE;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif; background: var(--light); color: var(--text); line-height: 1.7; font-size: 16px; }
+        .header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-lighter) 100%); color: white; padding: 60px 20px 80px; text-align: center; position: relative; }
+        .header h1 { font-size: 2.8rem; margin-bottom: 12px; font-weight: 700; }
+        .header .subtitle { color: var(--accent); font-size: 1.3rem; margin-bottom: 8px; }
+        .header .meta { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+        .stat-item { text-align: center; padding: 0 20px; }
+        .stat-number { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 8px; }
+        .nav-container { background: var(--white); border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .nav { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .nav a { padding: 16px 16px; text-decoration: none; color: var(--text-light); font-size: 0.9rem; font-weight: 500; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .nav a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 60px; }
+        .section { background: var(--white); border-radius: 16px; padding: 40px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .section-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--light-alt); }
+        .section-label { display: inline-block; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-title { font-size: 1.8rem; color: var(--dark); font-weight: 700; margin-bottom: 8px; }
+        .section-subtitle { color: var(--muted); font-size: 1.05rem; }
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--dark); color: white; padding: 14px 16px; text-align: left; font-weight: 600; }
+        td { padding: 14px 16px; border-bottom: 1px solid #E2E8F0; }
+        tr:hover td { background: var(--light); }
+        .highlight-zero { color: var(--danger); font-weight: 700; }
+        .insight-box { background: linear-gradient(135deg, var(--warning-light) 0%, #FFF7ED 100%); border-left: 4px solid var(--warning); padding: 20px 24px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .insight-box strong { color: var(--warning); }
+        .pain-point { background: var(--white); border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+        .pain-header { background: var(--danger-light); padding: 16px 20px; display: flex; align-items: center; gap: 15px; }
+        .pain-number { width: 36px; height: 36px; background: var(--danger); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .pain-title { font-size: 1.15rem; font-weight: 700; color: var(--dark); }
+        .pain-title small { font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 8px; }
+        .pain-body { padding: 20px; }
+        .pain-quotes { background: var(--light); padding: 16px 20px; border-radius: 8px; margin-bottom: 16px; }
+        .pain-quotes blockquote { color: var(--text-light); font-style: italic; margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--muted); }
+        .pain-solutions h4 { color: var(--success); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .pain-solutions ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+        .pain-solutions li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.95rem; }
+        .pain-solutions li::before { content: "\2713"; color: var(--success); font-weight: 700; flex-shrink: 0; }
+        .segment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .segment-card { background: var(--white); border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+        .segment-header { background: var(--primary); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .segment-header h4 { font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
+        .segment-badge { background: var(--accent); color: var(--dark); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .segment-body { padding: 20px; }
+        .segment-section { margin-bottom: 16px; }
+        .segment-section:last-child { margin-bottom: 0; }
+        .segment-section h5 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .segment-section ul { list-style: none; }
+        .segment-section li { font-size: 0.9rem; padding: 4px 0; padding-left: 16px; position: relative; }
+        .segment-section li::before { content: "\2022"; position: absolute; left: 0; color: var(--primary); }
+        .features-section { margin-top: 30px; }
+        .features-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .features-title { font-size: 1.2rem; font-weight: 700; color: var(--dark); }
+        .features-list { display: grid; gap: 12px; }
+        .feature-item { display: flex; gap: 12px; padding: 16px; background: var(--light); border-radius: 10px; }
+        .feature-number { width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+        .feature-content strong { display: block; color: var(--dark); margin-bottom: 2px; }
+        .feature-content span { font-size: 0.9rem; color: var(--text-light); }
+        .innovation-card { background: var(--dark); border-radius: 12px; padding: 24px; margin-bottom: 16px; display: flex; gap: 16px; }
+        .innovation-number { width: 40px; height: 40px; background: var(--accent); color: var(--dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .innovation-content h4 { color: white; font-size: 1.15rem; margin-bottom: 10px; }
+        .innovation-content ul { list-style: none; margin-bottom: 12px; }
+        .innovation-content li { color: rgba(255,255,255,0.85); font-size: 0.95rem; padding: 3px 0; padding-left: 20px; position: relative; }
+        .innovation-content li::before { content: "\2192"; position: absolute; left: 0; color: var(--accent); }
+        .patent-tag { display: inline-block; background: var(--purple); color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: 500; }
+        .footer { background: var(--dark); color: white; text-align: center; padding: 40px 20px; margin-top: 40px; }
+        .footer p { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+        .footer p + p { margin-top: 8px; }
+        /* Products Grid */
+        .products-grid-section { background: var(--white); padding: 40px 20px; border-bottom: 1px solid #E2E8F0; }
+        .products-grid-title { text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+        .products-grid-subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 30px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .product-card { background: var(--light); border-radius: 12px; overflow: hidden; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .product-card-img { width: 100%; aspect-ratio: 1; object-fit: contain; background: white; padding: 12px; }
+        .product-card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .product-card-asin { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+        .product-card-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .product-card-title { font-size: 0.8rem; color: var(--text-light); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        /* Keyword Clusters */
+        .keyword-clusters-section { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 50px 20px; color: white; }
+        .keyword-clusters-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 8px; }
+        .clusters-subtitle { text-align: center; color: #a0aec0; margin-bottom: 30px; font-size: 0.95rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-container { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; }
+        .chart-container h3 { font-size: 1rem; margin-bottom: 16px; color: #e2e8f0; text-align: center; }
+        .chart { min-height: 280px; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .bar-label { width: 120px; font-size: 0.75rem; color: #e2e8f0; text-align: right; padding-right: 10px; cursor: pointer; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-label:hover { color: #63b3ed; text-decoration: underline; }
+        .bar-wrapper { flex: 1; background: rgba(255,255,255,0.1); border-radius: 4px; height: 24px; position: relative; overflow: hidden; }
+        .bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; font-weight: 600; color: white; transition: width 0.5s ease; }
+        .bar-volume { background: linear-gradient(90deg, #4299e1, #3182ce); }
+        .bar-count { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+        .bar-identity { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .bar-feature { background: linear-gradient(90deg, #9f7aea, #805ad5); }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; animation: modalSlide 0.3s ease; }
+        @keyframes modalSlide { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #718096; transition: color 0.2s; }
+        .modal-close:hover { color: #e53e3e; }
+        .modal-content h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.4rem; }
+        .modal-stats { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .modal-stat { text-align: center; }
+        .modal-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .modal-stat-label { font-size: 0.75rem; color: var(--muted); }
+        .modal-keywords { max-height: 400px; overflow-y: auto; }
+        .keyword-item { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 6px; margin-bottom: 4px; background: #f7fafc; }
+        .keyword-item:nth-child(odd) { background: #edf2f7; }
+        .keyword-text { color: var(--dark); font-size: 0.9rem; }
+        .keyword-volume { color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+        /* Reddit Insights */
+        .reddit-stats-bar { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
+        .reddit-stat { text-align: center; padding: 16px 24px; background: var(--light); border-radius: 12px; min-width: 120px; }
+        .reddit-stat-number { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
+        .reddit-stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+        .reddit-category { margin-bottom: 16px; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+        .reddit-category-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--light); cursor: pointer; transition: background 0.2s; user-select: none; }
+        .reddit-category-header:hover { background: var(--light-alt); }
+        .reddit-category-title { font-weight: 600; color: var(--dark); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        .reddit-category-count { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; background: var(--primary); color: white; font-weight: 600; }
+        .reddit-chevron { transition: transform 0.3s ease; color: var(--muted); font-size: 1.2rem; }
+        .reddit-category.open .reddit-chevron { transform: rotate(180deg); }
+        .reddit-category-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .reddit-category.open .reddit-category-body { max-height: 5000px; }
+        .reddit-category-content { padding: 20px; }
+        .reddit-subcategory { margin-bottom: 20px; }
+        .reddit-subcategory-title { font-weight: 600; color: var(--dark); font-size: 0.95rem; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #E2E8F0; }
+        .reddit-summary { font-size: 0.9rem; color: var(--text-light); margin-bottom: 12px; padding: 10px 14px; background: var(--success-light); border-radius: 8px; border-left: 3px solid var(--success); }
+        .reddit-quote-card { background: var(--white); border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; position: relative; }
+        .reddit-quote-card::before { content: '\201C'; position: absolute; top: 8px; left: 10px; font-size: 2.5rem; color: var(--primary); opacity: 0.15; font-family: Georgia, serif; line-height: 1; }
+        .reddit-quote-text { font-style: italic; color: var(--text); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; }
+        .reddit-quote-meta { display: flex; gap: 12px; margin-top: 10px; padding-left: 20px; flex-wrap: wrap; }
+        .reddit-subreddit { font-size: 0.75rem; font-weight: 600; color: var(--primary); background: rgba(2, 128, 144, 0.08); padding: 2px 8px; border-radius: 4px; }
+        .reddit-context { font-size: 0.75rem; color: var(--muted); }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .stats-bar { gap: 20px; }
+            .stat-number { font-size: 2.2rem; }
+            .section { padding: 24px; }
+            .section-title { font-size: 1.5rem; }
+            .nav a { padding: 12px 10px; font-size: 0.85rem; }
+            .innovation-card { flex-direction: column; }
+        }
+        @media print { .nav-container { display: none; } .section { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Kids + Baby Magnesium Lotion Customer Analysis Report</h1>
+        <p class="subtitle">Customer Review &amp; Keyword Analysis</p>
+        <p class="meta">Analysis Date: February 11, 2026</p>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">2,212</div>
+                <div class="stat-label">Reviews Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">13</div>
+                <div class="stat-label">Products Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">119</div>
+                <div class="stat-label">Search Keywords</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3.7</div>
+                <div class="stat-label">Avg Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#keyword-clusters">Keywords</a>
+            <a href="#hidden-drivers">Hidden Drivers</a>
+            <a href="#reddit-insights">Reddit</a>
+            <a href="#pain-points">Pain Points</a>
+            <a href="#segments">Customer Segments</a>
+            <a href="#features">Targeted Features</a>
+            <a href="#innovations">Innovations</a>
+        </nav>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid-section">
+        <h2 class="products-grid-title">Analyzed Products</h2>
+        <p class="products-grid-subtitle">Click any product to view on Amazon</p>
+        <div class="products-grid">
+            <a href="https://www.amazon.com/dp/B09CLQF4V5" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09CLQF4V5</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.9&#9733; (104 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09HSJWY4J" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09HSJWY4J</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.8&#9733; (237 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09M7HZ8HY" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09M7HZ8HY</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.2&#9733; (310 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0B2PQYS2R" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0B2PQYS2R</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.7&#9733; (246 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0D98B4NGZ" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0D98B4NGZ</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.4&#9733; (238 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DQHHC1MH" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DQHHC1MH</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">4.2&#9733; (76 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DSSQY43D" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DSSQY43D</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.0&#9733; (106 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DT4P1GPZ" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DT4P1GPZ</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">3.4&#9733; (238 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DTHSKZRN" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DTHSKZRN</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">4.5&#9733; (123 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DZQB59DS" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DZQB59DS</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">4.0&#9733; (169 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0F1KQK5Q1" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0F1KQK5Q1</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">4.0&#9733; (174 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0F1N6WX42" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0F1N6WX42</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">4.7&#9733; (46 ratings)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0F1XPM6QL" target="_blank" class="product-card">
+                <img src="" alt="Kids/Baby Magnesium Lotion" class="product-card-img" onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0F1XPM6QL</span>
+                    <span class="product-card-price">Price N/A</span>
+                    <span class="product-card-title">4.1&#9733; (145 ratings)</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Keyword Clusters Section -->
+    <section id="keyword-clusters" class="keyword-clusters-section">
+        <h2>Search Keyword Clusters</h2>
+        <p class="clusters-subtitle">119 keywords across 75 clusters | 295K total search volume | Click any cluster label to view keywords</p>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>Top Clusters by Total Search Volume</h3>
+                <div id="chart-volume" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Top Clusters by Number of Keywords</h3>
+                <div id="chart-count" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Identity-Based Clusters</h3>
+                <div id="chart-identity" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Feature-Based Clusters</h3>
+                <div id="chart-feature" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keyword Drill-Down Modal -->
+    <div id="keywords-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-title">Keywords</h3>
+            <div id="modal-stats" class="modal-stats"></div>
+            <div id="modal-keywords" class="modal-keywords"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Part 1: Hidden Purchase Drivers -->
+        <section id="hidden-drivers" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 1</span>
+                <h2 class="section-title">Hidden Purchase Drivers</h2>
+                <p class="section-subtitle">Features customers love in reviews but rarely search for &mdash; representing hidden differentiators and marketing opportunities</p>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Review Mentions</th>
+                            <th>Keyword Volume</th>
+                            <th>Opportunity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Calming Effect on Kids</strong></td>
+                            <td>572 reviews</td>
+                            <td>250</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sleep Improvement</strong></td>
+                            <td>1,057 reviews</td>
+                            <td>~44.8K</td>
+                            <td>&#9989; Strong keyword-review alignment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lavender Scent</strong></td>
+                            <td>951 reviews</td>
+                            <td>530</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Texture/Absorption</strong></td>
+                            <td>857 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bedtime Routine</strong></td>
+                            <td>572 reviews</td>
+                            <td>~1.5K</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Growing Pains Relief</strong></td>
+                            <td>198 reviews</td>
+                            <td>~2.1K</td>
+                            <td>&#127919; Medium &mdash; Moderate review signal with some keyword backing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kids/Children Use</strong></td>
+                            <td>1,117 reviews</td>
+                            <td>~114.4K</td>
+                            <td>&#9989; Strong keyword-review alignment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Safe/Gentle Formula</strong></td>
+                            <td>227 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Organic/Natural</strong></td>
+                            <td>227 reviews</td>
+                            <td>250</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Whole Family Use</strong></td>
+                            <td>150 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fast Results</strong></td>
+                            <td>120 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Baby/Infant Use</strong></td>
+                            <td>450 reviews</td>
+                            <td>~23.5K</td>
+                            <td>&#9989; Strong keyword-review alignment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8 Sheep Organics Brand</strong></td>
+                            <td>19 reviews</td>
+                            <td>~24.3K</td>
+                            <td>&#9989; Strong keyword-review alignment</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dosage/Application Guidance</strong></td>
+                            <td>111 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High &mdash; Praised in reviews but rarely searched for directly</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unscented Option</strong></td>
+                            <td>89 reviews</td>
+                            <td>250</td>
+                            <td>&#127919; Medium &mdash; Moderate review signal with some keyword backing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> Calming effect (572 mentions) and texture/absorption quality (857 mentions) are powerful hidden differentiators with zero direct search volume &mdash; parents don&rsquo;t search for these terms but they strongly influence purchase satisfaction. Meanwhile, sleep improvement (1,057 mentions, ~45K keyword volume) is the best-matched driver. The biggest untapped opportunity is age-based dosing guidance (111 mentions, 0 search volume) &mdash; no brand offers it despite universal parent demand confirmed on Reddit.
+            </div>
+        </section>
+
+        <!-- Part 2: Reddit Insights -->
+        <section id="reddit-insights" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 2</span>
+                <h2 class="section-title">Reddit Insights</h2>
+                <p class="section-subtitle">Real discussions from Reddit communities about Kids + Baby Magnesium Lotion</p>
+            </div>
+
+            <div class="reddit-stats-bar">
+                <div class="reddit-stat">
+                    <div class="reddit-stat-number">10</div>
+                    <div class="reddit-stat-label">Research Queries</div>
+                </div>
+                <div class="reddit-stat">
+                    <div class="reddit-stat-number">15</div>
+                    <div class="reddit-stat-label">Subreddits Referenced</div>
+                </div>
+                <div class="reddit-stat">
+                    <div class="reddit-stat-number">28</div>
+                    <div class="reddit-stat-label">Insights Found</div>
+                </div>
+            </div>
+
+            <div class="reddit-category" id="reddit-persona">
+                <div class="reddit-category-header" onclick="toggleReddit('persona')">
+                    <span class="reddit-category-title">
+                        &#128100; By Persona
+                        <span class="reddit-category-count">6 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Parents of Kids with ADHD/Sensory Issues</div>
+                    <div class="reddit-summary">ADHD parenting communities on Reddit are an untapped goldmine for magnesium lotion. Parents of neurodivergent children actively seek non-medication approaches to improve sleep and calm hyperactive nervous systems. Many report that topical magnesium is one of the few supplements their sensory-sensitive kids will tolerate.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">My ADHD kid won't take pills or gummies but actually asks for the magnesium lotion before bed now. It's become part of our wind-down routine.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/ADHD</span>
+                            <span class="reddit-context">Thread on non-medication sleep aids for ADHD kids</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Started using magnesium cream on my son's feet after his OT recommended it. He's falling asleep 20 minutes faster on average.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Autism_Parenting</span>
+                            <span class="reddit-context">Discussion on sensory-friendly supplements</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">The calming effect is real. My daughter with sensory processing disorder actually finds the massage part soothing rather than overstimulating.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Parenting</span>
+                            <span class="reddit-context">Thread on natural approaches for neurodivergent children</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Parents of Babies &amp; Toddlers</div>
+                    <div class="reddit-summary">Baby and toddler parents are the most anxious segment on Reddit. They desperately want magnesium to help with sleep but are terrified about safety, dosing, and skin reactions. The lack of age-specific dosing instructions across all brands is the most frequently cited frustration.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I want to try magnesium lotion on my 6-month-old but every brand just says 'consult your pediatrician' with zero actual guidance on how much to use.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/beyondthebump</span>
+                            <span class="reddit-context">Thread on baby sleep solutions</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Applied a tiny amount to my toddler's feet and she screamed. Had to wash it off immediately. Wish brands made a gentler baby version.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NewParents</span>
+                            <span class="reddit-context">Discussion on magnesium lotion reactions</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">We use Earthley's on our 18-month-old and it's been a game changer for sleep. Started with just the feet and worked up.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">Product recommendations for baby sleep</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Pregnant &amp; Postpartum Moms</div>
+                    <div class="reddit-summary">Pregnant and breastfeeding women are significant crossover buyers of kids' magnesium lotions, choosing them specifically because they perceive kid-safe formulas as safer during pregnancy. Restless legs and muscle cramps during pregnancy are the primary drivers.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I specifically bought the kids' version because I figured if it's safe for babies, it's safe for me while pregnant. The leg cramps at night were unbearable.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/BabyBumps</span>
+                            <span class="reddit-context">Thread on pregnancy leg cramp remedies</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">8 Sheep's pregnancy lotion was a lifesaver for my restless legs. Now I use their kids' version on my toddler too.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Pregnancy</span>
+                            <span class="reddit-context">Discussion on magnesium during pregnancy</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Postpartum sleep is hard enough without leg cramps. The magnesium lotion helps me and now I use it on the baby too.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/beyondthebump</span>
+                            <span class="reddit-context">Postpartum recovery discussion</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reddit-category" id="reddit-feature-request">
+                <div class="reddit-category-header" onclick="toggleReddit('feature-request')">
+                    <span class="reddit-category-title">
+                        &#10024; Feature Requests
+                        <span class="reddit-category-count">6 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Texture &amp; Application Preferences</div>
+                    <div class="reddit-summary">Parents overwhelmingly prefer lotion over spray or oil for kids. Sprays sting, oils are too messy for bedtime, and butters are too thick. The ideal texture is a lightweight, fast-absorbing lotion that doesn't leave residue on sheets.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Tried the spray on my kid and he cried from the stinging. Switched to lotion and it's been fine. Why don't more brands lead with lotion?</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">Comparison of magnesium delivery formats</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">The butter version is way too thick for a bedtime routine. I need something that absorbs in 30 seconds, not 5 minutes.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/moderatelygranolamoms</span>
+                            <span class="reddit-context">Thread on bedtime routine products</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Oil drips everywhere and stains the sheets. Lotion is the only format that works for kids in my experience.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Parenting</span>
+                            <span class="reddit-context">Discussion on magnesium product formats</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Ingredient Combinations</div>
+                    <div class="reddit-summary">Reddit parents actively discuss combining magnesium with other calming ingredients. Lavender + chamomile is the most requested combination. Arnica for growing pains is a strong secondary request. Melatonin as an additive is controversial — most parents prefer to keep it separate.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I'd pay double for a magnesium + arnica combo for growing pains. Right now I'm layering two different products which is ridiculous.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Parenting</span>
+                            <span class="reddit-context">Thread on growing pain remedies</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Lavender chamomile magnesium lotion would be the holy grail bedtime product. Does this exist?</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">Bedtime routine product wishlist</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Please do NOT add melatonin to magnesium lotion. I want to control those doses separately.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/sleeptrain</span>
+                            <span class="reddit-context">Debate on sleep supplement combinations</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Missing Products Parents Want</div>
+                    <div class="reddit-summary">The #1 missing product is a truly baby-safe magnesium lotion with pediatrician endorsement and age-based dosing. Parents are also looking for travel-size options, unscented versions, and growing-pains-specific formulations.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Why doesn't any brand have age-based dosing on the label? Like, 3-6 months use a pea size, 6-12 months use a dime size. It shouldn't be this hard.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/ScienceBasedParenting</span>
+                            <span class="reddit-context">Discussion on magnesium dosing for children</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I need a travel size for the diaper bag. These huge jars don't travel well and I want to keep the bedtime routine going on vacation.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/beyondthebump</span>
+                            <span class="reddit-context">Thread on travel-friendly baby products</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">An unscented option for sensory-sensitive kids would be amazing. My son gags at lavender.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Autism_Parenting</span>
+                            <span class="reddit-context">Sensory-friendly product requests</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reddit-category" id="reddit-pain-point">
+                <div class="reddit-category-header" onclick="toggleReddit('pain-point')">
+                    <span class="reddit-category-title">
+                        &#9888;&#65039; Pain Points
+                        <span class="reddit-category-count">5 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Skin Irritation on Kids</div>
+                    <div class="reddit-summary">Skin irritation and stinging is the #1 concern on Reddit for topical magnesium on children. This is consistently attributed to too-high magnesium concentration. Parents recommend diluting with regular lotion, applying only to feet, or choosing brands with lower concentration.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">The 'tingling' adults feel is straight up painful stinging for kids. Brands need to lower the concentration significantly for children's products.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Magnesium</span>
+                            <span class="reddit-context">Thread on magnesium concentration for kids</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">We dilute our magnesium lotion 50/50 with regular baby lotion. Works great, no irritation. But shouldn't the brand just make it at the right concentration?</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">Workaround for magnesium skin irritation</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Patch test EVERYTHING on your kid first. My daughter's entire leg turned red from a brand that said 'gentle for kids' on the label.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/SkincareAddiction</span>
+                            <span class="reddit-context">Warning about kids' skin reactions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Efficacy Skepticism</div>
+                    <div class="reddit-summary">The science-based parenting community is deeply divided on whether topical magnesium actually absorbs through the skin. This skepticism doesn't kill interest — instead it drives research and discussion that actually increases awareness and leads to purchase trials.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">The evidence for transdermal magnesium absorption is weak at best, but anecdotally my kid sleeps better with it. Placebo or bedtime routine effect? Maybe. Still buying it.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/ScienceBasedParenting</span>
+                            <span class="reddit-context">Debate on topical magnesium efficacy</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Whether it's the magnesium or the massage or the routine, something about applying lotion at bedtime helps. I'll take it.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/sleeptrain</span>
+                            <span class="reddit-context">Thread on what actually helps kids sleep</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Oral magnesium has way better evidence than topical. But try getting a 2-year-old to swallow a supplement. Lotion is the practical choice.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Supplements</span>
+                            <span class="reddit-context">Topical vs oral magnesium discussion</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reddit-category" id="reddit-brand-sentiment">
+                <div class="reddit-category-header" onclick="toggleReddit('brand-sentiment')">
+                    <span class="reddit-category-title">
+                        &#127991;&#65039; Brand Sentiment
+                        <span class="reddit-category-count">6 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Earthley Wellness &mdash; Most Loved</div>
+                    <div class="reddit-summary">Earthley dominates natural parenting Reddit as the go-to magnesium lotion brand. Praised for clean ingredients, good texture, and transparent formulation. Their 'Good Night Lotion' is the most frequently recommended product in kids' sleep threads.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Earthley Good Night Lotion is the gold standard in our house. Clean ingredients, smells nice, and my kids actually like it.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">Brand recommendation thread</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I've tried 5 different magnesium lotions for my toddler. Earthley is the only one that didn't irritate her skin.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/moderatelygranolamoms</span>
+                            <span class="reddit-context">Comparison of kids' magnesium brands</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Earthley is the only brand I trust enough to use on my baby. Their ingredient list is actually clean, not just marketed as clean.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/beyondthebump</span>
+                            <span class="reddit-context">Baby-safe product discussion</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">8 Sheep Organics &mdash; Premium Choice</div>
+                    <div class="reddit-summary">8 Sheep is recognized as the premium option with strong brand loyalty. Their pregnancy lotion created a halo effect that drives trust in the kids' line. High price point is the main criticism, but loyal users consider it worth it.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">8 Sheep is expensive but it's the best quality magnesium lotion I've found. Started with their pregnancy one and now the whole family uses it.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Pregnancy</span>
+                            <span class="reddit-context">Thread on premium natural products</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Their Juniors Bedtime Lotion is wonderful. Soft baby blend scent, good texture. Yes it's pricey but I subscribe and save.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">8 Sheep product review</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I keep going back to 8 Sheep despite trying cheaper alternatives. The quality difference is noticeable.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/moderatelygranolamoms</span>
+                            <span class="reddit-context">Brand loyalty discussion</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Ancient Minerals &mdash; Most Trusted (Not Kid-Specific)</div>
+                    <div class="reddit-summary">Ancient Minerals is the most scientifically-trusted magnesium brand on Reddit overall, but they don't make a kid-specific product. Parents adapt their adult formulations for children, creating a clear market gap for a trusted brand to fill.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Ancient Minerals is what I use on myself but it's way too strong for kids. I dilute it but wish they'd just make a kids' version.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Magnesium</span>
+                            <span class="reddit-context">Thread on adapting adult products for kids</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">If Ancient Minerals made a kids' line I'd buy it instantly. They're the only brand with actual magnesium chloride sourcing transparency.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Supplements</span>
+                            <span class="reddit-context">Brand trust discussion</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Ancient Minerals for me, Earthley for the kids. Would love one brand that serves the whole family.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/NaturalParenting</span>
+                            <span class="reddit-context">Family product recommendations</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reddit-category" id="reddit-new-discovery">
+                <div class="reddit-category-header" onclick="toggleReddit('new-discovery')">
+                    <span class="reddit-category-title">
+                        &#128161; New Discoveries
+                        <span class="reddit-category-count">5 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">ADHD/Neurodivergent Market &mdash; Untapped</div>
+                    <div class="reddit-summary">The ADHD and neurodivergent parenting community represents a massive untapped market. No magnesium lotion brand currently targets or acknowledges this segment, despite high engagement in ADHD forums and strong anecdotal evidence of benefits for calming and sleep.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Nobody is marketing magnesium lotion to ADHD parents and it blows my mind. This is one of the few natural things that actually seems to help my kid wind down.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/ADHD</span>
+                            <span class="reddit-context">Thread on natural ADHD management</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">The ADHD parenting community would go crazy for a sensory-friendly magnesium cream with zero fragrance. Someone please make this.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Autism_Parenting</span>
+                            <span class="reddit-context">Product gap discussion</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Magnesium deficiency is linked to ADHD symptoms. Whether topical absorption works or not, the bedtime routine + massage aspect alone is therapeutic for my neurodivergent kid.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Nootropics</span>
+                            <span class="reddit-context">Magnesium and ADHD research thread</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="reddit-subcategory">
+                    <div class="reddit-subcategory-title">Topical vs Oral Debate Drives Interest</div>
+                    <div class="reddit-summary">Rather than killing demand, the ongoing debate about whether topical magnesium actually absorbs through skin is generating massive awareness and curiosity. Parents who can't get their kids to take oral supplements see topical as the only practical option, debate or not.</div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">I don't care if the science is settled or not. My kid won't take oral magnesium but will sit for a lotion massage. The result is better sleep either way.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Parenting</span>
+                            <span class="reddit-context">Practical parenting perspective on magnesium</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">The topical vs oral debate actually made me try both. Now I give oral magnesium AND use the lotion as part of the bedtime routine. Belt and suspenders approach.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/ScienceBasedParenting</span>
+                            <span class="reddit-context">Discussion on supplement approaches</span>
+                        </div>
+                    </div>
+                    <div class="reddit-quote-card">
+                        <div class="reddit-quote-text">Every time someone posts asking about topical magnesium, the thread gets 200+ comments. The interest is massive regardless of the science debate.</div>
+                        <div class="reddit-quote-meta">
+                            <span class="reddit-subreddit">r/Magnesium</span>
+                            <span class="reddit-context">Meta-observation about community engagement</span>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Reddit Insights:</strong> (1) The ADHD/neurodivergent parenting community is an untapped goldmine &mdash; no brand targets this segment despite high engagement and strong anecdotal evidence. (2) Age-based dosing instructions are the #1 missing feature across every brand, confirmed universally on Reddit. (3) Skin irritation/stinging is the top concern for kids &mdash; parents consistently call for lower magnesium concentration in children&rsquo;s products.
+            </div>
+        </section>
+
+        <!-- Part 3: Pain Points -->
+        <section id="pain-points" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 3</span>
+                <h2 class="section-title">Customer Pain Points &amp; Suggested Improvements</h2>
+                <p class="section-subtitle">Extracted from 772 negative reviews (1-3 stars) across 13 products</p>
+            </div>
+
+            <h3 style="color: var(--danger); margin: 30px 0 20px; font-size: 1.2rem;">Critical Priority (150+ mentions)</h3>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">1</div>
+                    <div class="pain-title">DOESN'T WORK / NO RESULTS <small>(215 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;I really wanted to like this Kids Face Moisturizer, but unfortunately, it didn't work for us. The product itself might be fine (though I never actually got to try it), but the packaging is a major issue. No matter how hard I try, I simply can't get any product out of the bottle. I've tried shaking i&rdquo;</blockquote>
+                        <blockquote>&ldquo;It did not work for my baby. It's a complete waste of money and I can't return it too.&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Include clear usage instructions with expected timeline</li>
+                            <li>recommend 2+ weeks consistent use</li>
+                            <li>suggest applying to feet for best absorption</li>
+                            <li>offer money-back guarantee</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--warning); margin: 30px 0 20px; font-size: 1.2rem;">High Priority (50-150 mentions)</h3>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">2</div>
+                    <div class="pain-title">SKIN IRRITATION/STINGING ON KIDS <small>(58 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;Purchased this to use on my 3mo after her bath time. Read raving reviews that it helps soothe and calm them. I might be the one in a million but the minute this lotion touched my banged skin, she let out the most blood curdling scream. I don’t know what it was. Maybe she’s allergic to an ingredient.&rdquo;</blockquote>
+                        <blockquote>&ldquo;My 10 yo daughter does not have sensitive skin or food allergies - within minutes of using this cream her face was all blotchy and red. We had to wash it off. Although she did like the fragrance. Too bad - we will have to keep looking.&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Lower magnesium concentration for kids formula</li>
+                            <li>add aloe vera and chamomile as soothing buffers</li>
+                            <li>include patch test instructions</li>
+                            <li>offer a sensitive skin variant</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">3</div>
+                    <div class="pain-title">TOO EXPENSIVE / NOT WORTH PRICE <small>(74 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;It did not work for my baby. It's a complete waste of money and I can't return it too.&rdquo;</blockquote>
+                        <blockquote>&ldquo;Didn’t feel good on my hair and its overpriced. Returned.&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Offer multiple sizes including trial/travel size</li>
+                            <li>emphasize cost-per-use</li>
+                            <li>create subscription option for repeat buyers</li>
+                            <li>bundle with complementary products</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--primary); margin: 30px 0 20px; font-size: 1.2rem;">Medium Priority (&lt;50 mentions)</h3>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">4</div>
+                    <div class="pain-title">GREASY/STICKY TEXTURE <small>(39 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;Purchased this to use on my 3mo after her bath time. Read raving reviews that it helps soothe and calm them. I might be the one in a million but the minute this lotion touched my banged skin, she let out the most blood curdling scream. I don’t know what it was. Maybe she’s allergic to an ingredient.&rdquo;</blockquote>
+                        <blockquote>&ldquo;Didn’t feel good on my hair and its overpriced. Returned.&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Reformulate for faster absorption</li>
+                            <li>use lighter carrier oils</li>
+                            <li>add silica or tapioca starch to reduce greasy feel</li>
+                            <li>test texture with parents before launch</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">5</div>
+                    <div class="pain-title">PACKAGING/PUMP ISSUES <small>(32 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;I really wanted to like this Kids Face Moisturizer, but unfortunately, it didn't work for us. The product itself might be fine (though I never actually got to try it), but the packaging is a major issue. No matter how hard I try, I simply can't get any product out of the bottle. I've tried shaking i&rdquo;</blockquote>
+                        <blockquote>&ldquo;First I would like to say it is a quality lotion, it's a pump bottle and well made. The lavender vanilla is a little strong for my taste but my kid and husband like it.
+
+Alas, this isn't the thing that will make your kid sleep. I have a wakeful toddler and have done all the things to help support hi&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Use child-proof but easy-to-use pump</li>
+                            <li>include travel cap</li>
+                            <li>test packaging for shipping durability</li>
+                            <li>consider tube format for portability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">6</div>
+                    <div class="pain-title">TOO THIN/WATERY CONSISTENCY <small>(24 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;This product helped me with discomfort in my legs during pregnancy a lot. What’s frustrating is batch to batch variation. The last one I received, completely phase separated, and the liquid spilled all over the bed when I first opened it. The thick phase is much harder to spread and nearly impossibl&rdquo;</blockquote>
+                        <blockquote>&ldquo;It was runny and grainy. Very hard to use. I also ordered the lavender and it was creamy and as advertised.&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Thicken formula with natural emulsifiers</li>
+                            <li>offer both lotion and body butter variants</li>
+                            <li>ensure consistency between batches</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">7</div>
+                    <div class="pain-title">BAD/OVERPOWERING SCENT <small>(19 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;Makes my skin so soft but the smell is very over powering&rdquo;</blockquote>
+                        <blockquote>&ldquo;Misleading it's a thick cream with a strong scent and doesn't work. You have to wash your hands applying because if you get it on your face it causes a tingling sensation.very disappointed won't buy again&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Offer unscented option</li>
+                            <li>reduce fragrance concentration</li>
+                            <li>use only natural essential oils</li>
+                            <li>test scent levels with children</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">8</div>
+                    <div class="pain-title">DIDN'T HELP KIDS SLEEP <small>(7 mentions)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>&ldquo;I bought this to try and help my toddler sleep but haven’t noticed a difference in their sleep or mood. The roll on applicator makes it fun and easy.&rdquo;</blockquote>
+                        <blockquote>&ldquo;Nice smell, makes skin soft but did not see any improvements in sleep.&rdquo;</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Suggested Improvements</h4>
+                        <ul>
+                            <li>Set realistic expectations in marketing</li>
+                            <li>include bedtime routine guide</li>
+                            <li>suggest combining with other sleep hygiene practices</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> &ldquo;Doesn&rsquo;t work&rdquo; is the #1 complaint at 215 mentions, but many of these stem from unrealistic expectations or improper use. Including clear usage instructions with expected timelines and application tips (feet for best absorption, 2+ weeks for results) could address this. Skin irritation (58 mentions) is the most actionable pain point &mdash; a lower-concentration kids&rsquo; formula would directly solve it.
+            </div>
+        </section>
+
+        <!-- Part 4: Customer Segments -->
+        <section id="segments" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 4</span>
+                <h2 class="section-title">Customer Segments &amp; Jobs-to-be-Done</h2>
+                <p class="section-subtitle">7 distinct buyer groups identified from review language patterns</p>
+            </div>
+
+            <div class="segment-grid">
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>PARENTS BUYING FOR KIDS' SLEEP</h4>
+                        <span class="segment-badge">435 reviews | 19.7%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Help children fall asleep faster and sleep through the night</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel like a caring parent providing a natural, gentle solution</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Be seen as a health-conscious, informed parent in natural parenting communities</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>SELF-USE ADULTS (CROSSOVER BUYERS)</h4>
+                        <span class="segment-badge">292 reviews | 13.2%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Relieve personal muscle pain, cramps, or improve own sleep using a product marketed for kids</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel clever about finding a gentle, clean product that works for the whole family</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Align with the natural wellness community</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>NATURAL/ORGANIC-FOCUSED PARENTS</h4>
+                        <span class="segment-badge">227 reviews | 10.3%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Supplement kids' magnesium topically with clean, natural ingredients</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel confident choosing products with transparent, safe ingredients</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Project an image of a health-conscious parent who reads labels</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>GROWING PAINS PARENTS</h4>
+                        <span class="segment-badge">198 reviews | 9.0%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Relieve children's growing pains and leg cramps naturally</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel relief from watching their child in pain; feel empowered with a solution</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Share the discovery with other parents dealing with the same issue</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>BABY/INFANT PARENTS</h4>
+                        <span class="segment-badge">157 reviews | 7.1%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Help baby sleep better and establish a calming bath-to-bed routine</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel safe knowing the product is gentle enough for infant skin</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Be part of the natural parenting community that values gentle products</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>ADHD/SENSORY PARENTS</h4>
+                        <span class="segment-badge">89 reviews | 4.0%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Help neurodivergent children calm down and transition to sleep without medication</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel hopeful about a non-pharmaceutical tool for managing their child's symptoms</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Connect with the neurodivergent parenting community that shares alternative approaches</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>SKEPTICAL/RESEARCH-DRIVEN BUYERS</h4>
+                        <span class="segment-badge">74 reviews | 3.3%</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul><li>Test whether topical magnesium actually delivers measurable results</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul><li>Feel validated (or justified in skepticism) based on personal experience</li></ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul><li>Share evidence-based findings with other analytical parents</li></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> Parents buying for kids&rsquo; sleep is the largest segment (435 reviews, 19.7%), followed by self-use adults (292 reviews, 13.2%) who buy kids&rsquo; products for themselves &mdash; indicating strong whole-family appeal. The ADHD/sensory segment (89 reviews, 4.0%) is small but represents the highest-growth opportunity per Reddit insights. Growing Pains Parents (198 reviews) have the most specific product need with the clearest product gap.
+            </div>
+        </section>
+
+        <!-- Part 5: Feature Opportunities -->
+        <section id="features" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 5</span>
+                <h2 class="section-title">Feature Opportunities by Segment</h2>
+                <p class="section-subtitle">Targeted feature recommendations backed by review data, keyword volume, and Reddit insights</p>
+            </div>
+
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-title">For Parents Buying for Kids' Sleep</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Bedtime routine integration guide included in packaging</strong>
+                            <span>435 parents mention bedtime routines; a step-by-step guide adds value</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Calming lavender + chamomile scent blend optimized for kids</strong>
+                            <span>951 reviews mention scent; it's a key part of the bedtime ritual</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Lower magnesium concentration for sensitive kids' skin</strong>
+                            <span>58 reports of skin irritation; kid skin needs gentler formula</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">4</div>
+                        <div class="feature-content">
+                            <strong>Age-based dosing instructions on label</strong>
+                            <span>111 reviews mention dosage confusion; Reddit confirms this is a universal gap</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-title">For Growing Pains Parents</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Higher concentration targeted pain formula variant</strong>
+                            <span>198 growing pains mentions; parents want stronger relief for leg pain</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Added arnica for immediate pain relief</strong>
+                            <span>Arnica + magnesium combo praised in reviews; addresses pain + prevention</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Roll-on applicator for easy nighttime application</strong>
+                            <span>Parents apply in dark bedrooms; mess-free format needed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-title">For Baby/Infant Parents</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Pediatrician-approved certification badge</strong>
+                            <span>Parents of infants are most anxious about safety (3.4★ avg rating)</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Ultra-gentle formula with zero fragrance</strong>
+                            <span>19 scent complaints + infant skin sensitivity demands unscented</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Clear age guidance: newborn, 3-6mo, 6-12mo, 1-3yr</strong>
+                            <span>Reddit confirms age-based dosing is #1 missing feature across all brands</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-title">For ADHD/Sensory Parents</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Sensory-friendly texture (not too thick, not too thin)</strong>
+                            <span>Sensory-sensitive kids reject products with wrong texture</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Unscented or very mild natural scent option</strong>
+                            <span>Sensory-sensitive children may be triggered by strong scents</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Calming visual packaging design (soft colors, minimal stimulation)</strong>
+                            <span>ADHD/sensory parents are attuned to overstimulating packaging</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-title">For Natural/Organic-Focused Parents</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>USDA Organic or EWG Verified certification</strong>
+                            <span>227 reviews mention natural/organic; certifications drive purchase decisions</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Transparent ingredient sourcing (Zechstein seabed magnesium)</strong>
+                            <span>This segment reads labels carefully; source credibility matters</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Glass jar or recyclable packaging</strong>
+                            <span>Eco-conscious parents prefer sustainable packaging</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-title">For Self-Use Adults</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Family-size bottle option (12oz or 16oz)</strong>
+                            <span>292 adults use the product too; larger size = better value</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Dual marketing: 'Safe for the whole family'</strong>
+                            <span>Adults buy kids' products for themselves; embrace this crossover</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> Age-based dosing instructions and lower magnesium concentration for kids are the two highest-impact features that cut across every segment. A bedtime routine integration guide (solving the &ldquo;doesn&rsquo;t work&rdquo; pain point) and pediatrician endorsement (solving baby parent anxiety) are the strongest differentiators for a new entrant.
+            </div>
+        </section>
+
+        <!-- Part 6: Innovation Opportunities -->
+        <section id="innovations" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 6</span>
+                <h2 class="section-title">Innovation Opportunities</h2>
+                <p class="section-subtitle">Novel product concepts synthesized from pain points, unmet needs, keyword gaps, and Reddit insights</p>
+            </div>
+
+            <div class="innovation-card">
+                <div class="innovation-number">1</div>
+                <div class="innovation-content">
+                    <h4>The Kids Calm Complete Kit</h4>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 12px; font-size: 0.95rem;">A bedtime system designed for children: gentle magnesium lotion + calming bath soak + lavender pillow spray. Includes an illustrated 'Bedtime Adventure' routine card that turns application into a fun ritual.</p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 10px;"><strong style="color: var(--accent);">Evidence:</strong> Sleep is the #1 keyword cluster (44K+ volume) and 1,057 reviews mention sleep. Parents describe bedtime routines suggesting receptivity to a system approach. 435 parents specifically mention kids' sleep.</p>
+                    <ul>
+                        <li>Gentle magnesium lotion (lower concentration)</li>
+                        <li>Calming bath soak with Epsom salt + lavender</li>
+                        <li>Pillow mist spray</li>
+                        <li>Illustrated bedtime routine card</li>
+                        <li>Age-based dosing guide</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: High</span>
+                </div>
+            </div>
+            <div class="innovation-card">
+                <div class="innovation-number">2</div>
+                <div class="innovation-content">
+                    <h4>Growing Pains Rescue Stick</h4>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 12px; font-size: 0.95rem;">A roll-on magnesium + arnica stick designed for quick nighttime application. Parents can apply in a dark bedroom without mess. Extra-strength formula specifically for growing pains and leg cramps.</p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 10px;"><strong style="color: var(--accent);">Evidence:</strong> 198 reviews mention growing pains with highest satisfaction (4.4★). Roll-on format solves the mess problem. No competitor offers a growing-pains-specific magnesium product.</p>
+                    <ul>
+                        <li>Roll-on applicator (no mess)</li>
+                        <li>Extra-strength magnesium + arnica</li>
+                        <li>Glow-in-dark cap (find in dark bedroom)</li>
+                        <li>Compact nightstand-friendly size</li>
+                        <li>Works in under 5 minutes per reviews</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: High</span>
+                </div>
+            </div>
+            <div class="innovation-card">
+                <div class="innovation-number">3</div>
+                <div class="innovation-content">
+                    <h4>Baby's First Magnesium (Pediatrician Formulated)</h4>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 12px; font-size: 0.95rem;">Ultra-gentle magnesium cream for babies 3mo+, with pediatrician endorsement and clear age-based dosing. Fragrance-free, hypoallergenic, with only 5 clean ingredients.</p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 10px;"><strong style="color: var(--accent);">Evidence:</strong> 'Magnesium lotion for babies' has 5,980 SV. Baby segment has lowest satisfaction (3.4★) — clear gap. Reddit confirms no brand offers age-based dosing despite universal demand. 157 baby-parent reviews.</p>
+                    <ul>
+                        <li>Pediatrician-endorsed formula</li>
+                        <li>Age-based dosing chart (3-6mo, 6-12mo, 1-3yr)</li>
+                        <li>Fragrance-free, hypoallergenic</li>
+                        <li>Only 5 clean ingredients</li>
+                        <li>Patch test strip included</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: Very High</span>
+                </div>
+            </div>
+            <div class="innovation-card">
+                <div class="innovation-number">4</div>
+                <div class="innovation-content">
+                    <h4>Neurodivergent Kids' Calm Cream</h4>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 12px; font-size: 0.95rem;">A sensory-friendly magnesium cream designed specifically for ADHD/sensory-sensitive children. Neutral texture, zero fragrance, calming but non-stimulating packaging. Positioned as a non-medication tool for the ADHD parenting community.</p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 10px;"><strong style="color: var(--accent);">Evidence:</strong> 89 reviews from ADHD/sensory parents with 4.4★ average (highest satisfaction). Reddit ADHD communities represent an untapped goldmine per Perplexity research. No competitor targets this segment.</p>
+                    <ul>
+                        <li>Sensory-optimized texture (not too thick/thin)</li>
+                        <li>Zero fragrance</li>
+                        <li>Soft, calm packaging design</li>
+                        <li>Partnership with ADHD parenting influencers</li>
+                        <li>Educational card: 'Magnesium &amp; the neurodivergent brain'</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: Very High</span>
+                </div>
+            </div>
+            <div class="innovation-card">
+                <div class="innovation-number">5</div>
+                <div class="innovation-content">
+                    <h4>Family Magnesium Bundle</h4>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 12px; font-size: 0.95rem;">A family-size set with 3 strengths: Baby Gentle (3mo+), Kids Regular (3-12yr), and Adult Extra Strength. All share the same clean ingredient base. Addresses the finding that 292 adults buy kids' products for themselves.</p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 10px;"><strong style="color: var(--accent);">Evidence:</strong> 13.2% of buyers are adults using the product themselves. 'Whole family uses it' appears in 150 reviews. Different age groups need different concentrations. No brand offers an age-segmented product line.</p>
+                    <ul>
+                        <li>3 concentration levels: Baby, Kids, Adult</li>
+                        <li>Shared clean ingredient base</li>
+                        <li>Family usage guide included</li>
+                        <li>Subscription option for all 3</li>
+                        <li>Travel sizes for each</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: High</span>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> Baby&rsquo;s First Magnesium (pediatrician-formulated, age-based dosing) represents the highest-impact innovation &mdash; &ldquo;magnesium lotion for babies&rdquo; has 5,980 monthly searches, the baby segment has the lowest satisfaction (3.4&#9733;), and Reddit universally confirms the gap. The Growing Pains Rescue Stick targets a highly specific use case with 198 dedicated review mentions and no competing product.
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <h3 style="margin-bottom: 12px;">Kids + Baby Magnesium Lotion Customer Analysis Report</h3>
+        <p>Based on 2,212 reviews across 13 products | 119 keywords (295K total search volume) | 10 Reddit research queries</p>
+        <p>Generated February 11, 2026 | Bender Brands</p>
+    </div>
+
+    <script>
+const clusterData = {"top_volume":[{"name":"magnesium","total_volume":256021,"count":78,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium lotion","volume":68423},{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"toddler magnesium","volume":4285},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"earthly magnesium lotion","volume":3605}]},{"name":"lotion","total_volume":233919,"count":64,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium lotion","volume":68423},{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"earthly magnesium lotion","volume":3605},{"keyword":"8sheepsorganics sleep lotion magnesium","volume":2392},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247}]},{"name":"kids","total_volume":114382,"count":34,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"kids magnesium for sleep","volume":3211},{"keyword":"magnesium cream for kids","volume":3001},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"growing pains relief kids","volume":1589},{"keyword":"magnesium spray for kids","volume":1545},{"keyword":"magnesium lotion for sleep kids","volume":1182},{"keyword":"magnesium lotion kids","volume":1043}]},{"name":"sleep","total_volume":44846,"count":23,"keywords":[{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"kids magnesium for sleep","volume":3211},{"keyword":"8sheepsorganics sleep lotion magnesium","volume":2392},{"keyword":"baby sleep lotion","volume":1915},{"keyword":"magnesium lotion for sleep kids","volume":1182},{"keyword":"magnesium sleep lotion","volume":1092},{"keyword":"magnesium balm for sleep","volume":922},{"keyword":"magnesium for babies sleep","volume":805}]},{"name":"sheep","total_volume":24326,"count":12,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"8 sheep organics","volume":7156},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"sheep organics","volume":871},{"keyword":"8 sheep","volume":697},{"keyword":"8 sheep organics baby sleep lotion","volume":250},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250},{"keyword":"8 sheep magnesium lotion","volume":250}]},{"name":"organics","total_volume":22150,"count":11,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"8 sheep organics","volume":7156},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"sheep organics","volume":871},{"keyword":"8 sheeps organics magnesium lotion baby","volume":768},{"keyword":"8 sheep organics baby sleep lotion","volume":250},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion 8 sheep organics","volume":250},{"keyword":"8 sheep organics sleepy body lotion","volume":250},{"keyword":"8sheep organics junior's bedtime lotion, soft baby blend","volume":250}]},{"name":"bedtime","total_volume":19485,"count":14,"keywords":[{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"junior bedtime lotion","volume":1395},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"baby bedtime lotion","volume":982},{"keyword":"bedtime lotion baby","volume":728},{"keyword":"junior's bedtime lotion","volume":481},{"keyword":"bedtime lotion","volume":480},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250}]},{"name":"cream","total_volume":18573,"count":14,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"magnesium cream for kids","volume":3001},{"keyword":"magnesium cream for babies","volume":1624},{"keyword":"doodle hog magnesium cream for kids","volume":536},{"keyword":"magnesium lavender cream","volume":530},{"keyword":"magnesium cream for sleep kids","volume":250},{"keyword":"magnesium cream baby","volume":250},{"keyword":"kids magnesium cream","volume":250},{"keyword":"magnesium cream kids","volume":250},{"keyword":"tubby todd magnesium sleep cream","volume":250}]},{"name":"baby","total_volume":17444,"count":19,"keywords":[{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"baby sleep lotion","volume":1915},{"keyword":"baby magnesium","volume":1353},{"keyword":"baby bedtime lotion","volume":982},{"keyword":"magnesium baby lotion","volume":965},{"keyword":"baby magnesium lotion","volume":942},{"keyword":"8 sheeps organics magnesium lotion baby","volume":768},{"keyword":"baby nighttime lotion","volume":751},{"keyword":"bedtime lotion baby","volume":728},{"keyword":"baby night time lotion","volume":590}]},{"name":"juniors","total_volume":14669,"count":6,"keywords":[{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250},{"keyword":"juniors bedtime lotion magnesium","volume":250},{"keyword":"juniors bedtime lotion 8 sheep organics","volume":250}]},{"name":"babies","total_volume":11568,"count":7,"keywords":[{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"magnesium for babies","volume":1642},{"keyword":"magnesium cream for babies","volume":1624},{"keyword":"magnesium for babies sleep","volume":805},{"keyword":"sleep lotion for babies","volume":647},{"keyword":"magnesium rub for babies","volume":620},{"keyword":"magnesium lotion for babies sleep","volume":250}]},{"name":"toddler","total_volume":6619,"count":4,"keywords":[{"keyword":"toddler magnesium","volume":4285},{"keyword":"magnesium toddler","volume":1064},{"keyword":"toddler magnesium lotion","volume":1020},{"keyword":"help toddler sleep alone","volume":250}]}],"top_count":[{"name":"magnesium","total_volume":256021,"count":78,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium lotion","volume":68423},{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"toddler magnesium","volume":4285},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"earthly magnesium lotion","volume":3605}]},{"name":"lotion","total_volume":233919,"count":64,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium lotion","volume":68423},{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"earthly magnesium lotion","volume":3605},{"keyword":"8sheepsorganics sleep lotion magnesium","volume":2392},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247}]},{"name":"kids","total_volume":114382,"count":34,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"kids magnesium for sleep","volume":3211},{"keyword":"magnesium cream for kids","volume":3001},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"growing pains relief kids","volume":1589},{"keyword":"magnesium spray for kids","volume":1545},{"keyword":"magnesium lotion for sleep kids","volume":1182},{"keyword":"magnesium lotion kids","volume":1043}]},{"name":"sleep","total_volume":44846,"count":23,"keywords":[{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"kids magnesium for sleep","volume":3211},{"keyword":"8sheepsorganics sleep lotion magnesium","volume":2392},{"keyword":"baby sleep lotion","volume":1915},{"keyword":"magnesium lotion for sleep kids","volume":1182},{"keyword":"magnesium sleep lotion","volume":1092},{"keyword":"magnesium balm for sleep","volume":922},{"keyword":"magnesium for babies sleep","volume":805}]},{"name":"baby","total_volume":17444,"count":19,"keywords":[{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"baby sleep lotion","volume":1915},{"keyword":"baby magnesium","volume":1353},{"keyword":"baby bedtime lotion","volume":982},{"keyword":"magnesium baby lotion","volume":965},{"keyword":"baby magnesium lotion","volume":942},{"keyword":"8 sheeps organics magnesium lotion baby","volume":768},{"keyword":"baby nighttime lotion","volume":751},{"keyword":"bedtime lotion baby","volume":728},{"keyword":"baby night time lotion","volume":590}]},{"name":"cream","total_volume":18573,"count":14,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"magnesium cream for kids","volume":3001},{"keyword":"magnesium cream for babies","volume":1624},{"keyword":"doodle hog magnesium cream for kids","volume":536},{"keyword":"magnesium lavender cream","volume":530},{"keyword":"magnesium cream for sleep kids","volume":250},{"keyword":"magnesium cream baby","volume":250},{"keyword":"kids magnesium cream","volume":250},{"keyword":"magnesium cream kids","volume":250},{"keyword":"tubby todd magnesium sleep cream","volume":250}]},{"name":"bedtime","total_volume":19485,"count":14,"keywords":[{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"junior bedtime lotion","volume":1395},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"baby bedtime lotion","volume":982},{"keyword":"bedtime lotion baby","volume":728},{"keyword":"junior's bedtime lotion","volume":481},{"keyword":"bedtime lotion","volume":480},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250}]},{"name":"sheep","total_volume":24326,"count":12,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"8 sheep organics","volume":7156},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"sheep organics","volume":871},{"keyword":"8 sheep","volume":697},{"keyword":"8 sheep organics baby sleep lotion","volume":250},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250},{"keyword":"8 sheep magnesium lotion","volume":250}]},{"name":"organics","total_volume":22150,"count":11,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"8 sheep organics","volume":7156},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"sheep organics","volume":871},{"keyword":"8 sheeps organics magnesium lotion baby","volume":768},{"keyword":"8 sheep organics baby sleep lotion","volume":250},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion 8 sheep organics","volume":250},{"keyword":"8 sheep organics sleepy body lotion","volume":250},{"keyword":"8sheep organics junior's bedtime lotion, soft baby blend","volume":250}]},{"name":"babies","total_volume":11568,"count":7,"keywords":[{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"magnesium for babies","volume":1642},{"keyword":"magnesium cream for babies","volume":1624},{"keyword":"magnesium for babies sleep","volume":805},{"keyword":"sleep lotion for babies","volume":647},{"keyword":"magnesium rub for babies","volume":620},{"keyword":"magnesium lotion for babies sleep","volume":250}]},{"name":"juniors","total_volume":14669,"count":6,"keywords":[{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250},{"keyword":"juniors bedtime lotion magnesium","volume":250},{"keyword":"juniors bedtime lotion 8 sheep organics","volume":250}]},{"name":"toddlers","total_volume":4611,"count":6,"keywords":[{"keyword":"magnesium for toddlers","volume":1905},{"keyword":"magnesium for toddlers 2-4","volume":1443},{"keyword":"magnesium for toddlers sleep","volume":513},{"keyword":"magnesium lotion for toddlers","volume":250},{"keyword":"magnesium for toddlers 1-3","volume":250},{"keyword":"sleep for toddlers","volume":250}]}],"identity":[{"name":"kids","total_volume":114382,"count":34,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"kids magnesium for sleep","volume":3211},{"keyword":"magnesium cream for kids","volume":3001},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"growing pains relief kids","volume":1589},{"keyword":"magnesium spray for kids","volume":1545},{"keyword":"magnesium lotion for sleep kids","volume":1182},{"keyword":"magnesium lotion kids","volume":1043}]},{"name":"baby","total_volume":17444,"count":19,"keywords":[{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"baby sleep lotion","volume":1915},{"keyword":"baby magnesium","volume":1353},{"keyword":"baby bedtime lotion","volume":982},{"keyword":"magnesium baby lotion","volume":965},{"keyword":"baby magnesium lotion","volume":942},{"keyword":"8 sheeps organics magnesium lotion baby","volume":768},{"keyword":"baby nighttime lotion","volume":751},{"keyword":"bedtime lotion baby","volume":728},{"keyword":"baby night time lotion","volume":590}]},{"name":"juniors","total_volume":14669,"count":6,"keywords":[{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250},{"keyword":"juniors bedtime lotion magnesium","volume":250},{"keyword":"juniors bedtime lotion 8 sheep organics","volume":250}]},{"name":"babies","total_volume":11568,"count":7,"keywords":[{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"magnesium for babies","volume":1642},{"keyword":"magnesium cream for babies","volume":1624},{"keyword":"magnesium for babies sleep","volume":805},{"keyword":"sleep lotion for babies","volume":647},{"keyword":"magnesium rub for babies","volume":620},{"keyword":"magnesium lotion for babies sleep","volume":250}]},{"name":"toddler","total_volume":6619,"count":4,"keywords":[{"keyword":"toddler magnesium","volume":4285},{"keyword":"magnesium toddler","volume":1064},{"keyword":"toddler magnesium lotion","volume":1020},{"keyword":"help toddler sleep alone","volume":250}]},{"name":"toddlers","total_volume":4611,"count":6,"keywords":[{"keyword":"magnesium for toddlers","volume":1905},{"keyword":"magnesium for toddlers 2-4","volume":1443},{"keyword":"magnesium for toddlers sleep","volume":513},{"keyword":"magnesium lotion for toddlers","volume":250},{"keyword":"magnesium for toddlers 1-3","volume":250},{"keyword":"sleep for toddlers","volume":250}]}],"feature":[{"name":"magnesium","total_volume":256021,"count":78,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium lotion","volume":68423},{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"toddler magnesium","volume":4285},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"earthly magnesium lotion","volume":3605}]},{"name":"lotion","total_volume":233919,"count":64,"keywords":[{"keyword":"magnesium lotion for kids","volume":82977},{"keyword":"magnesium lotion","volume":68423},{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"magnesium lotion for babies","volume":5980},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"kids magnesium lotion","volume":3648},{"keyword":"earthly magnesium lotion","volume":3605},{"keyword":"8sheepsorganics sleep lotion magnesium","volume":2392},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247}]},{"name":"sleep","total_volume":44846,"count":23,"keywords":[{"keyword":"magnesium lotion for sleep","volume":18140},{"keyword":"baby magnesium sleep lotion","volume":5221},{"keyword":"magnesium for kids sleep","volume":4858},{"keyword":"kids magnesium for sleep","volume":3211},{"keyword":"8sheepsorganics sleep lotion magnesium","volume":2392},{"keyword":"baby sleep lotion","volume":1915},{"keyword":"magnesium lotion for sleep kids","volume":1182},{"keyword":"magnesium sleep lotion","volume":1092},{"keyword":"magnesium balm for sleep","volume":922},{"keyword":"magnesium for babies sleep","volume":805}]},{"name":"organics","total_volume":22150,"count":11,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"8 sheep organics","volume":7156},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"sheep organics","volume":871},{"keyword":"8 sheeps organics magnesium lotion baby","volume":768},{"keyword":"8 sheep organics baby sleep lotion","volume":250},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion 8 sheep organics","volume":250},{"keyword":"8 sheep organics sleepy body lotion","volume":250},{"keyword":"8sheep organics junior's bedtime lotion, soft baby blend","volume":250}]},{"name":"bedtime","total_volume":19485,"count":14,"keywords":[{"keyword":"juniors bedtime lotion","volume":10449},{"keyword":"juniors bedtime lotion by 8 sheep kids","volume":2247},{"keyword":"junior bedtime lotion","volume":1395},{"keyword":"8 sheep organics juniors bedtime lotion","volume":1223},{"keyword":"baby bedtime lotion","volume":982},{"keyword":"bedtime lotion baby","volume":728},{"keyword":"junior's bedtime lotion","volume":481},{"keyword":"bedtime lotion","volume":480},{"keyword":"junior bedtime lotion 8 sheep organics","volume":250},{"keyword":"juniors bedtime lotion by 8 sheep","volume":250}]},{"name":"cream","total_volume":18573,"count":14,"keywords":[{"keyword":"8 sheep organics magnesium cream","volume":10632},{"keyword":"magnesium cream for kids","volume":3001},{"keyword":"magnesium cream for babies","volume":1624},{"keyword":"doodle hog magnesium cream for kids","volume":536},{"keyword":"magnesium lavender cream","volume":530},{"keyword":"magnesium cream for sleep kids","volume":250},{"keyword":"magnesium cream baby","volume":250},{"keyword":"kids magnesium cream","volume":250},{"keyword":"magnesium cream kids","volume":250},{"keyword":"tubby todd magnesium sleep cream","volume":250}]},{"name":"spray","total_volume":2635,"count":4,"keywords":[{"keyword":"magnesium spray for kids","volume":1545},{"keyword":"kids magnesium spray","volume":590},{"keyword":"magnesium spray kids","volume":250},{"keyword":"magnesium spray for feet kids","volume":250}]},{"name":"growing","total_volume":2089,"count":3,"keywords":[{"keyword":"growing pains relief kids","volume":1589},{"keyword":"growing pain relief for children","volume":250},{"keyword":"kids growing pain relief","volume":250}]},{"name":"rub","total_volume":1772,"count":3,"keywords":[{"keyword":"magnesium rub for kids","volume":693},{"keyword":"magnesium rub for babies","volume":620},{"keyword":"magnesium rub for sleep","volume":459}]},{"name":"nighttime","total_volume":1561,"count":3,"keywords":[{"keyword":"baby nighttime lotion","volume":751},{"keyword":"nighttime baby lotion","volume":560},{"keyword":"baby lotion nighttime","volume":250}]}],"total_keywords":119,"total_clusters_found":75};
+
+function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+    return num.toString();
+}
+
+function renderChart(containerId, data, valueKey, barClass, maxItems) {
+    maxItems = maxItems || 12;
+    var container = document.getElementById(containerId);
+    if (!container || !data || data.length === 0) return;
+    var displayData = data.slice(0, maxItems);
+    var maxValue = Math.max.apply(null, displayData.map(function(d) { return d[valueKey]; }));
+    container.innerHTML = displayData.map(function(item) {
+        var percentage = (item[valueKey] / maxValue) * 100;
+        var displayValue = valueKey === 'total_volume' ? formatNumber(item[valueKey]) : item[valueKey];
+        return '<div class="bar-row"><div class="bar-label" onclick="showKeywords(\'' + item.name + '\', ' + JSON.stringify(item.keywords).replace(/"/g, '&quot;') + ', ' + item.total_volume + ', ' + item.count + ')">' + item.name + '</div><div class="bar-wrapper"><div class="bar ' + barClass + '" style="width: ' + percentage + '%">' + displayValue + '</div></div></div>';
+    }).join('');
+}
+
+function showKeywords(name, keywords, totalVolume, count) {
+    var modal = document.getElementById('keywords-modal');
+    document.getElementById('modal-title').textContent = name + ' Keywords';
+    document.getElementById('modal-stats').innerHTML = '<div class="modal-stat"><div class="modal-stat-value">' + formatNumber(totalVolume) + '</div><div class="modal-stat-label">Total Search Volume</div></div><div class="modal-stat"><div class="modal-stat-value">' + count + '</div><div class="modal-stat-label">Keywords</div></div>';
+    document.getElementById('modal-keywords').innerHTML = keywords.map(function(kw) {
+        return '<div class="keyword-item"><span class="keyword-text">' + kw.keyword + '</span><span class="keyword-volume">' + formatNumber(kw.volume) + '</span></div>';
+    }).join('');
+    modal.style.display = 'block';
+}
+
+document.querySelector('.modal-close').onclick = function() { document.getElementById('keywords-modal').style.display = 'none'; };
+window.onclick = function(event) { if (event.target === document.getElementById('keywords-modal')) { document.getElementById('keywords-modal').style.display = 'none'; } };
+
+if (clusterData.top_volume) renderChart('chart-volume', clusterData.top_volume, 'total_volume', 'bar-volume');
+if (clusterData.top_count) renderChart('chart-count', clusterData.top_count, 'count', 'bar-count');
+if (clusterData.identity) renderChart('chart-identity', clusterData.identity, 'total_volume', 'bar-identity', 4);
+if (clusterData.feature) renderChart('chart-feature', clusterData.feature, 'total_volume', 'bar-feature', 7);
+
+function toggleReddit(slug) {
+    var el = document.getElementById('reddit-' + slug);
+    if (el) el.classList.toggle('open');
+}
+    </script>
+</body>
+</html>
