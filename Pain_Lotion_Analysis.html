@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pain Lotion Customer Analysis Report</title>
+    <style>
+        :root {
+            --primary: #028090;
+            --primary-dark: #026670;
+            --secondary: #00A896;
+            --accent: #02C39A;
+            --dark: #1B263B;
+            --dark-lighter: #2d3e50;
+            --light: #F7F9FC;
+            --light-alt: #EEF2F7;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --text-light: #475569;
+            --muted: #64748B;
+            --danger: #DC2626;
+            --danger-light: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --purple: #7C3AED;
+            --purple-light: #EDE9FE;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif; background: var(--light); color: var(--text); line-height: 1.7; font-size: 16px; }
+        .header { background: linear-gradient(135deg, var(--dark) 0%, var(--dark-lighter) 100%); color: white; padding: 60px 20px 80px; text-align: center; position: relative; }
+        .header h1 { font-size: 2.8rem; margin-bottom: 12px; font-weight: 700; }
+        .header .subtitle { color: var(--accent); font-size: 1.3rem; margin-bottom: 8px; }
+        .header .meta { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+        .stat-item { text-align: center; padding: 0 20px; }
+        .stat-number { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 8px; }
+        .nav-container { background: var(--white); border-bottom: 1px solid #E2E8F0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .nav { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .nav a { padding: 16px 16px; text-decoration: none; color: var(--text-light); font-size: 0.9rem; font-weight: 500; white-space: nowrap; border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .nav a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 60px; }
+        .section { background: var(--white); border-radius: 16px; padding: 40px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .section-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--light-alt); }
+        .section-label { display: inline-block; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-title { font-size: 1.8rem; color: var(--dark); font-weight: 700; margin-bottom: 8px; }
+        .section-subtitle { color: var(--muted); font-size: 1.05rem; }
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--dark); color: white; padding: 14px 16px; text-align: left; font-weight: 600; }
+        td { padding: 14px 16px; border-bottom: 1px solid #E2E8F0; }
+        tr:hover td { background: var(--light); }
+        .highlight-zero { color: var(--danger); font-weight: 700; }
+        .insight-box { background: linear-gradient(135deg, var(--warning-light) 0%, #FFF7ED 100%); border-left: 4px solid var(--warning); padding: 20px 24px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .insight-box strong { color: var(--warning); }
+        .pain-point { background: var(--white); border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+        .pain-header { background: var(--danger-light); padding: 16px 20px; display: flex; align-items: center; gap: 15px; }
+        .pain-number { width: 36px; height: 36px; background: var(--danger); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .pain-title { font-size: 1.15rem; font-weight: 700; color: var(--dark); }
+        .pain-title small { font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 8px; }
+        .pain-body { padding: 20px; }
+        .pain-quotes { background: var(--light); padding: 16px 20px; border-radius: 8px; margin-bottom: 16px; }
+        .pain-quotes blockquote { color: var(--text-light); font-style: italic; margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--muted); }
+        .pain-solutions h4 { color: var(--success); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .pain-solutions ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+        .pain-solutions li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.95rem; }
+        .pain-solutions li::before { content: "\2713"; color: var(--success); font-weight: 700; flex-shrink: 0; }
+        .segment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .segment-card { background: var(--white); border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+        .segment-header { background: var(--primary); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .segment-header h4 { font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
+        .segment-badge { background: var(--accent); color: var(--dark); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .segment-body { padding: 20px; }
+        .segment-section { margin-bottom: 16px; }
+        .segment-section:last-child { margin-bottom: 0; }
+        .segment-section h5 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .segment-section ul { list-style: none; }
+        .segment-section li { font-size: 0.9rem; padding: 4px 0; padding-left: 16px; position: relative; }
+        .segment-section li::before { content: "\2022"; position: absolute; left: 0; color: var(--primary); }
+        .segment-section.quotes blockquote { color: var(--text-light); font-style: italic; margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--muted); font-size: 0.9rem; }
+        .features-section { margin-top: 30px; }
+        .features-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .features-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .features-icon.neuropathy { background: #FEE2E2; }
+        .features-icon.cramps { background: #EDE9FE; }
+        .features-icon.arthritis { background: #DBEAFE; }
+        .features-icon.athlete { background: #FFF7ED; }
+        .features-icon.chronic { background: #D1FAE5; }
+        .features-icon.caregiver { background: #FCE7F3; }
+        .features-title { font-size: 1.2rem; font-weight: 700; color: var(--dark); }
+        .features-list { display: grid; gap: 12px; }
+        .feature-item { display: flex; gap: 12px; padding: 16px; background: var(--light); border-radius: 10px; }
+        .feature-number { width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+        .feature-content strong { display: block; color: var(--dark); margin-bottom: 2px; }
+        .feature-content span { font-size: 0.9rem; color: var(--text-light); }
+        .impact-badge { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: 8px; vertical-align: middle; }
+        .impact-badge.high { background: var(--danger-light); color: var(--danger); }
+        .impact-badge.medium { background: var(--warning-light); color: var(--warning); }
+        .innovation-card { background: var(--dark); border-radius: 12px; padding: 24px; margin-bottom: 16px; display: flex; gap: 16px; }
+        .innovation-number { width: 40px; height: 40px; background: var(--accent); color: var(--dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .innovation-content h4 { color: white; font-size: 1.15rem; margin-bottom: 10px; }
+        .innovation-content p { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 10px; line-height: 1.6; }
+        .innovation-content ul { list-style: none; margin-bottom: 12px; }
+        .innovation-content li { color: rgba(255,255,255,0.85); font-size: 0.95rem; padding: 3px 0; padding-left: 20px; position: relative; }
+        .innovation-content li::before { content: "\2192"; position: absolute; left: 0; color: var(--accent); }
+        .patent-tag { display: inline-block; background: var(--purple); color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: 500; }
+        .footer { background: var(--dark); color: white; text-align: center; padding: 40px 20px; margin-top: 40px; }
+        .footer p { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+        .footer p + p { margin-top: 8px; }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .stats-bar { gap: 20px; }
+            .stat-number { font-size: 2.2rem; }
+            .section { padding: 24px; }
+            .section-title { font-size: 1.5rem; }
+            .nav a { padding: 12px 10px; font-size: 0.85rem; }
+            .innovation-card { flex-direction: column; }
+        }
+        @media print { .nav-container { display: none; } .section { break-inside: avoid; } }
+        .products-grid-section { background: var(--white); padding: 40px 20px; border-bottom: 1px solid #E2E8F0; }
+        .products-grid-title { text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+        .products-grid-subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 30px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .product-card { background: var(--light); border-radius: 12px; overflow: hidden; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .product-card-img { width: 100%; aspect-ratio: 1; object-fit: contain; background: white; padding: 12px; }
+        .product-card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .product-card-asin { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+        .product-card-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .product-card-title { font-size: 0.8rem; color: var(--text-light); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-card-ingredients { font-size: 0.7rem; font-weight: 700; color: var(--success); line-height: 1.4; margin-top: 2px; }
+        .keyword-clusters-section { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 50px 20px; color: white; }
+        .keyword-clusters-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 8px; }
+        .clusters-subtitle { text-align: center; color: #a0aec0; margin-bottom: 30px; font-size: 0.95rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-container { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; }
+        .chart-container h3 { font-size: 1rem; margin-bottom: 16px; color: #e2e8f0; text-align: center; }
+        .chart { min-height: 280px; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .bar-label { width: 120px; font-size: 0.75rem; color: #e2e8f0; text-align: right; padding-right: 10px; cursor: pointer; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-label:hover { color: #63b3ed; text-decoration: underline; }
+        .bar-wrapper { flex: 1; background: rgba(255,255,255,0.1); border-radius: 4px; height: 24px; position: relative; overflow: hidden; }
+        .bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; font-weight: 600; color: white; transition: width 0.5s ease; }
+        .bar-volume { background: linear-gradient(90deg, #4299e1, #3182ce); }
+        .bar-count { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+        .bar-identity { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .bar-feature { background: linear-gradient(90deg, #9f7aea, #805ad5); }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; animation: modalSlide 0.3s ease; }
+        @keyframes modalSlide { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #718096; transition: color 0.2s; }
+        .modal-close:hover { color: #e53e3e; }
+        .modal-content h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.4rem; }
+        .modal-stats { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .modal-stat { text-align: center; }
+        .modal-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .modal-stat-label { font-size: 0.75rem; color: var(--muted); }
+        .modal-keywords { max-height: 400px; overflow-y: auto; }
+        .keyword-item { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 6px; margin-bottom: 4px; background: #f7fafc; }
+        .keyword-item:nth-child(odd) { background: #edf2f7; }
+        .keyword-text { color: var(--dark); font-size: 0.9rem; }
+        .keyword-volume { color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+        .reddit-stats-bar { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
+        .reddit-stat { text-align: center; padding: 16px 24px; background: var(--light); border-radius: 12px; min-width: 120px; }
+        .reddit-stat-number { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
+        .reddit-stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+        .reddit-category { margin-bottom: 16px; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+        .reddit-category-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--light); cursor: pointer; transition: background 0.2s; user-select: none; }
+        .reddit-category-header:hover { background: var(--light-alt); }
+        .reddit-category-title { font-weight: 600; color: var(--dark); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        .reddit-category-count { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; background: var(--primary); color: white; font-weight: 600; }
+        .reddit-chevron { transition: transform 0.3s ease; color: var(--muted); font-size: 1.2rem; }
+        .reddit-category.open .reddit-chevron { transform: rotate(180deg); }
+        .reddit-category-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .reddit-category.open .reddit-category-body { max-height: 5000px; }
+        .reddit-category-content { padding: 20px; }
+        .reddit-subcategory { margin-bottom: 20px; }
+        .reddit-subcategory-title { font-weight: 600; color: var(--dark); font-size: 0.95rem; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #E2E8F0; }
+        .reddit-summary { font-size: 0.9rem; color: var(--text-light); margin-bottom: 12px; padding: 10px 14px; background: var(--success-light); border-radius: 8px; border-left: 3px solid var(--success); }
+        .reddit-quote-card { background: var(--white); border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; position: relative; }
+        .reddit-quote-card::before { content: '\201C'; position: absolute; top: 8px; left: 10px; font-size: 2.5rem; color: var(--primary); opacity: 0.15; font-family: Georgia, serif; line-height: 1; }
+        .reddit-quote-text { font-style: italic; color: var(--text); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; }
+        .reddit-quote-meta { display: flex; gap: 12px; margin-top: 10px; padding-left: 20px; flex-wrap: wrap; }
+        .reddit-subreddit { font-size: 0.75rem; font-weight: 600; color: var(--primary); background: rgba(2, 128, 144, 0.08); padding: 2px 8px; border-radius: 4px; }
+        .reddit-context { font-size: 0.75rem; color: var(--muted); }
+        .severity-badge { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: 8px; }
+        .severity-badge.critical { background: var(--danger-light); color: var(--danger); }
+        .severity-badge.high-sev { background: var(--warning-light); color: #D97706; }
+        .severity-badge.medium-sev { background: var(--light-alt); color: var(--muted); }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>Pain Lotion Customer Analysis Report</h1>
+        <p class="subtitle">Customer Review &amp; Keyword Analysis</p>
+        <p class="meta">Analysis Date: February 12, 2026</p>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">9,292</div>
+                <div class="stat-label">Amazon Reviews</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">23</div>
+                <div class="stat-label">Products Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">347</div>
+                <div class="stat-label">Search Keywords</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3.21</div>
+                <div class="stat-label">Avg Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#keyword-clusters">Keywords</a>
+            <a href="#hidden-drivers">Hidden Drivers</a>
+            <a href="#reddit-insights">Reddit</a>
+            <a href="#pain-points">Pain Points</a>
+            <a href="#segments">Segments</a>
+            <a href="#features">Features</a>
+            <a href="#innovations">Innovations</a>
+        </nav>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid-section">
+        <h2 class="products-grid-title">Analyzed Products</h2>
+        <p class="products-grid-subtitle">Click any product to view on Amazon</p>
+        <div class="products-grid">
+            <a href="https://www.amazon.com/dp/B00018SHPG" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71Et8BXB14L._AC_SX569_.jpg" alt="Bengay Ultra Strength Topical Pain Relief Cream, Non-Greasy ..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B00018SHPG</span>
+                    <span class="product-card-price">$7.86</span>
+                    <span class="product-card-title">Bengay Ultra Strength Topical Pain Relief Cream, Non-Greasy ...</span>
+                    <span class="product-card-ingredients">Camphor, Menthol, Methyl Salicylate</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DB9K83N3" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61fy5N6poTL._AC_SY879_PIbundle-2,TopRight,0,0_SH20_.jpg" alt="Theraworx Relief for Muscle Cramps Foam Fast-Acting Muscle S..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DB9K83N3</span>
+                    <span class="product-card-price">$33.98</span>
+                    <span class="product-card-title">Theraworx Relief for Muscle Cramps Foam Fast-Acting Muscle S...</span>
+                    <span class="product-card-ingredients">Magnesium Sulfate</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09NF6MZZC" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71JyG99Ei3L._AC_SX569_.jpg" alt="Nervive Pain Relieving Cream, Max Strength Non-Greasy Topica..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09NF6MZZC</span>
+                    <span class="product-card-price">$12.47</span>
+                    <span class="product-card-title">Nervive Pain Relieving Cream, Max Strength Non-Greasy Topica...</span>
+                    <span class="product-card-ingredients">Lidocaine, Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B01BW9YW9C" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71ics-6BL6L._AC_SX569_.jpg" alt="Wise Men Healing Balm with Myrrh and Frankincense Essential ..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B01BW9YW9C</span>
+                    <span class="product-card-price">$15.45</span>
+                    <span class="product-card-title">Wise Men Healing Balm with Myrrh and Frankincense Essential ...</span>
+                    <span class="product-card-ingredients">Frankincense, Myrrh</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0C5G4TBXC" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61NrI1l8psL._AC_SX569_.jpg" alt="Theraworx Relief for Muscle Cramps Roll-On Fast-Acting Muscl..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0C5G4TBXC</span>
+                    <span class="product-card-price">$9.59</span>
+                    <span class="product-card-title">Theraworx Relief for Muscle Cramps Roll-On Fast-Acting Muscl...</span>
+                    <span class="product-card-ingredients">Magnesium Sulfate</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09XC6788X" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61r+qktTGuL._AC_SX569_.jpg" alt="Basic Vigor Migrastil Neuropathy Relief Cream Extra Strength..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09XC6788X</span>
+                    <span class="product-card-price">$21.99</span>
+                    <span class="product-card-title">Basic Vigor Migrastil Neuropathy Relief Cream Extra Strength...</span>
+                    <span class="product-card-ingredients">Essential Oil Blend (Chamomile, Rosemary, Ginger, Eucalyptus, Lavender)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09NF6QX1G" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/811WIMoTVpL._AC_SX569_.jpg" alt="Nervive Pain Relieving Roll On, Lidocaine Roll On, Nervive P..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09NF6QX1G</span>
+                    <span class="product-card-price">$12.47</span>
+                    <span class="product-card-title">Nervive Pain Relieving Roll On, Lidocaine Roll On, Nervive P...</span>
+                    <span class="product-card-ingredients">Lidocaine, Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B08X99HBH4" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71IyLZoeVXL._AC_SX569_.jpg" alt="AleveX Topical Pain Relief Lotion with Rollerball Applicator..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B08X99HBH4</span>
+                    <span class="product-card-price">$14.94</span>
+                    <span class="product-card-title">AleveX Topical Pain Relief Lotion with Rollerball Applicator...</span>
+                    <span class="product-card-ingredients">Camphor, Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0C6YGKHNG" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61Ygi1ROUTL._AC_SX569_.jpg" alt="Hempvana Ultra-Strength Nerve Relief Cream w/100% Pure Hemp ..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0C6YGKHNG</span>
+                    <span class="product-card-price">$18.88</span>
+                    <span class="product-card-title">Hempvana Ultra-Strength Nerve Relief Cream w/100% Pure Hemp ...</span>
+                    <span class="product-card-ingredients">Arnica Montana, Hypericum Perforatum</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0001VKXM8" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61o2B8FAo1L._SX569_.jpg" alt="Hyland's Leg Cramps Ointment, Arnica Gel Leg Cramp Relief, N..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0001VKXM8</span>
+                    <span class="product-card-price">$9.80</span>
+                    <span class="product-card-title">Hyland's Leg Cramps Ointment, Arnica Gel Leg Cramp Relief, N...</span>
+                    <span class="product-card-ingredients">Arnica Montana, Magnesium Phosphorica, Rhus Toxicodendron</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0026HDURA" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/6116oWW-xXL._AC_SX569_.jpg" alt="Penetrex Joint &amp; Muscle Therapy - Soothing Muscle Rub for Ba..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0026HDURA</span>
+                    <span class="product-card-price">$16.98</span>
+                    <span class="product-card-title">Penetrex Joint &amp; Muscle Therapy - Soothing Muscle Rub for Ba...</span>
+                    <span class="product-card-ingredients">Arnica, Boswellia, MSM, Glucosamine, Camphor</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B06X6GZZQ2" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61nGtYdYGuL._AC_SX569_.jpg" alt="Aspercreme Odor Free Max Strength Lidocaine Pain Relief Liqu..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B06X6GZZQ2</span>
+                    <span class="product-card-price">$9.19</span>
+                    <span class="product-card-title">Aspercreme Odor Free Max Strength Lidocaine Pain Relief Liqu...</span>
+                    <span class="product-card-ingredients">Lidocaine</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B07CNW2DWY" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81tQ4NDYQuL._SX425_.jpg" alt="Biofreeze Pain Relief Cream for Knee, Neck, Hip, Joint, Shou..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B07CNW2DWY</span>
+                    <span class="product-card-price">$11.98</span>
+                    <span class="product-card-title">Biofreeze Pain Relief Cream for Knee, Neck, Hip, Joint, Shou...</span>
+                    <span class="product-card-ingredients">Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B07G1KKZNN" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81D3e+hG7iL._AC_SX569_.jpg" alt="Boiron Arnicare Cream for Joint Pain, Muscle Pain, Swelling,..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B07G1KKZNN</span>
+                    <span class="product-card-price">$13.42</span>
+                    <span class="product-card-title">Boiron Arnicare Cream for Joint Pain, Muscle Pain, Swelling,...</span>
+                    <span class="product-card-ingredients">Arnica Montana</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B084ZMMVQS" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71SxAA0hjcL._AC_SX569_PIbundle-2,TopRight,0,0_SH20_.jpg" alt="Voltaren Arthritis Pain Gel for Powerful Topical Arthritis P..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B084ZMMVQS</span>
+                    <span class="product-card-price">$33.47</span>
+                    <span class="product-card-title">Voltaren Arthritis Pain Gel for Powerful Topical Arthritis P...</span>
+                    <span class="product-card-ingredients">Diclofenac Sodium (NSAID)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B086Q3ZMZJ" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71JlOBf8DvL._AC_SX679_.jpg" alt="Voltaren Arthritis Pain Relief Gel, Diclofenac Sodium, 1% (N..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B086Q3ZMZJ</span>
+                    <span class="product-card-price">$11.89</span>
+                    <span class="product-card-title">Voltaren Arthritis Pain Relief Gel, Diclofenac Sodium, 1% (N...</span>
+                    <span class="product-card-ingredients">Diclofenac Sodium (NSAID)</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B08PL4BY5S" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81mT3ws7-2L._AC_SX569_.jpg" alt="Tiger Balm Pain Relieving Ultra Strength, 10g – Soothing &amp; U..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B08PL4BY5S</span>
+                    <span class="product-card-price">$9.00</span>
+                    <span class="product-card-title">Tiger Balm Pain Relieving Ultra Strength, 10g – Soothing &amp; U...</span>
+                    <span class="product-card-ingredients">Camphor, Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0CTTPJSYP" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/81589LAD3BL._AC_SX569_.jpg" alt="Advil Targeted Relief Pain Relieving Cream, Up to 8 Hours of..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0CTTPJSYP</span>
+                    <span class="product-card-price">$10.98</span>
+                    <span class="product-card-title">Advil Targeted Relief Pain Relieving Cream, Up to 8 Hours of...</span>
+                    <span class="product-card-ingredients">Camphor, Capsaicin, Menthol, Methyl Salicylate</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0CWSHLMHT" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71RiUL7Q0-L._AC_SX569_.jpg" alt="HealthWise 4% Lidocaine Roll-On | OTC Strength | Pain Relief..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0CWSHLMHT</span>
+                    <span class="product-card-price">$4.99</span>
+                    <span class="product-card-title">HealthWise 4% Lidocaine Roll-On | OTC Strength | Pain Relief...</span>
+                    <span class="product-card-ingredients">Lidocaine</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DJYXR31R" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61whu-DB8XL._SX569_.jpg" alt="Mama Bear Oasis Lotion - Neuropathy Nerve Therapy &amp; Relief C..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DJYXR31R</span>
+                    <span class="product-card-price">$34.99</span>
+                    <span class="product-card-title">Mama Bear Oasis Lotion - Neuropathy Nerve Therapy &amp; Relief C...</span>
+                    <span class="product-card-ingredients">Magnesium Chloride, Arnica, MSM, Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0DQZR58ND" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/61XEM2hwl9L._AC_SX569_.jpg" alt="Icy Hot Original Pain Relief Nighttime Recovery No-Mess Roll..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0DQZR58ND</span>
+                    <span class="product-card-price">$7.98</span>
+                    <span class="product-card-title">Icy Hot Original Pain Relief Nighttime Recovery No-Mess Roll...</span>
+                    <span class="product-card-ingredients">Menthol</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B09PVMTM9W" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/51NCq08HxXL._AC_SX569_.jpg" alt="Life-flo Magnesium Lotion - Relief and Relaxation with Magne..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B09PVMTM9W</span>
+                    <span class="product-card-price">$11.69</span>
+                    <span class="product-card-title">Life-flo Magnesium Lotion - Relief and Relaxation with Magne...</span>
+                    <span class="product-card-ingredients">Magnesium Chloride</span>
+                </div>
+            </a>
+            <a href="https://www.amazon.com/dp/B0F1QHNFJP" target="_blank" class="product-card">
+                <img src="https://m.media-amazon.com/images/I/71+oszjnRVL._SX569_.jpg" alt="Magnum Solace Nighttime Magnesium Lotion with Arnica – Sooth..." class="product-card-img"
+                     onerror="this.style.background='#f0f0f0';this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/><text y=%2250%25%22 x=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22%2364748B%22>No Image</text></svg>'">
+                <div class="product-card-info">
+                    <span class="product-card-asin">B0F1QHNFJP</span>
+                    <span class="product-card-price">$8.99</span>
+                    <span class="product-card-title">Magnum Solace Nighttime Magnesium Lotion with Arnica – Sooth...</span>
+                    <span class="product-card-ingredients">Magnesium Chloride, Arnica</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Keyword Clusters Section -->
+    <div class="keyword-clusters-section" id="keyword-clusters">
+        <h2>Keyword Cluster Analysis</h2>
+        <p class="clusters-subtitle">347 keywords &bull; 647,856 total search volume &bull; 186 clusters identified</p>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>Top Clusters by Search Volume</h3>
+                <div class="chart" id="chart-volume"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Top Clusters by Keyword Count</h3>
+                <div class="chart" id="chart-count"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Pain Type / Body Part Clusters</h3>
+                <div class="chart" id="chart-identity"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Product Feature Clusters</h3>
+                <div class="chart" id="chart-feature"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for keyword details -->
+    <div id="keywords-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-title"></h3>
+            <div id="modal-stats" class="modal-stats"></div>
+            <div id="modal-keywords" class="modal-keywords"></div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- Part 1: Hidden Purchase Drivers -->
+        <section id="hidden-drivers" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 1</span>
+                <h2 class="section-title">Hidden Purchase Drivers</h2>
+                <p class="section-subtitle">Where review behavior and search behavior diverge reveals untapped positioning opportunities</p>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature / Theme</th>
+                            <th>Review Mentions</th>
+                            <th>Keyword Volume</th>
+                            <th>Opportunity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Smell / Odor Complaints</strong></td>
+                            <td>892 reviews</td>
+                            <td>~3.9K ("odorless" keywords)</td>
+                            <td>&#127919; High - 18.5% of negative reviews cite smell, but only a fraction of searchers explicitly look for "odorless." Massive hidden differentiator that drives repeat purchases and abandonment.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Non-Greasy / Fast-Absorbing</strong></td>
+                            <td>279 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High - Greasiness is the 8th biggest complaint yet virtually no one searches for "non-greasy pain cream." This is a pure post-purchase differentiator that drives reviews and word-of-mouth.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Neuropathy / Nerve Pain</strong></td>
+                            <td>304 reviews</td>
+                            <td>~46.6K ("nerve" + "neuropathy" keywords)</td>
+                            <td>&#9989; Strong keyword-review alignment. This is a well-matched, high-demand sub-niche with dedicated search behavior and clear product expectations.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nighttime / Sleep Use</strong></td>
+                            <td>598 reviews</td>
+                            <td>~4.6K ("relaxing leg cream pm")</td>
+                            <td>&#127919; High - 6.4% of all reviews mention nighttime use with highest satisfaction (2.62 ratio), yet very few products or keywords target this specifically. Huge underserved occasion.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Roll-On Application</strong></td>
+                            <td>299 reviews (usability)</td>
+                            <td>~44K ("roll on" keywords)</td>
+                            <td>&#9989; Well-matched format preference. Roll-on is the 5th largest keyword cluster AND a top review theme. Both search and review data confirm this format demand.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cramps / RLS / Spasms</strong></td>
+                            <td>297 reviews</td>
+                            <td>~4.4K ("cramps" + "restless legs")</td>
+                            <td>&#127919; Medium - Significant review volume from a desperate, underserved segment. Moderate search volume indicates a niche that relies more on word-of-mouth than search discovery.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Arthritis / Joint Pain</strong></td>
+                            <td>218 reviews</td>
+                            <td>~51.5K ("arthritis" keywords)</td>
+                            <td>&#9989; Highest search volume identity cluster. Well-matched with strong search intent. Dominated by Voltaren positioning, leaving room for alternatives.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Burning / Skin Irritation</strong></td>
+                            <td>337 reviews</td>
+                            <td class="highlight-zero">~0</td>
+                            <td>&#127919; High - 7% of negative reviews report burning or irritation, yet no one searches for "gentle pain cream" or "no burn pain relief." A product positioned as "dermatologist-tested, no-burn formula" could capture this anxiety.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Long-Lasting Relief</strong></td>
+                            <td>85 reviews (explicit) + pervasive in negative sentiment</td>
+                            <td>~250 ("long lasting")</td>
+                            <td>&#127919; Medium - Duration of relief is rarely searched for but is the #1 frustration on Reddit and a recurring complaint. Demonstrating "4+ hour relief" would be a powerful differentiator.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Back Pain</strong></td>
+                            <td>292 reviews</td>
+                            <td>~7.1K ("back" keywords)</td>
+                            <td>&#9989; Well-matched but underperforming. Back pain has only 49.5% satisfaction rate, meaning current products fail this use case. Opportunity to create a back-pain-specific formula.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Maximum Strength</strong></td>
+                            <td>Pervasive across reviews</td>
+                            <td>~27.5K ("maximum" keywords)</td>
+                            <td>&#9989; "Maximum strength" is the 4th largest feature cluster. Buyers actively seek the strongest available option, signaling distrust in standard formulas.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> The pain lotion category has a massive disconnect between what drives search (condition-specific terms like "arthritis cream" and "nerve pain relief") and what drives satisfaction (texture, smell, duration, and skin compatibility). The biggest hidden differentiators -- odorless formula, non-greasy texture, no-burn guarantee, and nighttime-specific positioning -- are almost invisible in search data but dominate review sentiment. A product that nails these "invisible" attributes while targeting a specific pain condition would have a significant competitive advantage.
+            </div>
+        </section>
+
+        <!-- Part 2: Reddit Insights -->
+        <section id="reddit-insights" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 2</span>
+                <h2 class="section-title">Reddit Insights</h2>
+                <p class="section-subtitle">Real discussions from Reddit communities about pain relief topicals</p>
+            </div>
+
+            <div class="reddit-stats-bar">
+                <div class="reddit-stat">
+                    <div class="reddit-stat-number">16</div>
+                    <div class="reddit-stat-label">Research Queries</div>
+                </div>
+                <div class="reddit-stat">
+                    <div class="reddit-stat-number">16</div>
+                    <div class="reddit-stat-label">Subreddits Referenced</div>
+                </div>
+                <div class="reddit-stat">
+                    <div class="reddit-stat-number">23</div>
+                    <div class="reddit-stat-label">Insights Found</div>
+                </div>
+            </div>
+
+            <!-- By Persona -->
+            <div class="reddit-category" id="reddit-persona">
+                <div class="reddit-category-header" onclick="toggleReddit('persona')">
+                    <span class="reddit-category-title">
+                        &#128100; By Persona
+                        <span class="reddit-category-count">6 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Neuropathy Sufferers</div>
+                            <div class="reddit-summary">Neuropathy patients view most OTC topicals as temporary band-aids. The community strongly favors lidocaine for numbing and increasingly discusses capsaicin cream (0.075%+) for long-term nerve desensitization, despite the harsh initial burning period. Gabapentin is seen as the "real solution" while topicals are supplementary.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">I have tried every cream on Amazon for my diabetic neuropathy. Lidocaine patches are the only topical that actually numbs the burning in my feet. Everything else is just expensive lotion.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Neuropathy</span>
+                                    <span class="reddit-context">Thread about best OTC options for peripheral neuropathy</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">The problem with most neuropathy creams on Amazon is they are just menthol with fancy marketing. If you actually want nerve pain relief, you need either prescription compounded cream or high-dose capsaicin.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Neuropathy</span>
+                                    <span class="reddit-context">Thread comparing neuropathy cream options</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Capsaicin cream was horrible for the first 2 weeks but after pushing through, my nerve pain actually decreased significantly. You have to use it consistently for it to work -- most people give up too early.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Discussion on capsaicin for nerve pain management</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Arthritis Warriors</div>
+                            <div class="reddit-summary">Arthritis sufferers overwhelmingly recommend Voltaren (diclofenac) as the gold standard topical for hands and knees. However, they note significant limitations: requires consistent multi-day use, cannot be used on back/hips, and the dosing card is annoying. Penetrex has a devoted following as a non-NSAID alternative for deeper joint pain.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Voltaren is the only topical that actually treats inflammation rather than just masking pain with cooling or heating sensations. Everything else is just a distraction technique for your nerves.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Arthritis</span>
+                                    <span class="reddit-context">Thread comparing arthritis pain creams</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Penetrex is underrated for hand arthritis. It does not have that strong menthol smell so I can use it at work, and it actually seems to reduce swelling over time, not just numb the pain.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/rheumatoid</span>
+                                    <span class="reddit-context">Discussion on topicals for hand arthritis</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Fibromyalgia Sufferers</div>
+                            <div class="reddit-summary">Fibromyalgia patients report that most topical pain creams provide minimal relief for their widespread pain. The community favors lidocaine patches for targeted flare-ups and CBD topicals for general soreness. Many note that menthol and cooling sensations actually worsen their skin hypersensitivity.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">With fibro, the pain is everywhere so topical creams feel pointless -- you would need to cover your entire body. Lidocaine patches on my worst spots plus oral meds is my approach.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Fibromyalgia</span>
+                                    <span class="reddit-context">Thread about managing widespread fibro pain</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">I have found that magnesium lotion before bed actually helps more than any pain cream for my fibro. It relaxes the muscles and I sleep better, which reduces next-day pain.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Fibromyalgia</span>
+                                    <span class="reddit-context">User sharing nighttime fibro routine</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Athletes &amp; Fitness Enthusiasts</div>
+                            <div class="reddit-summary">The fitness community strongly favors Biofreeze and Tiger Balm for post-workout recovery, valuing the immediate cooling/heating sensation. Non-greasy formulas and roll-on applicators are highly preferred for gym use. Athletes often layer products: Biofreeze immediately post-workout, CBD cream at night.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Biofreeze roll-on is my go-to after heavy leg day. Quick to apply, not greasy, and the cooling sensation helps me mentally move past the soreness. I keep one in my gym bag at all times.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/fitness</span>
+                                    <span class="reddit-context">Thread on post-workout recovery products</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">I need something non-greasy that will not stain my gear. Most pain creams leave residue on everything. Roll-on formats are way better for gym use.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/fitness</span>
+                                    <span class="reddit-context">Thread asking about clean pain relief options</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">RLS &amp; Nighttime Cramp Sufferers</div>
+                            <div class="reddit-summary">A frustrated and underserved community. Many have tried magnesium supplements with mixed results and are turning to topical magnesium lotions as a targeted alternative. The community strongly desires a product specifically formulated for nighttime use without stimulating menthol or camphor.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Magnesium cream on my calves before bed is the only thing that stopped my nighttime leg cramps. Oral magnesium gave me digestive issues but the topical version is a game changer.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/RestlessLegs</span>
+                                    <span class="reddit-context">Thread on natural RLS remedies</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Please, someone make a pain cream specifically for nighttime that does not have menthol. I do not want to be wide awake from a cooling sensation when I am trying to sleep.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/RestlessLegs</span>
+                                    <span class="reddit-context">User frustrated with stimulating pain creams</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Elderly &amp; Caregiver Buyers</div>
+                            <div class="reddit-summary">Caregivers buying for elderly parents frequently mention arthritis-friendly packaging, ease of application, and concerns about drug interactions. Many elderly users struggle with jar lids and strongly prefer pump or roll-on dispensers. Gentle, unscented formulas are valued for thin, fragile skin.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">I buy pain cream for my 85-year-old mom and the biggest issue is packaging. She cannot open child-proof caps with her arthritic hands. We have switched to pump bottles only.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/eldercare</span>
+                                    <span class="reddit-context">Thread about products for elderly parents with arthritis</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">The smell of Bengay fills the entire house when mom uses it. We switched to Aspercreme odor-free and it is so much better for everyone.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/eldercare</span>
+                                    <span class="reddit-context">Discussion on odor-free pain relief for shared living spaces</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Requests -->
+            <div class="reddit-category" id="reddit-feature-request">
+                <div class="reddit-category-header" onclick="toggleReddit('feature-request')">
+                    <span class="reddit-category-title">
+                        &#10024; Feature Requests
+                        <span class="reddit-category-count">5 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Non-Greasy, Fast-Absorbing Formulas</div>
+                            <div class="reddit-summary">The #1 product feature request across all pain communities. Users consistently complain about products that leave residue on clothing, bedsheets, and furniture. Especially important for daytime work use and nighttime bed use.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">The absolute worst thing about pain creams is getting it on my clothes and sheets. I need something that absorbs in under a minute and does not transfer to everything I touch.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread on daily pain cream frustrations</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Penetrex wins for me purely because it is not greasy. I can apply it at my desk and go right back to typing. Try doing that with Tiger Balm.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Arthritis</span>
+                                    <span class="reddit-context">User comparing pain cream textures</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Longer-Lasting Relief (4+ Hours)</div>
+                            <div class="reddit-summary">Short-lived relief is the most universal frustration. Users report most topicals wearing off within 30-60 minutes. The desire for 4-8 hour relief is consistently expressed, with many noting they would pay significantly more for genuinely long-lasting formulas.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Every pain cream I have tried works for maybe 30 minutes. I would pay triple the price for something that actually lasts 4-6 hours. The constant reapplication is exhausting.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread about long-lasting pain relief options</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Odorless / Mild Scent Options</div>
+                            <div class="reddit-summary">Strong menthol or camphor smell is a major barrier to use, especially in work environments and shared living spaces. The few truly odorless options (Aspercreme, Penetrex) are praised specifically for this feature.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">I cannot use Bengay or Icy Hot at work because the entire office would smell it. Aspercreme lidocaine is my work-hours solution -- no smell at all.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread about discreet pain relief for work</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Multi-Ingredient Combinations</div>
+                            <div class="reddit-summary">Advanced pain management users increasingly favor multi-ingredient approaches. The combination of lidocaine (numbing) + menthol (cooling) + anti-inflammatory is the most requested profile. Compounded pharmacy creams are seen as the gold standard but are expensive and require prescriptions.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">The best pain relief I have found is layering Voltaren for inflammation, then Biofreeze on top for immediate cooling. No single product does both well.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">User sharing layering technique</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Roll-On Applicators Over Jars</div>
+                            <div class="reddit-summary">Roll-on applicators are strongly preferred for hygiene, ease of use, and mess-free application. Users with hand arthritis particularly value roll-ons. The self-massage effect of the roller ball is seen as an added benefit.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Roll-on is the only format I will buy now. My arthritis hands cannot scoop cream from a jar, and I do not want to get the product all over my hands when applying it to my knees.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Arthritis</span>
+                                    <span class="reddit-context">Thread about preferred pain cream formats</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pain Points -->
+            <div class="reddit-category" id="reddit-pain-point">
+                <div class="reddit-category-header" onclick="toggleReddit('pain-point')">
+                    <span class="reddit-category-title">
+                        &#9888;&#65039; Pain Points
+                        <span class="reddit-category-count">4 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Short-Lived Relief is #1 Frustration</div>
+                            <div class="reddit-summary">The single biggest complaint across all Reddit pain communities. Most users report relief duration of 30-60 minutes, creating a cycle of constant reapplication, high product usage, and ultimately product abandonment.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">I have spent hundreds on pain creams. They all work for about 30 minutes then the pain comes right back. It is like putting a bandaid on a broken bone.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Frustrated user venting about topical pain products</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Skin Irritation from Capsaicin</div>
+                            <div class="reddit-summary">Capsaicin products generate the most extreme reactions -- users either love the long-term benefits or hate the burning. The initial 2-week adjustment period causes most people to quit before seeing benefits.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Capsaicin cream literally felt like I dipped my feet in lava. I lasted 3 days before throwing it away. My dermatologist said to push through for 2 weeks but I could not.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Neuropathy</span>
+                                    <span class="reddit-context">Thread about capsaicin side effects</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">High Prices for Small Quantities</div>
+                            <div class="reddit-summary">Price-to-quantity ratio is a significant pain point for chronic users who go through product quickly with multiple daily applications. Users frequently compare cost per ounce and feel many products are overpriced relative to active ingredients.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Penetrex is $17 for 2oz. I use it 3 times a day on both knees and it lasts maybe 10 days. That is $50 a month for marginal relief. The math does not work.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Arthritis</span>
+                                    <span class="reddit-context">Thread calculating cost of daily pain cream use</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Snake Oil Concerns with Natural Products</div>
+                            <div class="reddit-summary">Reddit communities are highly skeptical of "natural" pain products with vague ingredient lists, homeopathic claims, or MLM associations. Users demand clinical evidence and known active ingredients.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">If a pain cream lists homeopathic ingredients, it is literally just water and wishful thinking. Look for actual drug facts panels with real active ingredients.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/AskDocs</span>
+                                    <span class="reddit-context">Doctor responding to question about homeopathic pain creams</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Sentiment -->
+            <div class="reddit-category" id="reddit-brand-sentiment">
+                <div class="reddit-category-header" onclick="toggleReddit('brand-sentiment')">
+                    <span class="reddit-category-title">
+                        &#127991;&#65039; Brand Sentiment
+                        <span class="reddit-category-count">3 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Loved: Voltaren, Penetrex, Aspercreme</div>
+                            <div class="reddit-summary">Voltaren is valued as the only truly anti-inflammatory OTC topical. Penetrex is loved for its non-greasy formula and deep joint effectiveness. Aspercreme lidocaine is praised for odor-free numbing that works quickly.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Voltaren is the only OTC topical that actually treats the cause of pain (inflammation) rather than just masking it. Everything else is just a fancy distraction.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Arthritis</span>
+                                    <span class="reddit-context">Thread about best arthritis treatments</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Aspercreme with lidocaine is my secret weapon. No smell, works in 10 minutes, and you can apply it at work without anyone knowing.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread about discreet workplace pain relief</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Overrated: Icy Hot, Bengay, Nervive</div>
+                            <div class="reddit-summary">Icy Hot and Bengay are frequently called "overrated" -- users feel they provide only temporary distraction through intense sensation rather than real relief. Nervive is increasingly criticized as "gimmicky" marketing targeting neuropathy patients with standard lidocaine ingredients at a premium price.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Icy Hot is the placebo of pain creams. It makes you FEEL like something is happening because of the intense hot-cold sensation, but your pain is still there once it wears off.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread debating whether Icy Hot actually works</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Nervive is just rebranded lidocaine cream with "neuropathy" on the label and a 3x markup. Check the active ingredients -- there is nothing special about it.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Neuropathy</span>
+                                    <span class="reddit-context">Discussion about Nervive marketing vs ingredients</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Underrated: Theraworx, Sombra, Aspercreme</div>
+                            <div class="reddit-summary">Theraworx has a niche following among cramp sufferers and is often recommended by physical therapists. Sombra warm therapy cream has a devoted professional/clinical following. Aspercreme is overlooked due to "old-person branding" but their lidocaine products are genuinely effective.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">My physical therapist introduced me to Sombra warm therapy cream and it is incredible for deep muscle pain. Never seen it in a regular store -- it is like a clinic secret.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">User discovering professional-grade pain products</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Discoveries -->
+            <div class="reddit-category" id="reddit-new-discovery">
+                <div class="reddit-category-header" onclick="toggleReddit('new-discovery')">
+                    <span class="reddit-category-title">
+                        &#128161; New Discoveries
+                        <span class="reddit-category-count">5 insights</span>
+                    </span>
+                    <span class="reddit-chevron">&#9660;</span>
+                </div>
+                <div class="reddit-category-body">
+                    <div class="reddit-category-content">
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Product Layering is Standard Practice</div>
+                            <div class="reddit-summary">Experienced pain management users routinely layer multiple topical products: anti-inflammatory (Voltaren) as base, cooling agent (Biofreeze) on top. This reveals a clear opportunity for an all-in-one product combining multiple pain mechanisms.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">My pain management routine: Voltaren on the joint first for inflammation, wait 10 minutes, then Biofreeze roll-on on top for immediate cooling relief. It is the only combo that gets me through the day.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/Arthritis</span>
+                                    <span class="reddit-context">User sharing daily pain management protocol</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Layering works because each product targets a different pain pathway. Menthol gates pain signals, NSAIDs reduce inflammation, and lidocaine blocks nerve transmission. One product cannot do all three well.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/PainManagement</span>
+                                    <span class="reddit-context">Medical perspective on why layering works</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Nighttime-Specific Formulas are an Unmet Need</div>
+                            <div class="reddit-summary">Reddit users consistently express desire for pain creams specifically designed for nighttime. Current products either contain stimulating menthol that disrupts sleep or lack sufficient efficacy. The ideal formula would combine pain relief with sleep-promoting properties and avoid cooling/heating sensations.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">Every pain cream keeps me awake with the tingling. I need something calming that helps me sleep, not a cooling sensation that makes me more alert. Magnesium lotion with lavender is my current workaround.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread about pain relief that does not disrupt sleep</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">My ideal nighttime pain cream: no menthol, no camphor, includes magnesium for cramps, lavender for relaxation, and some kind of actual pain relief ingredient. Nobody makes this.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/RestlessLegs</span>
+                                    <span class="reddit-context">User describing ideal nighttime product</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">CBD Gaining Traction but Quality Inconsistent</div>
+                            <div class="reddit-summary">CBD topicals are increasingly popular but the community is deeply divided on efficacy. Users report wildly inconsistent results between brands, attributed to variations in CBD concentration and extraction quality. Third-party testing is becoming a key purchasing criterion. Many "hemp" products are just moisturizer.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">CBD cream is either a game-changer or expensive lotion depending on the brand. I have tried 6 different ones and only 2 actually worked. The difference is full-spectrum vs isolate.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread comparing CBD pain creams</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">Compounded Pharmacy Creams as Gold Standard</div>
+                            <div class="reddit-summary">Prescription compounded creams (ketamine + lidocaine + gabapentin) are consistently described as the most effective topical pain solution. This represents the ceiling of what is possible and reveals a significant efficacy gap between prescription and OTC options.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">My compounded cream has ketamine 10%, lidocaine 5%, and gabapentin 6%. It costs $80 but nothing OTC even comes close. Someone needs to make a better OTC multi-ingredient option.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/PainManagement</span>
+                                    <span class="reddit-context">User sharing experience with compounded cream</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reddit-subcategory">
+                            <div class="reddit-subcategory-title">PEA (Palmitoylethanolamide) Emerging as Novel Ingredient</div>
+                            <div class="reddit-summary">PEA is increasingly discussed in pain management communities as a promising natural anti-inflammatory and neuroprotective compound. Available as a supplement and beginning to appear in topical formulations. Clinical research supports its use for neuropathic pain with no known side effects.</div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">PEA (palmitoylethanolamide) is getting a lot of attention in the chronic pain community. It is a naturally occurring fatty acid with anti-inflammatory properties and no known side effects.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/ChronicPain</span>
+                                    <span class="reddit-context">Thread about emerging pain relief ingredients</span>
+                                </div>
+                            </div>
+                            <div class="reddit-quote-card">
+                                <div class="reddit-quote-text">The research on PEA for neuropathic pain is actually solid -- there are several randomized controlled trials. It is not snake oil, but topical formulations are still rare.</div>
+                                <div class="reddit-quote-meta">
+                                    <span class="reddit-subreddit">r/PainManagement</span>
+                                    <span class="reddit-context">Discussion on clinical evidence for PEA</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Reddit Insights:</strong> Three major findings from Reddit research: (1) Experienced pain users routinely <strong>layer multiple products</strong> (Voltaren + Biofreeze) because no single OTC product addresses multiple pain pathways -- this is a clear product development opportunity. (2) <strong>Nighttime-specific pain relief</strong> is a massive unmet need, with users explicitly requesting formulas without menthol/camphor that include calming ingredients like magnesium and lavender. (3) <strong>PEA (Palmitoylethanolamide)</strong> is emerging as a clinically-backed novel ingredient for neuropathic pain that could differentiate a new entrant from the menthol-dominated market.
+            </div>
+        </section>
+
+        <!-- Part 3: Pain Points -->
+        <section id="pain-points" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 3</span>
+                <h2 class="section-title">Pain Points Analysis</h2>
+                <p class="section-subtitle">Top complaints from 4,824 negative reviews (1-3 stars) across 23 products</p>
+            </div>
+
+            <h3 style="color: var(--danger); margin-bottom: 20px;">&#128680; Critical (1,000+ mentions) <span class="severity-badge critical">CRITICAL</span></h3>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">1</div>
+                    <div class="pain-title">Does Not Work / Ineffective <small>1,077 mentions (22.3%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"Did nothing for me except smell like vanilla. I bought it specifically for relief and relaxation, not as a basic vanilla lotion. I used it for several days and tested it in every way I could think of. No relaxation, no easing of tension, no calming effect."</blockquote>
+                        <blockquote>"I had high hopes this product would help calm muscle spasms in my feet and calves. After following directions to apply, let it dry, then apply a second coat... it did absolutely nothing."</blockquote>
+                        <blockquote>"Hyped as a better product than something I can buy at any store, but the ingredients are not even as strong as a $6 tube of Walmart pain relieving cream."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Include clinically-proven active ingredients with drug facts panel (not just homeopathic or "natural" claims)</li>
+                            <li>Set realistic expectations in marketing -- "takes the edge off" not "miracle cure"</li>
+                            <li>Target specific pain types rather than claiming to treat everything</li>
+                            <li>Provide clear usage instructions with expected onset time and duration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: #D97706; margin: 30px 0 20px;">&#9888;&#65039; High (200-999 mentions) <span class="severity-badge high-sev">HIGH</span></h3>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">2</div>
+                    <div class="pain-title">Smell / Odor <small>892 mentions (18.5%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"I cannot state enough my dislike for this product. The smell is overpowering and lingers for hours. It permeates bedsheets, clothing, and the entire room."</blockquote>
+                        <blockquote>"The scent is super strong, which I was also hoping to avoid, so I cannot use this if I intend to leave the house soon after."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Develop truly odorless formulas (not just "mild scent" claims)</li>
+                            <li>If scent is necessary, use calming scents (lavender, chamomile) not medicinal</li>
+                            <li>Highlight "odor-free" prominently on packaging -- it is a purchase driver</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">3</div>
+                    <div class="pain-title">Burning / Skin Irritation <small>337 mentions (7.0%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"I used Ben Gay ultra strength and it CAUSED SEVERE 2nd DEGREE BURNS. I applied it once, then six hours later applied it again."</blockquote>
+                        <blockquote>"Lovely smell but there is skin irritation when I use it. I think it is the lavender oil they use because the bergamot version gave me no problems."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Dermatologist-tested, hypoallergenic formulas for sensitive skin</li>
+                            <li>Clear "no-burn guarantee" positioning</li>
+                            <li>Patch test instructions and gradual dosing guidance</li>
+                            <li>Avoid capsaicin or offer very low concentrations with proper warnings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">4</div>
+                    <div class="pain-title">Neuropathy / Nerve Pain Complaints <small>304 mentions (6.3%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"This product was a total waste of money. I bought this for foot pain and neuropathy. There is nothing therapeutic about it."</blockquote>
+                        <blockquote>"Not an instant cure, but some relief for neuropathy. Slightly overhyped in the ads. Not a miracle cure but it does offer some relief for those burning toes."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Neuropathy-specific formula with targeted ingredients (lidocaine, PEA, B vitamins)</li>
+                            <li>Address the specific neuropathy experience: burning, tingling, numbness</li>
+                            <li>Include capsaicin at therapeutic levels with clear adjustment-period instructions</li>
+                            <li>Partner with neurologists for credibility</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">5</div>
+                    <div class="pain-title">Application / Usability Issues <small>299 mentions (6.2%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"My purpose in purchasing was to help relieve arthritis pain in my knees and hands. However, because the top is so difficult to open I have not been able to use this product yet."</blockquote>
+                        <blockquote>"Right out of the gate it was difficult to use. Because coconut oil is used it basically is a solid. So try applying a solid to your body."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Roll-on or pump formats that do not require grip strength</li>
+                            <li>Arthritis-friendly packaging (easy-open caps, no jars)</li>
+                            <li>Consistent texture that works in all temperatures</li>
+                            <li>One-hand application design for self-treating hard-to-reach areas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">6</div>
+                    <div class="pain-title">Cramps / Spasms / RLS <small>297 mentions (6.2%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"I am the Queen of Cramps. I have severe, debilitating cramps more than anyone I have talked to. My cramps last as long as 13 minutes, and I feel as though I am in a literal prison cramp and being tightened into a human vice."</blockquote>
+                        <blockquote>"I purchased it because my wife gets severe leg cramps in the morning several times per week. Unfortunately Theraworx Relief does not work at all for either of us."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Magnesium-forward formula specifically for cramps and RLS</li>
+                            <li>Fast-absorbing foam or lotion format for mid-cramp application</li>
+                            <li>Nighttime positioning (no stimulating ingredients)</li>
+                            <li>Preventative use messaging: apply before bed, not during cramp</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">7</div>
+                    <div class="pain-title">Back Pain Dissatisfaction <small>292 mentions (6.1%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"I have very bad chronic lower back pain, maybe that is why it did not work. I did apply it almost every day, for two to three times a day. Frankly, I did not feel any differences."</blockquote>
+                        <blockquote>"Be aware that Voltaren has significant limitations for its use! You MAY NOT use it on back, hip, or shoulder areas."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Back-pain-specific formula that penetrates deeper tissue</li>
+                            <li>Self-application tool or roll-on designed for back reach</li>
+                            <li>Address the Voltaren gap: back/hip/shoulder are restricted for diclofenac</li>
+                            <li>Combine with warming element for muscle spasm component</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">8</div>
+                    <div class="pain-title">Greasy / Sticky / Messy <small>279 mentions (5.8%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"While it can help with pain it also gets everywhere and once it is on your skin it is impossible to get off. Get this on your hands and it stays on your hands no matter what you scrub with."</blockquote>
+                        <blockquote>"The product is worthless... smelly... greasy... it does nothing for my arthritic pain in my right thumb."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Quick-absorbing, dry-touch formula that does not transfer</li>
+                            <li>No residue on clothing, bedsheets, or furniture</li>
+                            <li>"Vanishing cream" or gel texture over heavy ointments</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3 style="color: var(--muted); margin: 30px 0 20px;">Medium (&lt;200 mentions) <span class="severity-badge medium-sev">MEDIUM</span></h3>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">9</div>
+                    <div class="pain-title">Price / Value Concerns <small>242 mentions (5.0%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"It is so small and pricy and I have to apply quite a bit. In the long run, this would add up. It looks like they do not sell larger volumes either, so you are stuck buying small quantities at a time."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Offer larger "chronic user" sizes (8oz+) at better per-ounce pricing</li>
+                            <li>Subscription model for frequent users</li>
+                            <li>FSA/HSA eligible certification (1,538 searches for "fsa pain relief")</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">10</div>
+                    <div class="pain-title">Menthol / Cooling Complaints <small>233 mentions (4.8%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"It is not Advil ibuprofen, nor any anti-inflammatory. It is just another counter irritant -- if you want a burning sensation in addition to your pain from inflammation. Literally just Capsaicin hot sauce for the skin."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Menthol-free formulas for sensitive users and nighttime use</li>
+                            <li>Adjustable sensation levels (mild, moderate, strong)</li>
+                            <li>Transparency about counter-irritant mechanism vs actual treatment</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pain-point">
+                <div class="pain-header">
+                    <div class="pain-number">11</div>
+                    <div class="pain-title">Misleading Marketing / Scam Concerns <small>112 mentions (2.3%)</small></div>
+                </div>
+                <div class="pain-body">
+                    <div class="pain-quotes">
+                        <blockquote>"I should have paid more attention that this is homeopathic. How do you even figure out what is in this or the concentration of actual therapeutic substance? Is this just hopes and dreams?"</blockquote>
+                        <blockquote>"Marketing as Advil targeted relief is deceiving even though the company makes it clear that it does not contain the same active ingredient as Advil."</blockquote>
+                    </div>
+                    <div class="pain-solutions">
+                        <h4>Product Opportunities</h4>
+                        <ul>
+                            <li>Transparent ingredient lists with clear drug facts panel</li>
+                            <li>Evidence-based claims backed by clinical studies</li>
+                            <li>Avoid trading on brand names that imply different active ingredients</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> The pain lotion category has the lowest average rating (3.21) and highest negative review percentage (52%) of any category analyzed in this report series. The root cause is a <strong>fundamental expectation gap</strong>: buyers expect "pain relief" but most products only provide temporary counter-irritation (menthol/camphor sensation). The categories with the lowest satisfaction -- back pain (49.5%), hands (49.6%), and full body (29.5%) -- are areas where topicals physically cannot penetrate deep enough to reach the pain source. Products that honestly communicate their mechanism and target appropriate use cases (surface-level, localized pain) while innovating on texture, scent, and duration will win.
+            </div>
+        </section>
+
+        <!-- Part 4: Customer Segments -->
+        <section id="segments" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 4</span>
+                <h2 class="section-title">Customer Segments</h2>
+                <p class="section-subtitle">Six distinct buyer personas identified from review language and use-case patterns</p>
+            </div>
+
+            <div class="segment-grid">
+
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>&#129504; Neuropathy Sufferers</h4>
+                        <span class="segment-badge">304 mentions</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul>
+                                <li>Reduce burning, tingling, and numbness in feet, hands, and toes</li>
+                                <li>Find a topical that provides meaningful nerve pain relief between doctor visits</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul>
+                                <li>Feel hopeful that something can help manage an incurable condition</li>
+                                <li>Regain a sense of normalcy and independence in daily activities</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul>
+                                <li>Not appear "sick" or limited to family and coworkers</li>
+                                <li>Use a product discreetly without strong medicinal smell</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section quotes">
+                            <blockquote>"I have horrible nerve pain and nothing really helps it. This cream takes the edge off which is nice but has not been a miracle worker like I hoped."</blockquote>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>&#127769; Cramp &amp; RLS Nighttime Sufferers</h4>
+                        <span class="segment-badge">598 + 297 mentions</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul>
+                                <li>Prevent or stop nighttime leg cramps, restless legs, and muscle spasms</li>
+                                <li>Get uninterrupted sleep without being woken by sudden cramping</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul>
+                                <li>End the dread and anxiety of going to bed knowing cramps may strike</li>
+                                <li>Feel rested and functional the next morning</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul>
+                                <li>Not disturb a partner with sudden cramp episodes at night</li>
+                                <li>Use a product that does not make the bedroom smell medicinal</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section quotes">
+                            <blockquote>"I have episodic painful leg and foot cramps, some very bad. The worst are lower leg cramps where the muscles twist and form a baseball sized lump."</blockquote>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>&#128170; Arthritis &amp; Joint Pain Warriors</h4>
+                        <span class="segment-badge">218 + 426 knee + 587 hands</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul>
+                                <li>Reduce inflammation and stiffness in hands, knees, and joints</li>
+                                <li>Maintain grip strength and mobility for daily tasks</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul>
+                                <li>Maintain independence and avoid feeling "old" or disabled</li>
+                                <li>Feel confident they can still do what they love (gardening, cooking, hobbies)</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul>
+                                <li>Apply discreetly at work without greasy hands or strong smell</li>
+                                <li>Packaging that does not broadcast a medical condition</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section quotes">
+                            <blockquote>"I suffer from debilitating degenerative joint disease pain in my hands and neck... wanted a drug-free means to make it bearable."</blockquote>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>&#127939; Active &amp; Athletic Recovery</h4>
+                        <span class="segment-badge">69 mentions (2.63 ratio)</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul>
+                                <li>Recover faster from workouts, sports injuries, and muscle soreness</li>
+                                <li>Quick application before/after training without mess</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul>
+                                <li>Feel proactive about recovery and performance optimization</li>
+                                <li>Get back to training faster without being sidelined by soreness</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul>
+                                <li>Use a product that fits a fitness/performance identity (not "grandma cream")</li>
+                                <li>Apply at the gym without embarrassment</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section quotes">
+                            <blockquote>"Tiger Balm Ultra is legit for deep muscle aches. The warming sensation penetrates better than cold products for my lower back after deadlifts."</blockquote>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>&#128167; Chronic Pain Managers</h4>
+                        <span class="segment-badge">292 back + 1,906 workers</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul>
+                                <li>Manage persistent back pain, sciatica, and fibromyalgia on a daily basis</li>
+                                <li>Reduce reliance on oral pain medications (NSAIDs, opioids)</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul>
+                                <li>Maintain dignity and normalcy despite chronic pain</li>
+                                <li>Feel that something is helping, even if it does not eliminate pain completely</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul>
+                                <li>Continue working and being productive despite pain</li>
+                                <li>Not be defined by their pain condition</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section quotes">
+                            <blockquote>"First I have to explain I have extremely severe neck and back issues. I was on opioid meds for years until recently and just decided to get off of them for my overall well being."</blockquote>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="segment-card">
+                    <div class="segment-header">
+                        <h4>&#127873; Gift Buyers &amp; Caregivers</h4>
+                        <span class="segment-badge">331 mentions (1.47 ratio)</span>
+                    </div>
+                    <div class="segment-body">
+                        <div class="segment-section">
+                            <h5>Functional Job</h5>
+                            <ul>
+                                <li>Find an effective pain solution for an elderly parent, spouse, or family member</li>
+                                <li>Product must be easy to use for someone with limited mobility</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Emotional Job</h5>
+                            <ul>
+                                <li>Feel like a caring, attentive family member who found something helpful</li>
+                                <li>Reduce guilt about loved one's suffering</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section">
+                            <h5>Social Job</h5>
+                            <ul>
+                                <li>Give a thoughtful gift that shows they understand the person's pain</li>
+                                <li>Product should look premium and giftable, not clinical</li>
+                            </ul>
+                        </div>
+                        <div class="segment-section quotes">
+                            <blockquote>"I purchase this for my Mother. The first jar was half filled with cream. This product is too expensive to be getting half-filled jars."</blockquote>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> What makes pain lotion unique compared to other product categories is that it serves <strong>multiple distinct medical conditions</strong>, each with fundamentally different needs. Neuropathy sufferers need nerve-calming ingredients, cramp sufferers need magnesium and muscle relaxation, arthritis patients need anti-inflammatory action, and athletes need fast recovery. No single product can serve all six segments well -- this is why the category has a 3.21 average rating. The opportunity is to <strong>stop trying to be everything to everyone</strong> and instead create targeted formulas for specific conditions.
+            </div>
+        </section>
+
+        <!-- Part 5: Feature Opportunities -->
+        <section id="features" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 5</span>
+                <h2 class="section-title">Feature Opportunities</h2>
+                <p class="section-subtitle">Segment-specific product features backed by review data and Reddit insights</p>
+            </div>
+
+            <!-- Neuropathy Features -->
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-icon neuropathy">&#129504;</div>
+                    <div class="features-title">For Neuropathy Sufferers</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>PEA + Lidocaine Dual-Action Formula <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>Combine PEA (palmitoylethanolamide) for long-term nerve inflammation reduction with lidocaine for immediate numbing. 304 negative reviews cite neuropathy pain as unresolved. PEA has clinical backing for neuropathic pain and is virtually unknown in OTC products.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Feet-First Application Design <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>750 reviews mention feet/toes as the application area. Design a non-greasy foot cream format with non-slip texture so users can apply before putting on socks. Include B vitamins (B6, B12) that support nerve health.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Gentle Capsaicin with Guided Protocol <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>Reddit data shows capsaicin works long-term but most users quit during the 2-week burning adjustment period. Include a starter dose (0.025%) and a maintenance dose (0.075%) with a clear 14-day guide. "Stick with it" messaging backed by clinical evidence.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cramp/RLS Features -->
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-icon cramps">&#127769;</div>
+                    <div class="features-title">For Cramp &amp; RLS Nighttime Sufferers</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Magnesium Chloride + Lavender Nighttime Formula <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>598 reviews mention nighttime use with highest satisfaction ratio (2.62). Zero menthol or camphor. Magnesium chloride for muscle relaxation, lavender essential oil for sleep promotion. Position as "apply before bed to prevent cramps."</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Fast-Absorbing Foam Format <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>Theraworx uses foam and 297 cramp reviews mention needing quick application during a cramp episode. Foam absorbs faster than cream and does not require rubbing, which is difficult mid-cramp. Easy to apply to calves and feet without fully waking up.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Bedside Pump Dispenser <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>Nighttime users need one-handed, in-the-dark application. A large pump bottle that can sit on a nightstand eliminates fumbling with caps. Include a glow-in-the-dark pump head for middle-of-night access.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arthritis Features -->
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-icon arthritis">&#128170;</div>
+                    <div class="features-title">For Arthritis &amp; Joint Pain Warriors</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Anti-Inflammatory + Cooling Combo Cream <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>Reddit reveals arthritis users layer Voltaren (anti-inflammatory) + Biofreeze (cooling). Create a single product with natural anti-inflammatories (boswellia, MSM) plus mild menthol that provides both mechanisms. Voltaren cannot be used on back/hips -- fill that gap.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Odorless Roll-On for Hands and Knees <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>892 smell complaints + 587 hand mentions + 426 knee mentions. An odorless roll-on specifically designed for arthritic joints would solve three top pain points simultaneously. Penetrex is the closest but lacks a roll-on option.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Arthritis-Friendly Easy-Open Packaging <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>The irony is cruel: pain products for arthritis sufferers come in packaging that arthritic hands cannot open. 299 usability complaints. Every container should have a flip-top, pump, or roll-on -- never a twist-off jar lid.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Athlete Features -->
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-icon athlete">&#127939;</div>
+                    <div class="features-title">For Active &amp; Athletic Recovery</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Non-Greasy Sport Roll-On with Cooling <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>Athletes (2.63 satisfaction ratio -- highest segment) want immediate cooling sensation in a non-greasy format. Roll-on with menthol + arnica in a fast-absorbing base. Gym-bag sized. No staining. Under 60-second dry time.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Pre/Post Workout Dual-Use Positioning <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>Athletes layer products (Biofreeze post-workout, CBD at night). Create a system: "Activate" roll-on with cooling for post-workout, "Recover" cream with CBD/arnica for overnight. Bundle as a recovery kit.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chronic Pain Features -->
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-icon chronic">&#128167;</div>
+                    <div class="features-title">For Chronic Pain Managers</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>All-Day Value Size (8oz+) with Extended Relief <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>1,906 worker mentions + 242 price complaints. Chronic users burn through product fast. Offer an 8oz "daily use" size with a time-release formula that extends relief duration. Price per ounce should undercut premium 2oz tubes.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Multi-Mechanism Formula (Aspiring to Compounded Cream) <span class="impact-badge high">HIGH IMPACT</span></strong>
+                            <span>Reddit reveals compounded pharmacy creams (ketamine + lidocaine + gabapentin) are the gold standard. Create the best OTC approximation: lidocaine (numbing) + menthol (gate control) + natural anti-inflammatory (boswellia/arnica). Three mechanisms in one.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">3</div>
+                        <div class="feature-content">
+                            <strong>Self-Application Back Roller Tool <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>292 back pain reviews with only 49.5% satisfaction. Part of the problem is application difficulty. Bundle a long-handled roll-on applicator or partner with a back-roller tool. Solve both the formula AND the application problem.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caregiver Features -->
+            <div class="features-section">
+                <div class="features-header">
+                    <div class="features-icon caregiver">&#127873;</div>
+                    <div class="features-title">For Gift Buyers &amp; Caregivers</div>
+                </div>
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-number">1</div>
+                        <div class="feature-content">
+                            <strong>Premium Gift Set with Clear Condition Targeting <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>331 gift buyer mentions. Create condition-specific gift sets: "Arthritis Care Kit" (roll-on + hand cream), "Sleep Relief Kit" (nighttime lotion + foot cream). Premium packaging that looks giftable, not clinical.</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-number">2</div>
+                        <div class="feature-content">
+                            <strong>Senior-Safe, Gentle Formula with Large Print <span class="impact-badge medium">MEDIUM IMPACT</span></strong>
+                            <span>61 elderly mentions with lowest satisfaction (0.69 ratio). Seniors have thin skin, take blood thinners, and have drug interaction concerns. Hypoallergenic, fragrance-free, large-print labels with clear drug interaction warnings.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> The highest-impact features across all segments share three common threads: (1) <strong>Roll-on format</strong> appears as a need in every segment, from arthritic hands to gym use to nighttime application. (2) <strong>Odorless or calming scent</strong> is universally valued but especially critical for workplace and nighttime use. (3) <strong>Multi-mechanism formulas</strong> that combine 2-3 active ingredients (anti-inflammatory + numbing + cooling) are what experienced pain users already build through product layering. The brand that solves these three problems for a specific condition will dominate its niche.
+            </div>
+        </section>
+
+        <!-- Part 6: Innovation Opportunities -->
+        <section id="innovations" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 6</span>
+                <h2 class="section-title">Innovation Opportunities</h2>
+                <p class="section-subtitle">Novel product concepts at the intersection of unmet needs, pain point gaps, and keyword opportunities</p>
+            </div>
+
+            <div class="innovation-card">
+                <div class="innovation-number">1</div>
+                <div class="innovation-content">
+                    <h4>Nighttime Cramp &amp; RLS Relief Lotion</h4>
+                    <p><strong>Why It Works:</strong> 598 reviews mention nighttime use with the highest satisfaction ratio (2.62) of any segment, yet only one product (Icy Hot Nighttime) attempts to serve this occasion -- and it still contains menthol, which users explicitly say keeps them awake. "Magnilife relaxing leg cream pm" has 4,615 monthly searches, proving dedicated demand. The review data shows a 3.21 average rating because products designed for daytime muscle pain are being used for nighttime cramps -- a fundamentally different use case.</p>
+                    <ul>
+                        <li>Magnesium chloride as primary active (topical absorption, muscle relaxation)</li>
+                        <li>Zero menthol, zero camphor -- calming only</li>
+                        <li>Lavender + chamomile essential oils for sleep promotion</li>
+                        <li>Fast-absorbing, non-greasy formula that will not stain sheets</li>
+                        <li>Bedside pump bottle with glow-in-the-dark dispenser</li>
+                        <li>Target keywords: "leg cramp relief," "restless legs," "nighttime muscle cramps"</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: High -- No dedicated nighttime cramp lotion without menthol exists</span>
+                </div>
+            </div>
+
+            <div class="innovation-card">
+                <div class="innovation-number">2</div>
+                <div class="innovation-content">
+                    <h4>Neuropathy-Specific Nerve Comfort Cream</h4>
+                    <p><strong>Why It Works:</strong> Neuropathy has 46,564 keyword search volume ("nerve" cluster) and 304 dedicated negative reviews. Current products either use generic menthol (wrong mechanism for nerve pain) or capsaicin (too harsh for most users). Reddit communities identify PEA (palmitoylethanolamide) as an emerging ingredient with clinical backing for neuropathic pain. No OTC cream combines PEA + lidocaine + B vitamins specifically for neuropathy -- this is a wide-open gap.</p>
+                    <ul>
+                        <li>PEA (palmitoylethanolamide) for long-term nerve inflammation reduction</li>
+                        <li>4% lidocaine for immediate numbing of burning and tingling</li>
+                        <li>Vitamin B6 and B12 for nerve health support</li>
+                        <li>Gentle, no-burn formula (no capsaicin in primary product)</li>
+                        <li>Foot-and-hand optimized texture (non-slip, sock-compatible)</li>
+                        <li>Target keywords: "neuropathy pain relief," "nerve pain cream," "neuropathy relief for feet"</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: Very High -- PEA in topical OTC pain cream is virtually nonexistent</span>
+                </div>
+            </div>
+
+            <div class="innovation-card">
+                <div class="innovation-number">3</div>
+                <div class="innovation-content">
+                    <h4>Multi-Mechanism All-Day Roll-On</h4>
+                    <p><strong>Why It Works:</strong> Reddit reveals experienced pain users routinely layer 2-3 products (Voltaren + Biofreeze + CBD) because no single OTC product addresses multiple pain pathways. Roll-on has 44,018 keyword search volume and is the preferred format across every segment. 892 smell complaints + 279 greasiness complaints demand an odorless, fast-absorbing solution. This product aspires to be the OTC approximation of compounded pharmacy creams.</p>
+                    <ul>
+                        <li>Triple-action formula: lidocaine (numbing) + mild menthol (gate control) + boswellia (natural anti-inflammatory)</li>
+                        <li>Roll-on format with massage roller ball</li>
+                        <li>Odorless or very mild clean scent</li>
+                        <li>Fast-absorbing, non-greasy gel</li>
+                        <li>Larger 4oz roll-on for chronic daily use</li>
+                        <li>Target keywords: "roll on pain relief," "maximum strength," "pain relief roll on"</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: High -- No roll-on combines 3 mechanisms in odorless format</span>
+                </div>
+            </div>
+
+            <div class="innovation-card">
+                <div class="innovation-number">4</div>
+                <div class="innovation-content">
+                    <h4>Natural Anti-Inflammatory Joint Cream</h4>
+                    <p><strong>Why It Works:</strong> 112 reviews cite "misleading/scam" concerns, and Reddit communities are deeply skeptical of "natural" products. Yet Hemp/CBD has the highest sentiment score (+0.29) of any ingredient in reviews, and "natural pain relief cream" has 741 monthly searches. The opportunity is a natural formula that actually works -- with transparent, clinically-studied ingredients and a drug facts panel. Not homeopathic. Not essential oils. Evidence-based natural.</p>
+                    <ul>
+                        <li>Arnica montana (standardized extract, not homeopathic dilution)</li>
+                        <li>Boswellia serrata (clinically studied for joint inflammation)</li>
+                        <li>MSM (methylsulfonylmethane) for joint health</li>
+                        <li>Full-spectrum hemp extract (not just "hemp seed oil")</li>
+                        <li>Third-party tested with COA (certificate of analysis) accessible via QR code</li>
+                        <li>Target keywords: "natural pain relief cream," "arthritis cream," "joint pain relief"</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: Medium-High -- Bridges the trust gap between "natural" and "effective"</span>
+                </div>
+            </div>
+
+            <div class="innovation-card">
+                <div class="innovation-number">5</div>
+                <div class="innovation-content">
+                    <h4>Condition-Specific Pain System (Product Line)</h4>
+                    <p><strong>Why It Works:</strong> The fundamental problem in this category is that one product tries to serve 6+ different medical conditions. A 3.21 average rating proves this approach fails. Instead of one "pain cream," launch a system of 3-4 targeted formulas under one brand. Each formula addresses a specific condition with appropriate ingredients, format, and messaging. This is how the category evolves beyond "crowded but shallow."</p>
+                    <ul>
+                        <li><strong>Nerve:</strong> PEA + Lidocaine + B vitamins (cream for feet/hands)</li>
+                        <li><strong>Sleep:</strong> Magnesium + Lavender (nighttime lotion, no menthol)</li>
+                        <li><strong>Joint:</strong> Boswellia + Menthol + MSM (odorless roll-on)</li>
+                        <li><strong>Muscle:</strong> Menthol + Arnica + Camphor (sport roll-on)</li>
+                        <li>Unified branding with color-coded conditions for easy shelf navigation</li>
+                        <li>Bundle options for multi-condition households (arthritis + cramps gift set)</li>
+                    </ul>
+                    <span class="patent-tag">Uniqueness: Very High -- No brand offers condition-specific pain relief system</span>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>&#128161; Key Insight:</strong> The overarching innovation thesis is clear: <strong>stop making generic "pain cream" and start making condition-specific solutions</strong>. The data proves this at every level. The category average is 3.21 stars because a menthol-and-camphor cream designed for muscle soreness is being used by neuropathy patients, cramp sufferers, and arthritis patients -- conditions that require fundamentally different active ingredients and delivery formats. Innovation #5 (Condition-Specific Pain System) is the most strategically valuable because it reframes the entire competitive landscape. Rather than competing on "strongest" or "maximum strength," compete on <strong>specificity</strong>: the right formula for the right condition.
+            </div>
+        </section>
+
+    </div><!-- end container -->
+
+    <!-- Footer -->
+    <div class="footer">
+        <p><strong>Pain Lotion Customer Analysis Report</strong></p>
+        <p>9,292 Amazon reviews across 23 products &bull; 347 keywords &bull; 647,856 total search volume &bull; 16 Reddit research queries</p>
+        <p>Analysis Date: February 12, 2026</p>
+    </div>
+
+    <script>
+const clusterData = {"top_volume": [{"name": "pain", "total_volume": 376493, "count": 206, "keywords": [{"keyword": "pain relief cream", "volume": 34148}, {"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "shoulder pain relief", "volume": 16013}, {"keyword": "joint pain relief", "volume": 12345}, {"keyword": "pain cream", "volume": 12011}, {"keyword": "knee pain relief products", "volume": 10752}, {"keyword": "neuropathy pain relief", "volume": 9471}, {"keyword": "sombra warm pain relief", "volume": 9296}, {"keyword": "muscle pain relief", "volume": 8625}, {"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "sombra warm pain relief cream", "volume": 6695}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "foot pain relief products", "volume": 5632}]}, {"name": "relief", "total_volume": 335588, "count": 156, "keywords": [{"keyword": "pain relief cream", "volume": 34148}, {"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "shoulder pain relief", "volume": 16013}, {"keyword": "joint pain relief", "volume": 12345}, {"keyword": "knee pain relief products", "volume": 10752}, {"keyword": "neuropathy pain relief", "volume": 9471}, {"keyword": "sombra warm pain relief", "volume": 9296}, {"keyword": "muscle pain relief", "volume": 8625}, {"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "sombra warm pain relief cream", "volume": 6695}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "foot pain relief products", "volume": 5632}, {"keyword": "pain relief roll on", "volume": 5377}]}, {"name": "cream", "total_volume": 237228, "count": 138, "keywords": [{"keyword": "pain relief cream", "volume": 34148}, {"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "pain cream", "volume": 12011}, {"keyword": "arthritis cream", "volume": 11604}, {"keyword": "voltaren cream", "volume": 7700}, {"keyword": "sombra warm pain relief cream", "volume": 6695}, {"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "muscle pain relief cream", "volume": 5297}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "magnilife relaxing leg cream pm", "volume": 4615}, {"keyword": "nerve pain relief cream", "volume": 4118}, {"keyword": "penetrex pain relief cream", "volume": 4070}, {"keyword": "topricin pain relief cream", "volume": 3852}, {"keyword": "muscle relaxer cream", "volume": 3742}, {"keyword": "shingles pain relief cream", "volume": 3274}]}, {"name": "muscle", "total_volume": 88484, "count": 59, "keywords": [{"keyword": "muscle rub", "volume": 16267}, {"keyword": "penetrex joint & muscle therapy", "volume": 8793}, {"keyword": "muscle pain relief", "volume": 8625}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "muscle pain relief cream", "volume": 5297}, {"keyword": "sore muscle relief", "volume": 4746}, {"keyword": "muscle relaxer cream", "volume": 3742}, {"keyword": "muscle cream", "volume": 3252}, {"keyword": "muscle relief", "volume": 2872}, {"keyword": "muscle cramps relief", "volume": 2105}, {"keyword": "muscle pain", "volume": 2100}, {"keyword": "muscle spasms relief", "volume": 2001}, {"keyword": "muscle pain relief products", "volume": 1943}, {"keyword": "muscle cream for deep pain relief", "volume": 1812}, {"keyword": "joint & muscle pain relief", "volume": 1673}]}, {"name": "strength", "total_volume": 54278, "count": 33, "keywords": [{"keyword": "bengay ultra strength", "volume": 10100}, {"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "ben gay bengay ultra strength pain odorless", "volume": 3648}, {"keyword": "aspercreme arthritis max strength", "volume": 3499}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "topical pain relief extra strength", "volume": 1671}, {"keyword": "pain relief cream maximum strength", "volume": 1398}, {"keyword": "ben gay maximum strength", "volume": 1345}, {"keyword": "ben gay ultra strength pain relief cream", "volume": 1331}, {"keyword": "voltaren extra strength", "volume": 1322}, {"keyword": "voltaren cream extra strength", "volume": 1074}, {"keyword": "bengay ultra strength pain relief cream", "volume": 1029}]}, {"name": "voltaren", "total_volume": 52600, "count": 12, "keywords": [{"keyword": "voltaren", "volume": 39059}, {"keyword": "voltaren cream", "volume": 7700}, {"keyword": "voltaren extra strength", "volume": 1322}, {"keyword": "voltaren cream extra strength", "volume": 1074}, {"keyword": "voltaren roll on", "volume": 875}, {"keyword": "voltaren cream for pain", "volume": 571}, {"keyword": "voltaren roll on extra strength", "volume": 545}, {"keyword": "voltaren emulgel", "volume": 454}, {"keyword": "extra strength voltaren", "volume": 250}, {"keyword": "voltaren back and muscle pain", "volume": 250}, {"keyword": "voltaren emulgel back & muscle pain", "volume": 250}, {"keyword": "voltaren gel extra strength roll on", "volume": 250}]}, {"name": "arthritis", "total_volume": 51470, "count": 26, "keywords": [{"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "arthritis cream", "volume": 11604}, {"keyword": "aspercreme arthritis max strength", "volume": 3499}, {"keyword": "strongest otc arthritis pain reliever", "volume": 2167}, {"keyword": "arthritis pain reliever cream", "volume": 1532}, {"keyword": "pain cream for arthritis", "volume": 1094}, {"keyword": "arthritis pain cream", "volume": 830}, {"keyword": "rub on relief arthritis pain relief", "volume": 591}, {"keyword": "arthritis lotion", "volume": 250}, {"keyword": "arthritis pain for back", "volume": 250}, {"keyword": "arthritis pain relief roll on", "volume": 250}, {"keyword": "arthritis rub", "volume": 250}, {"keyword": "best topical cream for arthritis", "volume": 250}, {"keyword": "arthritis cream for joint pain", "volume": 250}, {"keyword": "arthritis pain reliever roll on", "volume": 250}]}, {"name": "nerve", "total_volume": 46564, "count": 18, "keywords": [{"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "nerve pain", "volume": 4131}, {"keyword": "nerve pain relief cream", "volume": 4118}, {"keyword": "nerve cream", "volume": 2209}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "theraworx nerve relief foam", "volume": 1680}, {"keyword": "nerve pain relief products", "volume": 1659}, {"keyword": "nerve balm", "volume": 1419}, {"keyword": "theraworx nerve relief", "volume": 1372}, {"keyword": "nerve pain cream", "volume": 981}, {"keyword": "nerve relief cream", "volume": 729}, {"keyword": "best nerve pain reliever", "volume": 250}, {"keyword": "best topical cream for nerve pain", "volume": 250}, {"keyword": "cream nerve pain", "volume": 250}, {"keyword": "nerve cream pain relief", "volume": 250}]}, {"name": "roll", "total_volume": 44018, "count": 38, "keywords": [{"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "pain relief roll on", "volume": 5377}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "nervive roll on pain relief", "volume": 3676}, {"keyword": "nervive roll on", "volume": 1837}, {"keyword": "penetrex roll on", "volume": 1123}, {"keyword": "pain roll on", "volume": 1068}, {"keyword": "roll on pain reliever maximum strength", "volume": 1009}, {"keyword": "biofreeze professional roll on", "volume": 1008}, {"keyword": "bengay roll on", "volume": 878}, {"keyword": "voltaren roll on", "volume": 875}, {"keyword": "roll on muscle pain relief", "volume": 853}, {"keyword": "roll on pain relief maximum strength", "volume": 659}, {"keyword": "advil roll on pain reliever maximum strength", "volume": 625}]}, {"name": "joint", "total_volume": 40325, "count": 16, "keywords": [{"keyword": "joint pain relief", "volume": 12345}, {"keyword": "penetrex joint & muscle therapy", "volume": 8793}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "joint pain", "volume": 3474}, {"keyword": "joint pain relief cream", "volume": 2404}, {"keyword": "joint & muscle pain relief", "volume": 1673}, {"keyword": "muscle and joint pain relief", "volume": 952}, {"keyword": "joint relief cream", "volume": 937}, {"keyword": "joint and muscle pain relief", "volume": 635}, {"keyword": "joint cream pain relief", "volume": 521}, {"keyword": "joint pain cream", "volume": 486}, {"keyword": "joint cream for knees", "volume": 250}, {"keyword": "arthritis cream for joint pain", "volume": 250}, {"keyword": "joint pain and arthritis relief", "volume": 250}, {"keyword": "joint relief cream for knees", "volume": 250}]}, {"name": "bengay", "total_volume": 38994, "count": 9, "keywords": [{"keyword": "bengay", "volume": 17087}, {"keyword": "bengay ultra strength", "volume": 10100}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "ben gay bengay ultra strength pain odorless", "volume": 3648}, {"keyword": "bengay cream", "volume": 1381}, {"keyword": "bengay ultra strength pain relief cream", "volume": 1029}, {"keyword": "bengay roll on", "volume": 878}, {"keyword": "bengay cream for pain", "volume": 766}, {"keyword": "bengay ultra strength cream", "volume": 250}]}, {"name": "maximum", "total_volume": 27544, "count": 15, "keywords": [{"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "pain relief cream maximum strength", "volume": 1398}, {"keyword": "ben gay maximum strength", "volume": 1345}, {"keyword": "roll on pain reliever maximum strength", "volume": 1009}, {"keyword": "theragesic maximum strength", "volume": 680}, {"keyword": "roll on pain relief maximum strength", "volume": 659}, {"keyword": "advil roll on pain reliever maximum strength", "volume": 625}, {"keyword": "aspercreme roll on maximum strength", "volume": 503}, {"keyword": "knee pain cream maximum strength", "volume": 250}, {"keyword": "pain relief roll on maximum strength", "volume": 250}, {"keyword": "theragesic maximum strength pain cream", "volume": 250}]}], "top_count": [{"name": "pain", "total_volume": 376493, "count": 206, "keywords": [{"keyword": "pain relief cream", "volume": 34148}, {"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "shoulder pain relief", "volume": 16013}, {"keyword": "joint pain relief", "volume": 12345}, {"keyword": "pain cream", "volume": 12011}, {"keyword": "knee pain relief products", "volume": 10752}, {"keyword": "neuropathy pain relief", "volume": 9471}, {"keyword": "sombra warm pain relief", "volume": 9296}, {"keyword": "muscle pain relief", "volume": 8625}, {"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "sombra warm pain relief cream", "volume": 6695}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "foot pain relief products", "volume": 5632}]}, {"name": "relief", "total_volume": 335588, "count": 156, "keywords": [{"keyword": "pain relief cream", "volume": 34148}, {"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "shoulder pain relief", "volume": 16013}, {"keyword": "joint pain relief", "volume": 12345}, {"keyword": "knee pain relief products", "volume": 10752}, {"keyword": "neuropathy pain relief", "volume": 9471}, {"keyword": "sombra warm pain relief", "volume": 9296}, {"keyword": "muscle pain relief", "volume": 8625}, {"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "sombra warm pain relief cream", "volume": 6695}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "foot pain relief products", "volume": 5632}, {"keyword": "pain relief roll on", "volume": 5377}]}, {"name": "cream", "total_volume": 237228, "count": 138, "keywords": [{"keyword": "pain relief cream", "volume": 34148}, {"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "pain cream", "volume": 12011}, {"keyword": "arthritis cream", "volume": 11604}, {"keyword": "voltaren cream", "volume": 7700}, {"keyword": "sombra warm pain relief cream", "volume": 6695}, {"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "muscle pain relief cream", "volume": 5297}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "magnilife relaxing leg cream pm", "volume": 4615}, {"keyword": "nerve pain relief cream", "volume": 4118}, {"keyword": "penetrex pain relief cream", "volume": 4070}, {"keyword": "topricin pain relief cream", "volume": 3852}, {"keyword": "muscle relaxer cream", "volume": 3742}, {"keyword": "shingles pain relief cream", "volume": 3274}]}, {"name": "muscle", "total_volume": 88484, "count": 59, "keywords": [{"keyword": "muscle rub", "volume": 16267}, {"keyword": "penetrex joint & muscle therapy", "volume": 8793}, {"keyword": "muscle pain relief", "volume": 8625}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "muscle pain relief cream", "volume": 5297}, {"keyword": "sore muscle relief", "volume": 4746}, {"keyword": "muscle relaxer cream", "volume": 3742}, {"keyword": "muscle cream", "volume": 3252}, {"keyword": "muscle relief", "volume": 2872}, {"keyword": "muscle cramps relief", "volume": 2105}, {"keyword": "muscle pain", "volume": 2100}, {"keyword": "muscle spasms relief", "volume": 2001}, {"keyword": "muscle pain relief products", "volume": 1943}, {"keyword": "muscle cream for deep pain relief", "volume": 1812}, {"keyword": "joint & muscle pain relief", "volume": 1673}]}, {"name": "roll", "total_volume": 44018, "count": 38, "keywords": [{"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "pain relief roll on", "volume": 5377}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "nervive roll on pain relief", "volume": 3676}, {"keyword": "nervive roll on", "volume": 1837}, {"keyword": "penetrex roll on", "volume": 1123}, {"keyword": "pain roll on", "volume": 1068}, {"keyword": "roll on pain reliever maximum strength", "volume": 1009}, {"keyword": "biofreeze professional roll on", "volume": 1008}, {"keyword": "bengay roll on", "volume": 878}, {"keyword": "voltaren roll on", "volume": 875}, {"keyword": "roll on muscle pain relief", "volume": 853}, {"keyword": "roll on pain relief maximum strength", "volume": 659}, {"keyword": "advil roll on pain reliever maximum strength", "volume": 625}]}, {"name": "strength", "total_volume": 54278, "count": 33, "keywords": [{"keyword": "bengay ultra strength", "volume": 10100}, {"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "ben gay bengay ultra strength pain odorless", "volume": 3648}, {"keyword": "aspercreme arthritis max strength", "volume": 3499}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "topical pain relief extra strength", "volume": 1671}, {"keyword": "pain relief cream maximum strength", "volume": 1398}, {"keyword": "ben gay maximum strength", "volume": 1345}, {"keyword": "ben gay ultra strength pain relief cream", "volume": 1331}, {"keyword": "voltaren extra strength", "volume": 1322}, {"keyword": "voltaren cream extra strength", "volume": 1074}, {"keyword": "bengay ultra strength pain relief cream", "volume": 1029}]}, {"name": "arthritis", "total_volume": 51470, "count": 26, "keywords": [{"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "arthritis cream", "volume": 11604}, {"keyword": "aspercreme arthritis max strength", "volume": 3499}, {"keyword": "strongest otc arthritis pain reliever", "volume": 2167}, {"keyword": "arthritis pain reliever cream", "volume": 1532}, {"keyword": "pain cream for arthritis", "volume": 1094}, {"keyword": "arthritis pain cream", "volume": 830}, {"keyword": "rub on relief arthritis pain relief", "volume": 591}, {"keyword": "arthritis lotion", "volume": 250}, {"keyword": "arthritis pain for back", "volume": 250}, {"keyword": "arthritis pain relief roll on", "volume": 250}, {"keyword": "arthritis rub", "volume": 250}, {"keyword": "best topical cream for arthritis", "volume": 250}, {"keyword": "arthritis cream for joint pain", "volume": 250}, {"keyword": "arthritis pain reliever roll on", "volume": 250}]}, {"name": "best", "total_volume": 5103, "count": 18, "keywords": [{"keyword": "best knee pain relief cream", "volume": 853}, {"keyword": "best muscle relaxer cream", "volume": 250}, {"keyword": "best ointment for back muscle pain", "volume": 250}, {"keyword": "best muscle pain relief cream", "volume": 250}, {"keyword": "best sciatica pain relief cream", "volume": 250}, {"keyword": "best cream for pain", "volume": 250}, {"keyword": "best nerve pain reliever", "volume": 250}, {"keyword": "best pain cream for severe pain", "volume": 250}, {"keyword": "best pain relief cream", "volume": 250}, {"keyword": "best topical cream for arthritis", "volume": 250}, {"keyword": "best topical cream for nerve pain", "volume": 250}, {"keyword": "best arthritis pain cream", "volume": 250}, {"keyword": "best arthritis pain relief", "volume": 250}, {"keyword": "best roll on pain relief", "volume": 250}, {"keyword": "best neuropathy pain relief", "volume": 250}]}, {"name": "nerve", "total_volume": 46564, "count": 18, "keywords": [{"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "nerve pain", "volume": 4131}, {"keyword": "nerve pain relief cream", "volume": 4118}, {"keyword": "nerve cream", "volume": 2209}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "theraworx nerve relief foam", "volume": 1680}, {"keyword": "nerve pain relief products", "volume": 1659}, {"keyword": "nerve balm", "volume": 1419}, {"keyword": "theraworx nerve relief", "volume": 1372}, {"keyword": "nerve pain cream", "volume": 981}, {"keyword": "nerve relief cream", "volume": 729}, {"keyword": "best nerve pain reliever", "volume": 250}, {"keyword": "best topical cream for nerve pain", "volume": 250}, {"keyword": "cream nerve pain", "volume": 250}, {"keyword": "nerve cream pain relief", "volume": 250}]}, {"name": "joint", "total_volume": 40325, "count": 16, "keywords": [{"keyword": "joint pain relief", "volume": 12345}, {"keyword": "penetrex joint & muscle therapy", "volume": 8793}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "joint pain", "volume": 3474}, {"keyword": "joint pain relief cream", "volume": 2404}, {"keyword": "joint & muscle pain relief", "volume": 1673}, {"keyword": "muscle and joint pain relief", "volume": 952}, {"keyword": "joint relief cream", "volume": 937}, {"keyword": "joint and muscle pain relief", "volume": 635}, {"keyword": "joint cream pain relief", "volume": 521}, {"keyword": "joint pain cream", "volume": 486}, {"keyword": "joint cream for knees", "volume": 250}, {"keyword": "arthritis cream for joint pain", "volume": 250}, {"keyword": "joint pain and arthritis relief", "volume": 250}, {"keyword": "joint relief cream for knees", "volume": 250}]}, {"name": "maximum", "total_volume": 27544, "count": 15, "keywords": [{"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "pain relief cream maximum strength", "volume": 1398}, {"keyword": "ben gay maximum strength", "volume": 1345}, {"keyword": "roll on pain reliever maximum strength", "volume": 1009}, {"keyword": "theragesic maximum strength", "volume": 680}, {"keyword": "roll on pain relief maximum strength", "volume": 659}, {"keyword": "advil roll on pain reliever maximum strength", "volume": 625}, {"keyword": "aspercreme roll on maximum strength", "volume": 503}, {"keyword": "knee pain cream maximum strength", "volume": 250}, {"keyword": "pain relief roll on maximum strength", "volume": 250}, {"keyword": "theragesic maximum strength pain cream", "volume": 250}]}, {"name": "back", "total_volume": 7074, "count": 12, "keywords": [{"keyword": "back pain cream", "volume": 1719}, {"keyword": "back pain relief cream", "volume": 1691}, {"keyword": "back spasm relief", "volume": 858}, {"keyword": "strongest back pain cream", "volume": 568}, {"keyword": "back and leg pain relief", "volume": 488}, {"keyword": "best ointment for back muscle pain", "volume": 250}, {"keyword": "back cream for pain", "volume": 250}, {"keyword": "arthritis pain for back", "volume": 250}, {"keyword": "voltaren back and muscle pain", "volume": 250}, {"keyword": "back muscle pain relief", "volume": 250}, {"keyword": "soothing muscle rub for back, neck, hands, feet", "volume": 250}, {"keyword": "voltaren emulgel back & muscle pain", "volume": 250}]}], "identity": [{"name": "arthritis", "total_volume": 51470, "count": 26, "keywords": [{"keyword": "arthritis pain relief cream", "volume": 25653}, {"keyword": "arthritis cream", "volume": 11604}, {"keyword": "aspercreme arthritis max strength", "volume": 3499}, {"keyword": "strongest otc arthritis pain reliever", "volume": 2167}, {"keyword": "arthritis pain reliever cream", "volume": 1532}, {"keyword": "pain cream for arthritis", "volume": 1094}, {"keyword": "arthritis pain cream", "volume": 830}, {"keyword": "rub on relief arthritis pain relief", "volume": 591}]}, {"name": "nerve", "total_volume": 46564, "count": 18, "keywords": [{"keyword": "nerve pain relief", "volume": 24778}, {"keyword": "nerve pain", "volume": 4131}, {"keyword": "nerve pain relief cream", "volume": 4118}, {"keyword": "nerve cream", "volume": 2209}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "theraworx nerve relief foam", "volume": 1680}, {"keyword": "nerve pain relief products", "volume": 1659}, {"keyword": "nerve balm", "volume": 1419}]}, {"name": "joint", "total_volume": 40325, "count": 16, "keywords": [{"keyword": "joint pain relief", "volume": 12345}, {"keyword": "penetrex joint & muscle therapy", "volume": 8793}, {"keyword": "joint & muscle pain relief rubs", "volume": 6855}, {"keyword": "joint pain", "volume": 3474}, {"keyword": "joint pain relief cream", "volume": 2404}, {"keyword": "joint & muscle pain relief", "volume": 1673}, {"keyword": "muscle and joint pain relief", "volume": 952}, {"keyword": "joint relief cream", "volume": 937}]}, {"name": "neuropathy", "total_volume": 22790, "count": 9, "keywords": [{"keyword": "neuropathy pain relief", "volume": 9471}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "neuropathy relief for feet and legs", "volume": 1873}, {"keyword": "cream for neuropathy in feet", "volume": 1844}, {"keyword": "foot cream for neuropathy", "volume": 1787}, {"keyword": "neuropathy pain relief cream", "volume": 1255}, {"keyword": "peripheral neuropathy pain relief", "volume": 250}, {"keyword": "best neuropathy pain relief", "volume": 250}]}, {"name": "knee", "total_volume": 18061, "count": 12, "keywords": [{"keyword": "knee pain relief products", "volume": 10752}, {"keyword": "knee pain cream", "volume": 2079}, {"keyword": "knee pain relief cream", "volume": 1061}, {"keyword": "best knee pain relief cream", "volume": 853}, {"keyword": "knee cream", "volume": 848}, {"keyword": "strongest cream for knee pain", "volume": 755}, {"keyword": "knee cream for pain", "volume": 463}, {"keyword": "cream for knee pain", "volume": 250}]}, {"name": "shoulder", "total_volume": 16763, "count": 4, "keywords": [{"keyword": "shoulder pain relief", "volume": 16013}, {"keyword": "shoulder pain cream", "volume": 250}, {"keyword": "shoulder muscle pain relief", "volume": 250}, {"keyword": "shoulder arthritis pain relief", "volume": 250}]}, {"name": "foot", "total_volume": 12743, "count": 8, "keywords": [{"keyword": "foot pain relief products", "volume": 5632}, {"keyword": "foot cream for neuropathy", "volume": 1787}, {"keyword": "foot pain relief cream", "volume": 1778}, {"keyword": "foot cream for pain", "volume": 1704}, {"keyword": "foot pain cream", "volume": 1092}, {"keyword": "extreme foot pain relief", "volume": 250}, {"keyword": "cream for foot pain", "volume": 250}, {"keyword": "pain relief foot cream", "volume": 250}]}, {"name": "leg", "total_volume": 11073, "count": 6, "keywords": [{"keyword": "magnilife relaxing leg cream pm", "volume": 4615}, {"keyword": "leg pain relief products", "volume": 2451}, {"keyword": "magnilife relaxing leg cream", "volume": 1430}, {"keyword": "leg pain", "volume": 1373}, {"keyword": "leg pain relief for elderly", "volume": 716}, {"keyword": "back and leg pain relief", "volume": 488}]}], "feature": [{"name": "strength", "total_volume": 54278, "count": 33, "keywords": [{"keyword": "bengay ultra strength", "volume": 10100}, {"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "ben gay bengay ultra strength pain odorless", "volume": 3648}, {"keyword": "aspercreme arthritis max strength", "volume": 3499}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}]}, {"name": "roll", "total_volume": 44018, "count": 38, "keywords": [{"keyword": "roll on pain relief", "volume": 7708}, {"keyword": "outback pain relief roll on for neuropathy", "volume": 5810}, {"keyword": "pain relief roll on", "volume": 5377}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "nervive roll on pain relief", "volume": 3676}, {"keyword": "nervive roll on", "volume": 1837}, {"keyword": "penetrex roll on", "volume": 1123}, {"keyword": "pain roll on", "volume": 1068}]}, {"name": "maximum", "total_volume": 27544, "count": 15, "keywords": [{"keyword": "nervive cream maximum strength", "volume": 5508}, {"keyword": "pain cream maximum strength relief", "volume": 4864}, {"keyword": "icy hot roll on maximum strength", "volume": 4610}, {"keyword": "bengay with lidocaine maximum strength", "volume": 3855}, {"keyword": "hempvana nerve relief cream maximum strength", "volume": 1738}, {"keyword": "pain relief cream maximum strength", "volume": 1398}, {"keyword": "ben gay maximum strength", "volume": 1345}, {"keyword": "roll on pain reliever maximum strength", "volume": 1009}]}, {"name": "ultra", "total_volume": 16358, "count": 5, "keywords": [{"keyword": "bengay ultra strength", "volume": 10100}, {"keyword": "ben gay bengay ultra strength pain odorless", "volume": 3648}, {"keyword": "ben gay ultra strength pain relief cream", "volume": 1331}, {"keyword": "bengay ultra strength pain relief cream", "volume": 1029}, {"keyword": "bengay ultra strength cream", "volume": 250}]}, {"name": "warm", "total_volume": 15991, "count": 2, "keywords": [{"keyword": "sombra warm pain relief", "volume": 9296}, {"keyword": "sombra warm pain relief cream", "volume": 6695}]}, {"name": "topical", "total_volume": 8662, "count": 8, "keywords": [{"keyword": "topical pain relief", "volume": 4690}, {"keyword": "topical pain relief extra strength", "volume": 1671}, {"keyword": "topical anti inflammatory", "volume": 730}, {"keyword": "topical pain relief cream", "volume": 571}, {"keyword": "strongest topical pain relief", "volume": 250}, {"keyword": "best topical cream for arthritis", "volume": 250}, {"keyword": "best topical cream for nerve pain", "volume": 250}, {"keyword": "topical nsaid", "volume": 250}]}, {"name": "extra", "total_volume": 6627, "count": 11, "keywords": [{"keyword": "topical pain relief extra strength", "volume": 1671}, {"keyword": "voltaren extra strength", "volume": 1322}, {"keyword": "voltaren cream extra strength", "volume": 1074}, {"keyword": "voltaren roll on extra strength", "volume": 545}, {"keyword": "aleve cream extra strength", "volume": 515}, {"keyword": "pain a trate extra strength cream", "volume": 250}, {"keyword": "pain ointment extra strength", "volume": 250}, {"keyword": "muscle rub pain relieving cream extra strength", "volume": 250}]}]};
+
+function formatNumber(num) {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+    return num.toString();
+}
+
+function renderChart(containerId, data, valueKey, barClass, maxItems) {
+    maxItems = maxItems || 12;
+    var container = document.getElementById(containerId);
+    if (!container || !data || data.length === 0) return;
+    var displayData = data.slice(0, maxItems);
+    var maxValue = Math.max.apply(null, displayData.map(function(d) { return d[valueKey]; }));
+    container.innerHTML = displayData.map(function(item) {
+        var percentage = (item[valueKey] / maxValue) * 100;
+        var displayValue = valueKey === 'total_volume' ? formatNumber(item[valueKey]) : item[valueKey];
+        var kwJson = JSON.stringify(item.keywords).replace(/"/g, '&quot;');
+        return '<div class="bar-row"><div class="bar-label" onclick="showKeywords(\'' + item.name.replace(/'/g, "\\'") + '\', ' + kwJson + ', ' + item.total_volume + ', ' + item.count + ')">' + item.name + '</div><div class="bar-wrapper"><div class="bar ' + barClass + '" style="width: ' + percentage + '%">' + displayValue + '</div></div></div>';
+    }).join('');
+}
+
+function showKeywords(name, keywords, totalVolume, count) {
+    var modal = document.getElementById('keywords-modal');
+    document.getElementById('modal-title').textContent = name + ' Keywords';
+    document.getElementById('modal-stats').innerHTML = '<div class="modal-stat"><div class="modal-stat-value">' + formatNumber(totalVolume) + '</div><div class="modal-stat-label">Total Search Volume</div></div><div class="modal-stat"><div class="modal-stat-value">' + count + '</div><div class="modal-stat-label">Keywords</div></div>';
+    document.getElementById('modal-keywords').innerHTML = keywords.map(function(kw) { return '<div class="keyword-item"><span class="keyword-text">' + kw.keyword + '</span><span class="keyword-volume">' + formatNumber(kw.volume) + '</span></div>'; }).join('');
+    modal.style.display = 'block';
+}
+
+document.querySelector('.modal-close').onclick = function() { document.getElementById('keywords-modal').style.display = 'none'; };
+window.onclick = function(event) { if (event.target === document.getElementById('keywords-modal')) { document.getElementById('keywords-modal').style.display = 'none'; } };
+
+if (clusterData.top_volume) renderChart('chart-volume', clusterData.top_volume, 'total_volume', 'bar-volume');
+if (clusterData.top_count) renderChart('chart-count', clusterData.top_count, 'count', 'bar-count');
+if (clusterData.identity) renderChart('chart-identity', clusterData.identity, 'total_volume', 'bar-identity', 8);
+if (clusterData.feature) renderChart('chart-feature', clusterData.feature, 'total_volume', 'bar-feature', 7);
+
+function toggleReddit(slug) {
+    var el = document.getElementById('reddit-' + slug);
+    if (el) el.classList.toggle('open');
+}
+    </script>
+</body>
+</html>
