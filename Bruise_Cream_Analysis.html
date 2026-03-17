@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bruise Cream Customer Analysis Report</title>
+    <style>
+        :root {
+            --primary: #028090;
+            --primary-dark: #026670;
+            --secondary: #00A896;
+            --accent: #02C39A;
+            --dark: #1B263B;
+            --dark-lighter: #2d3e50;
+            --light: #F7F9FC;
+            --light-alt: #EEF2F7;
+            --white: #FFFFFF;
+            --text: #1E293B;
+            --text-light: #475569;
+            --muted: #64748B;
+            --danger: #DC2626;
+            --danger-light: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-light: #FEF3C7;
+            --success: #10B981;
+            --success-light: #D1FAE5;
+            --purple: #7C3AED;
+            --purple-light: #EDE9FE;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-lighter) 100%);
+            color: white;
+            padding: 60px 20px 80px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.8rem; margin-bottom: 12px; font-weight: 700; }
+        .header .subtitle { color: var(--accent); font-size: 1.3rem; margin-bottom: 8px; }
+        .header .meta { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+
+        /* Stats Bar */
+        .stats-bar { display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap; }
+        .stat-item { text-align: center; padding: 0 20px; }
+        .stat-number { font-size: 3rem; font-weight: 700; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-top: 8px; }
+
+        /* Navigation */
+        .nav-container {
+            background: var(--white);
+            border-bottom: 1px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav a {
+            padding: 16px;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* Products Grid */
+        .products-grid-section { background: var(--white); padding: 40px 20px; border-bottom: 1px solid #E2E8F0; }
+        .products-grid-title { text-align: center; font-size: 1.4rem; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+        .products-grid-subtitle { text-align: center; color: var(--muted); font-size: 0.95rem; margin-bottom: 30px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .product-card { background: var(--light); border-radius: 12px; overflow: hidden; text-decoration: none; color: var(--text); transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .product-card-img { width: 100%; aspect-ratio: 1; object-fit: contain; background: white; padding: 12px; }
+        .product-card-info { padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .product-card-asin { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+        .product-card-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .product-card-title { font-size: 0.8rem; color: var(--text-light); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Keyword Clusters */
+        .keyword-clusters-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 50px 20px;
+            color: white;
+        }
+        .keyword-clusters-section h2 { text-align: center; font-size: 1.8rem; margin-bottom: 8px; }
+        .clusters-subtitle { text-align: center; color: #a0aec0; margin-bottom: 30px; font-size: 0.95rem; }
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+        .chart-container { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; }
+        .chart-container h3 { font-size: 1rem; margin-bottom: 16px; color: #e2e8f0; text-align: center; }
+        .chart { min-height: 280px; }
+        .bar-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .bar-label { width: 120px; font-size: 0.75rem; color: #e2e8f0; text-align: right; padding-right: 10px; cursor: pointer; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-label:hover { color: #63b3ed; text-decoration: underline; }
+        .bar-wrapper { flex: 1; background: rgba(255,255,255,0.1); border-radius: 4px; height: 24px; position: relative; overflow: hidden; }
+        .bar { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.7rem; font-weight: 600; color: white; transition: width 0.5s ease; }
+        .bar-volume { background: linear-gradient(90deg, #4299e1, #3182ce); }
+        .bar-count { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+        .bar-identity { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .bar-feature { background: linear-gradient(90deg, #9f7aea, #805ad5); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; position: relative; animation: modalSlide 0.3s ease; }
+        @keyframes modalSlide { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #718096; transition: color 0.2s; }
+        .modal-close:hover { color: #e53e3e; }
+        .modal-content h3 { color: var(--primary); margin-bottom: 10px; font-size: 1.4rem; }
+        .modal-stats { display: flex; gap: 20px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .modal-stat { text-align: center; }
+        .modal-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
+        .modal-stat-label { font-size: 0.75rem; color: var(--muted); }
+        .modal-keywords { max-height: 400px; overflow-y: auto; }
+        .keyword-item { display: flex; justify-content: space-between; padding: 10px 12px; border-radius: 6px; margin-bottom: 4px; background: #f7fafc; }
+        .keyword-item:nth-child(odd) { background: #edf2f7; }
+        .keyword-text { color: var(--dark); font-size: 0.9rem; }
+        .keyword-volume { color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+
+        /* Container & Sections */
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px 60px; }
+        .section { background: var(--white); border-radius: 16px; padding: 40px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+        .section-header { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid var(--light-alt); }
+        .section-label { display: inline-block; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .section-title { font-size: 1.8rem; color: var(--dark); font-weight: 700; margin-bottom: 8px; }
+        .section-subtitle { color: var(--muted); font-size: 1.05rem; }
+
+        /* Tables (Hidden Drivers) */
+        .table-container { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { background: var(--dark); color: white; padding: 14px 16px; text-align: left; font-weight: 600; }
+        td { padding: 14px 16px; border-bottom: 1px solid #E2E8F0; }
+        tr:hover td { background: var(--light); }
+        .highlight-zero { color: var(--danger); font-weight: 700; }
+
+        th.alt { background: var(--light); font-weight: 600; color: var(--dark); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Insight Box - Style A (gradient warning) */
+        .insight-box { background: linear-gradient(135deg, var(--warning-light) 0%, #FFF7ED 100%); border-left: 4px solid var(--warning); padding: 20px 24px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .insight-box strong { color: var(--warning); }
+
+        /* Insight Box - Style B (gradient teal, used in Lunch Box) */
+        .insight-box-alt { background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%); color: white; padding: 20px 25px; border-radius: 12px; margin: 25px 0; font-size: 1rem; }
+
+        /* === Pain Points - Pattern A (older reports: Kindle, Weighted Eye Mask, Packing) === */
+        .pain-point { background: var(--white); border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+        .pain-header { background: var(--danger-light); padding: 16px 20px; display: flex; align-items: center; gap: 15px; }
+        .pain-number { width: 36px; height: 36px; background: var(--danger); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .pain-title { font-size: 1.15rem; font-weight: 700; color: var(--dark); }
+        .pain-title small { font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 8px; }
+        .pain-badge { display: inline-block; font-size: 0.7rem; padding: 3px 8px; border-radius: 12px; font-weight: 600; margin-left: 8px; }
+        .pain-badge-safety { background: var(--danger-light); color: var(--danger); }
+        .pain-badge-design { background: var(--purple-light); color: var(--purple); }
+        .pain-badge-performance { background: var(--warning-light); color: var(--warning); }
+        .pain-badge-experience { background: var(--light-alt); color: var(--muted); }
+        .pain-badge-preference { background: var(--success-light); color: var(--success); }
+        .pain-badge-quality { background: rgba(2, 128, 144, 0.1); color: var(--primary); }
+        .pain-body { padding: 20px; }
+        .pain-quotes { background: var(--light); padding: 16px 20px; border-radius: 8px; margin-bottom: 16px; }
+        .pain-quotes blockquote { color: var(--text-light); font-style: italic; margin: 8px 0; padding-left: 12px; border-left: 3px solid var(--muted); }
+        .pain-solutions h4 { color: var(--success); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        .pain-solutions ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+        .pain-solutions li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.95rem; }
+        .pain-solutions li::before { content: "\2713"; color: var(--success); font-weight: 700; flex-shrink: 0; }
+
+        /* === Pain Points - Pattern B (newer reports: Lunch Box) === */
+        .pain-grid, .segment-grid, .feature-grid, .innovation-grid { display: grid; gap: 20px; margin-top: 20px; }
+        .pain-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .feature-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+        .innovation-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .pain-card, .feature-card { background: var(--light); border-radius: 12px; padding: 20px; }
+        .pain-card { border-left: 4px solid var(--danger); }
+        .feature-card { border-left: 4px solid var(--warning); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-title { font-weight: 600; color: var(--dark); font-size: 1.05rem; }
+        .card-badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+        .badge-critical { background: var(--danger-light); color: var(--danger); }
+        .badge-high { background: var(--warning-light); color: var(--warning); }
+        .badge-medium { background: var(--light-alt); color: var(--muted); }
+        .badge-count { background: var(--primary); color: white; }
+        .card-quote { font-style: italic; color: var(--text-light); font-size: 0.9rem; padding: 12px; background: white; border-radius: 8px; margin: 12px 0; border-left: 3px solid var(--muted); }
+        .card-solution, .card-jobs, .card-features, .card-description { font-size: 0.9rem; color: var(--text-light); margin-top: 10px; }
+        .card-solution strong, .card-jobs strong, .card-features strong { color: var(--dark); }
+        .priority-section { margin-top: 30px; }
+        .priority-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .priority-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .priority-dot.critical { background: var(--danger); }
+        .priority-dot.high { background: var(--warning); }
+        .priority-dot.medium { background: var(--muted); }
+        .priority-title { font-weight: 600; font-size: 1.1rem; color: var(--dark); }
+
+        /* Segments */
+        .segment-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .segment-card { background: var(--white); border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+        .segment-card.bordered { background: var(--light); border-left: 4px solid var(--secondary); }
+        .segment-header { background: var(--primary); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .segment-header h4 { font-size: 1rem; font-weight: 600; letter-spacing: 0.5px; }
+        .segment-badge { background: var(--accent); color: var(--dark); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .segment-body { padding: 20px; }
+        .segment-section { margin-bottom: 16px; }
+        .segment-section:last-child { margin-bottom: 0; }
+        .segment-section h5 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .segment-section ul { list-style: none; }
+        .segment-section li { font-size: 0.9rem; padding: 4px 0; padding-left: 16px; position: relative; }
+        .segment-section li::before { content: "\2022"; position: absolute; left: 0; color: var(--primary); }
+
+        /* Features - Pattern A (older) */
+        .features-section { margin-top: 30px; }
+        .features-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .features-title { font-size: 1.2rem; font-weight: 700; color: var(--dark); }
+        .features-list { display: grid; gap: 12px; }
+        .feature-item { display: flex; gap: 12px; padding: 16px; background: var(--light); border-radius: 10px; }
+        .feature-number { width: 28px; height: 28px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+        .feature-content strong { display: block; color: var(--dark); margin-bottom: 2px; }
+        .feature-content span { font-size: 0.9rem; color: var(--text-light); }
+
+        /* Innovations - Pattern A (older: dark card) */
+        .innovation-card { background: var(--dark); border-radius: 12px; padding: 24px; margin-bottom: 16px; display: flex; gap: 16px; }
+        .innovation-card.light { background: var(--light); border-left: 4px solid var(--purple); }
+        .innovation-card.light h4 { color: var(--dark); }
+        .innovation-card.light li { color: var(--text-light); }
+        .innovation-card.light li::before { color: var(--purple); }
+        .innovation-number { width: 40px; height: 40px; background: var(--accent); color: var(--dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+        .innovation-content h4 { color: white; font-size: 1.15rem; margin-bottom: 10px; }
+        .innovation-content ul { list-style: none; margin-bottom: 12px; }
+        .innovation-content li { color: rgba(255,255,255,0.85); font-size: 0.95rem; padding: 3px 0; padding-left: 20px; position: relative; }
+        .innovation-content li::before { content: "\2192"; position: absolute; left: 0; color: var(--accent); }
+        .patent-tag { display: inline-block; background: var(--purple); color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 4px; font-weight: 500; }
+
+        /* Reddit Insights */
+        .reddit-stats-bar { display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
+        .reddit-stat { text-align: center; padding: 16px 24px; background: var(--light); border-radius: 12px; min-width: 120px; }
+        .reddit-stat-number { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
+        .reddit-stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+        .reddit-category { margin-bottom: 16px; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; }
+        .reddit-category-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--light); cursor: pointer; transition: background 0.2s; user-select: none; }
+        .reddit-category-header:hover { background: var(--light-alt); }
+        .reddit-category-title { font-weight: 600; color: var(--dark); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+        .reddit-category-count { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; background: var(--primary); color: white; font-weight: 600; }
+        .reddit-chevron { transition: transform 0.3s ease; color: var(--muted); font-size: 1.2rem; }
+        .reddit-category.open .reddit-chevron { transform: rotate(180deg); }
+        .reddit-category-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .reddit-category.open .reddit-category-body { max-height: 5000px; }
+        .reddit-category-content { padding: 20px; }
+        .reddit-subcategory { margin-bottom: 20px; }
+        .reddit-subcategory-title { font-weight: 600; color: var(--dark); font-size: 0.95rem; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #E2E8F0; }
+        .reddit-summary { font-size: 0.9rem; color: var(--text-light); margin-bottom: 12px; padding: 10px 14px; background: var(--success-light); border-radius: 8px; border-left: 3px solid var(--success); }
+        .reddit-quote-card { background: var(--white); border: 1px solid #E2E8F0; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; position: relative; }
+        .reddit-quote-card::before { content: '\201C'; position: absolute; top: 8px; left: 10px; font-size: 2.5rem; color: var(--primary); opacity: 0.15; font-family: Georgia, serif; line-height: 1; }
+        .reddit-quote-text { font-style: italic; color: var(--text); font-size: 0.9rem; line-height: 1.6; padding-left: 20px; }
+        .reddit-quote-meta { display: flex; gap: 12px; margin-top: 10px; padding-left: 20px; flex-wrap: wrap; }
+        .reddit-subreddit { font-size: 0.75rem; font-weight: 600; color: var(--primary); background: rgba(2, 128, 144, 0.08); padding: 2px 8px; border-radius: 4px; }
+        .reddit-context { font-size: 0.75rem; color: var(--muted); }
+
+        /* Footer */
+        .footer { background: var(--dark); color: rgba(255,255,255,0.8); padding: 40px 20px; text-align: center; font-size: 0.9rem; }
+        .footer p { margin: 6px 0; }
+        .footer p + p { margin-top: 8px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2rem; }
+            .stats-bar { gap: 20px; }
+            .stat-number { font-size: 2.2rem; }
+            .section { padding: 24px; }
+            .section-title { font-size: 1.5rem; }
+            .nav a { padding: 12px 10px; font-size: 0.85rem; }
+            .innovation-card { flex-direction: column; }
+        }
+        @media print { .nav-container { display: none; } .section { break-inside: avoid; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bruise Cream Market Analysis</h1>
+        <p class="subtitle">Customer Voice &amp; Competitive Intelligence Report</p>
+        <p class="meta">March 2026 &bull; 30 Products &bull; 1,201 Reviews &bull; 152 Keywords &bull; 15 Reddit Queries</p>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-number">1,201</div>
+                <div class="stat-label">Reviews Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">30</div>
+                <div class="stat-label">Products Analyzed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">152</div>
+                <div class="stat-label">Search Keywords</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3.62</div>
+                <div class="stat-label">Avg Rating</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#keyword-clusters">Keywords</a>
+<a href="#hidden-drivers">Hidden Drivers</a>
+<a href="#reddit-insights">Reddit Insights</a>
+<a href="#pain-points">Pain Points</a>
+<a href="#segments">Segments</a>
+<a href="#features">Features</a>
+<a href="#innovations">Innovations</a>
+        </nav>
+    </div>
+
+    <div class="products-grid-section">
+        <h2 class="products-grid-title">Analyzed Products</h2>
+        <p class="products-grid-subtitle">Click any product to view on Amazon</p>
+        <div class="products-grid">
+            <a href="https://www.amazon.com/dp/B07G1KKZNN" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/81D3e+hG7iL._AC_SX679_.jpg" alt="Boiron Arnicare Cream for Joint Pain, Muscle Pain, Swelling, Soreness, Stiffness, and Bruises - Fast Absorbing and Fragrance-Free - 4.2 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B07G1KKZNN</span>
+        <span class="product-card-price">$14.25</span>
+        <span class="product-card-title">Boiron Arnicare Cream for Joint Pain, Muscle Pain, Swelling, Soreness, Stiffness, and Bruises - Fast Absorbing and Fragrance-Free - 4.2 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B099X664Q6" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/81R6z3TMFcL._AC_SX679_.jpg" alt="Boiron Arnicare Bruise Cream for Pain Relief from Bruising and Swelling or Discoloration from Injury - 1.4 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B099X664Q6</span>
+        <span class="product-card-price">$7.41</span>
+        <span class="product-card-title">Boiron Arnicare Bruise Cream for Pain Relief from Bruising and Swelling or Discoloration from Injury - 1.4 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B078L3RQDM" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/51YwVToAlVL._AC_SX679_.jpg" alt="Arnica Montana 30X HPUS, Clinical Grade, Quick Dissolve Tablets, Five-Day Recovery Pack for Pain and Bruise Relief After Surgery or Injury, Natural Healing, Gentle on The Stomach - 30 Count" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B078L3RQDM</span>
+        <span class="product-card-price">$16.95</span>
+        <span class="product-card-title">Arnica Montana 30X HPUS, Clinical Grade, Quick Dissolve Tablets, Five-Day Recovery Pack for Pain and Bruise Relief After Surgery or Injury, Natural Healing, Gentle on The Stomach - 30 Count</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B00I9GTE5Y" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61T5s1vsaJL._AC_SX679_.jpg" alt="VitaMedica Arnica Montana 30X Rapid Dissolve Arnica Tablets for Natural Pain, Bruising, and Swelling Support - Homeopathic Medicine for Injury and Surgery Recovery - 150 Ct - 50 Servings" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B00I9GTE5Y</span>
+        <span class="product-card-price">$24.95</span>
+        <span class="product-card-title">VitaMedica Arnica Montana 30X Rapid Dissolve Arnica Tablets for Natural Pain, Bruising, and Swelling Support - Homeopathic Medicine for Injury and Surgery Recovery - 150 Ct - 50 Servings</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B00BWTKA94" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61GkQLavmSL._SX679_.jpg" alt="Dermend Arnica Bruise Cream with Vitamin K - Moisturizer for Bruising on Arms, Legs &amp; Hands - 4.5 Oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B00BWTKA94</span>
+        <span class="product-card-price">$27.50</span>
+        <span class="product-card-title">Dermend Arnica Bruise Cream with Vitamin K - Moisturizer for Bruising on Arms, Legs &amp; Hands - 4.5 Oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B004EBS25Q" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61tcLIVAAkL._SX679_.jpg" alt="VitaMedica Arnica + Vitamin K Bruise Recovery Cream for Face &amp; Under-Eye, Sensitive-Skin Formula, Post-Procedure Support, 0.5 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B004EBS25Q</span>
+        <span class="product-card-price">$29.95</span>
+        <span class="product-card-title">VitaMedica Arnica + Vitamin K Bruise Recovery Cream for Face &amp; Under-Eye, Sensitive-Skin Formula, Post-Procedure Support, 0.5 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B002XO9JMG" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61Dq0sEh2aL._SY879_.jpg" alt="Miracle Plus Arnica Cream Bruise Relief Lotion For Bruising And Swelling On Skin | Arnica Montana Extra Strength Vitamin K Cream | Moisturizing Formula Skin Care Gel With Horse Chestnut, 4 Fl Oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B002XO9JMG</span>
+        <span class="product-card-price">$14.99</span>
+        <span class="product-card-title">Miracle Plus Arnica Cream Bruise Relief Lotion For Bruising And Swelling On Skin | Arnica Montana Extra Strength Vitamin K Cream | Moisturizing Formula Skin Care Gel With Horse Chestnut, 4 Fl Oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B07D7NVWN7" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/716lAJ3lYoL._SX679_.jpg" alt="SKINTENSIVE Arnica Bruise Cream for Thin Skin - Moisturizing Arnica Cream, Vitamin K C and E, Skin Renewal, 4 Oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B07D7NVWN7</span>
+        <span class="product-card-price">$29.94</span>
+        <span class="product-card-title">SKINTENSIVE Arnica Bruise Cream for Thin Skin - Moisturizing Arnica Cream, Vitamin K C and E, Skin Renewal, 4 Oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FX31M22J" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71smKUUyGbL._SX679_.jpg" alt="Boiron Arnicare Bruise Gel for Pain, Inflammation or Swelling, Soreness, and Discoloration - Non-greasy and Fragrance-Free - 4.2 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FX31M22J</span>
+        <span class="product-card-price">$14.28</span>
+        <span class="product-card-title">Boiron Arnicare Bruise Gel for Pain, Inflammation or Swelling, Soreness, and Discoloration - Non-greasy and Fragrance-Free - 4.2 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B01CMDX3ZG" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71AVJLw92RL._AC_SX679_.jpg" alt="Boiron Arnicare Bruise Gel for Relief of Pain, Inflammation or Swelling, Soreness, and Discoloration - Non-greasy and Fragrance-Free - 1.5 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B01CMDX3ZG</span>
+        <span class="product-card-price">$6.36</span>
+        <span class="product-card-title">Boiron Arnicare Bruise Gel for Relief of Pain, Inflammation or Swelling, Soreness, and Discoloration - Non-greasy and Fragrance-Free - 1.5 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FV5N4155" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/713lkNvxH2L._SX679_.jpg" alt="Arnica Bruise Cream Extra Strength: Fast Healing Arnica Cream for Bruising Swelling Thin Skin-Enhanced Recovery Vitamin K Creams With Arnica Montana, VK, C&amp;E– Soothing Hydrating for senior, Adult, Kid" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FV5N4155</span>
+        <span class="product-card-price">$24.99</span>
+        <span class="product-card-title">Arnica Bruise Cream Extra Strength: Fast Healing Arnica Cream for Bruising Swelling Thin Skin-Enhanced Recovery Vitamin K Creams With Arnica Montana, VK, C&amp;E– Soothing Hydrating for senior, Adult, Kid</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B07G75GR5B" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/81a6pGlWQjL._SX679_.jpg" alt="Dermend Bruise Cream 2.5 oz." class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B07G75GR5B</span>
+        <span class="product-card-price">$19.97</span>
+        <span class="product-card-title">Dermend Bruise Cream 2.5 oz.</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FV52WV8Y" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71m5UMLPgSL._SX679_.jpg" alt="Arnica Bruise Cream Extra Strength: Fast Healing for Bruising and Swelling on Thin &amp; Sensitive Skin - Enriched with Arnica Montana &amp; Vitamins K, C &amp; E - Daily Care for Teens, Adults &amp; Seniors 4oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FV52WV8Y</span>
+        <span class="product-card-price">$25.99</span>
+        <span class="product-card-title">Arnica Bruise Cream Extra Strength: Fast Healing for Bruising and Swelling on Thin &amp; Sensitive Skin - Enriched with Arnica Montana &amp; Vitamins K, C &amp; E - Daily Care for Teens, Adults &amp; Seniors 4oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0D5J3DDSR" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71GTHeiacOL._AC_SX679_.jpg" alt="5kind Extra Strong Arnica Cream 10.1 Fl Oz - Bruise Cream Extra Strength - High Concentration Arnica Montana Extract - Natural Formula" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0D5J3DDSR</span>
+        <span class="product-card-price">$28.97</span>
+        <span class="product-card-title">5kind Extra Strong Arnica Cream 10.1 Fl Oz - Bruise Cream Extra Strength - High Concentration Arnica Montana Extract - Natural Formula</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0G15RRJJ6" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71z1IlLOB0L._SX679_.jpg" alt="Boiron Arnicare Bruise Gel for Pain, Inflammation or Swelling, Soreness, and Discoloration - Non-greasy and Fragrance-Free - 2.6 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0G15RRJJ6</span>
+        <span class="product-card-price">$8.48</span>
+        <span class="product-card-title">Boiron Arnicare Bruise Gel for Pain, Inflammation or Swelling, Soreness, and Discoloration - Non-greasy and Fragrance-Free - 2.6 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B00J7WI64Y" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71G7sOPaFmL._AC_SX679_.jpg" alt="Procure Bruise Remedy" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B00J7WI64Y</span>
+        <span class="product-card-price">$10.99</span>
+        <span class="product-card-title">Procure Bruise Remedy</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0F7HZ1MPL" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71eFzOkNvGL._SX679_.jpg" alt="Hermon Arnica Bruise Cream: Arnica Montana with Vitamins K, C &amp; E–Hydrating Moisturizer for Face 4 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0F7HZ1MPL</span>
+        <span class="product-card-price">$23.99</span>
+        <span class="product-card-title">Hermon Arnica Bruise Cream: Arnica Montana with Vitamins K, C &amp; E–Hydrating Moisturizer for Face 4 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FJ9TP8CB" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61h3-ghLxoL._SX679_.jpg" alt="Arnica Bruise Cream Extra Strength: Rapid Relief for Bruising Swelling Soreness Pain on Thin Skin - Potent Arnica Montana with Vitamin K Coconut Shea Butter - Face &amp; Body" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FJ9TP8CB</span>
+        <span class="product-card-price">$24.95</span>
+        <span class="product-card-title">Arnica Bruise Cream Extra Strength: Rapid Relief for Bruising Swelling Soreness Pain on Thin Skin - Potent Arnica Montana with Vitamin K Coconut Shea Butter - Face &amp; Body</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B08TCKRGM9" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/41HqhRXHFWL._AC_SX679_.jpg" alt="Topical Gel for Bruising and Swelling, 20% Arnica, Bromelain, 2% Vitamin K, 20g (0.7 fl oz) – Advanced Concentrated Bruise Treatment Formula" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B08TCKRGM9</span>
+        <span class="product-card-price">$13.99</span>
+        <span class="product-card-title">Topical Gel for Bruising and Swelling, 20% Arnica, Bromelain, 2% Vitamin K, 20g (0.7 fl oz) – Advanced Concentrated Bruise Treatment Formula</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0G9C2D35Q" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/81GQapjx5hL._SX679_.jpg" alt="Vigority Helichrysum Arnica Recovery Cream: Arnica Cream for Bruises, Mature &amp; Thin Skin with Vitamins K, C &amp; E - Soothes, Restores &amp; Strengthens Skin Barrier for Adult &amp; Senior - Non-Greasy 3.4oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0G9C2D35Q</span>
+        <span class="product-card-price">$24.99</span>
+        <span class="product-card-title">Vigority Helichrysum Arnica Recovery Cream: Arnica Cream for Bruises, Mature &amp; Thin Skin with Vitamins K, C &amp; E - Soothes, Restores &amp; Strengthens Skin Barrier for Adult &amp; Senior - Non-Greasy 3.4oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0D5TW1DB4" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/51ozH1TS69L._SX679_.jpg" alt="Arnica Bruise Cream Balm with Vitamin K – Bruise Cream for Seniors with Thin, Mature, Elderly Skin- Fragile Skin Moisturing Formula legs, arms, hands" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0D5TW1DB4</span>
+        <span class="product-card-price">$19.95</span>
+        <span class="product-card-title">Arnica Bruise Cream Balm with Vitamin K – Bruise Cream for Seniors with Thin, Mature, Elderly Skin- Fragile Skin Moisturing Formula legs, arms, hands</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FV5QK2K3" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71NoEY3hx3L._SX679_.jpg" alt="TAGRID Arnica Cream Extra Strength: Fast Pain Relief Arnica Bruise Cream with Vitamin K for Bruising and Swelling on Thin Skin, Joint Pain, Muscle Pain, Soreness (4 Ounce (Pack of 1))" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FV5QK2K3</span>
+        <span class="product-card-price">$24.99</span>
+        <span class="product-card-title">TAGRID Arnica Cream Extra Strength: Fast Pain Relief Arnica Bruise Cream with Vitamin K for Bruising and Swelling on Thin Skin, Joint Pain, Muscle Pain, Soreness (4 Ounce (Pack of 1))</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B06XJYWY4L" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71nAl7rYq3L._SX679_.jpg" alt="Reshape+ Arnica Bruise Relief Topical Cream For Bruising, Swelling, &amp; Discoloration On Skin, Natural Skin Care Homeopathic Arnica Lotion W/Vitamin K, Horse Chestnut, &amp; Collagen, Large 8 Fl Oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B06XJYWY4L</span>
+        <span class="product-card-price">$15.99</span>
+        <span class="product-card-title">Reshape+ Arnica Bruise Relief Topical Cream For Bruising, Swelling, &amp; Discoloration On Skin, Natural Skin Care Homeopathic Arnica Lotion W/Vitamin K, Horse Chestnut, &amp; Collagen, Large 8 Fl Oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0GCS5LFKQ" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/715dqn35AyL._SX679_.jpg" alt="Arnica Bruise Relief Cream Extra Strength: Soothing Moisturizer with Vitamin K, C &amp; E for Thin &amp; Sensitive Skin - Daily Care for Teens, Adults &amp; Mature Skin (3 Oz * 2 PCS)" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0GCS5LFKQ</span>
+        <span class="product-card-price">$39.99</span>
+        <span class="product-card-title">Arnica Bruise Relief Cream Extra Strength: Soothing Moisturizer with Vitamin K, C &amp; E for Thin &amp; Sensitive Skin - Daily Care for Teens, Adults &amp; Mature Skin (3 Oz * 2 PCS)</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B01L03N1RO" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/81+AnqL1MmL._AC_SX679_.jpg" alt="Arnica Cream Bruise Relief Lotion for Bruising and Swelling On Skin | Bruise Cream Extra Strength Vitamin K Cream | Moisturizing Arnica Bruise Formula Skin Care Gel W/Collagen, 4 Fl Oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B01L03N1RO</span>
+        <span class="product-card-price">$14.99</span>
+        <span class="product-card-title">Arnica Cream Bruise Relief Lotion for Bruising and Swelling On Skin | Bruise Cream Extra Strength Vitamin K Cream | Moisturizing Arnica Bruise Formula Skin Care Gel W/Collagen, 4 Fl Oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B07GXYFJ3P" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/618h8e-FByL._SX679_.jpg" alt="Vitamin K Cream- Moisturizing Bruise Healing Formula. Dark Spot Corrector for Bruising, Spider Veins &amp; Broken Capillaries. Reduces Under Eye Dark Circles, Fine Lines, Puffiness, &amp; Wrinkles with Arnica" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B07GXYFJ3P</span>
+        <span class="product-card-price">$29.98</span>
+        <span class="product-card-title">Vitamin K Cream- Moisturizing Bruise Healing Formula. Dark Spot Corrector for Bruising, Spider Veins &amp; Broken Capillaries. Reduces Under Eye Dark Circles, Fine Lines, Puffiness, &amp; Wrinkles with Arnica</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FXLGPNC7" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61M2rFzGfsL._AC_SX679_.jpg" alt="TAGRID Arnica Bruise Cream: Extra Strength Formula Suitable for Seniors, Sensitive Thin Skin - with Vitamin K for Fast Relief of Bruising, Swelling, Joint &amp; Muscle Soreness (3.53OZ)" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FXLGPNC7</span>
+        <span class="product-card-price">$24.99</span>
+        <span class="product-card-title">TAGRID Arnica Bruise Cream: Extra Strength Formula Suitable for Seniors, Sensitive Thin Skin - with Vitamin K for Fast Relief of Bruising, Swelling, Joint &amp; Muscle Soreness (3.53OZ)</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B07K6VRLP2" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/71gg9d1UiIL._SX679_.jpg" alt="Vitamin K Cream- Bruise Healing Formula with Arnica. Dark Spot Moisturizer for Bruising, Spider Veins &amp; Broken Capillaries. Repair Under Eye Dark Circles, &amp; Puffiness." class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B07K6VRLP2</span>
+        <span class="product-card-price">$32.98</span>
+        <span class="product-card-title">Vitamin K Cream- Bruise Healing Formula with Arnica. Dark Spot Moisturizer for Bruising, Spider Veins &amp; Broken Capillaries. Repair Under Eye Dark Circles, &amp; Puffiness.</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0DK66L9Y4" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/51NjtuYpU4L._AC_SX679_.jpg" alt="terrasil Bruise Cream for Thin Skin Bruises, Senile Purpura Treatment, Helps Relieve Discoloration, Swelling with Arnica Extract and Natural Ingredients for Elderly Skin Bruising, 1.7 oz" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0DK66L9Y4</span>
+        <span class="product-card-price">$19.95</span>
+        <span class="product-card-title">terrasil Bruise Cream for Thin Skin Bruises, Senile Purpura Treatment, Helps Relieve Discoloration, Swelling with Arnica Extract and Natural Ingredients for Elderly Skin Bruising, 1.7 oz</span>
+    </div>
+</a>
+<a href="https://www.amazon.com/dp/B0FJCC1GY6" target="_blank" class="product-card">
+    <img src="https://m.media-amazon.com/images/I/61iCiVr7TXL._SX679_.jpg" alt="Arnica Bruise Cream Extra-Strength: Fast-Acting for Bruising &amp; Swelling on Thin Skin - Advanced Formula with Arnica Montana Vitamin K C &amp; E - Soothing Hydrating for Face and Body (4 Fl Oz (Pack of 1))" class="product-card-img" loading="lazy">
+    <div class="product-card-info">
+        <span class="product-card-asin">B0FJCC1GY6</span>
+        <span class="product-card-price">$26.95</span>
+        <span class="product-card-title">Arnica Bruise Cream Extra-Strength: Fast-Acting for Bruising &amp; Swelling on Thin Skin - Advanced Formula with Arnica Montana Vitamin K C &amp; E - Soothing Hydrating for Face and Body (4 Fl Oz (Pack of 1))</span>
+    </div>
+</a>
+        </div>
+    </div>
+
+    <section id="keyword-clusters" class="keyword-clusters-section">
+        <h2>Search Keyword Clusters</h2>
+        <p class="clusters-subtitle">152 search keywords organized into 52 clusters — click any bar to see keywords</p>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3>Top Clusters by Total Search Volume</h3>
+                <div id="chart-volume" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Top Clusters by Number of Keywords</h3>
+                <div id="chart-count" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Identity-Based Clusters</h3>
+                <div id="chart-identity" class="chart"></div>
+            </div>
+            <div class="chart-container">
+                <h3>Feature-Based Clusters</h3>
+                <div id="chart-feature" class="chart"></div>
+            </div>
+        </div>
+    </section>
+
+    <div id="keywords-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3 id="modal-title">Keywords</h3>
+            <div id="modal-stats" class="modal-stats"></div>
+            <div id="modal-keywords" class="modal-keywords"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <section id="hidden-drivers" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 1</span>
+                <h2 class="section-title">Hidden Purchase Drivers</h2>
+                <p class="section-subtitle">Features customers love but don't actively search for</p>
+            </div>
+            <div class="table-container">
+<table>
+    <tr>
+        <th>Feature / Driver</th>
+        <th>Review Mentions</th>
+        <th>Keyword Volume</th>
+        <th>Opportunity</th>
+    </tr>
+    <tr>
+    <td><strong>Arnica Montana</strong></td>
+    <td>166 reviews (13.8%)</td>
+    <td>~89.2K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Discoloration / Color Fading</strong></td>
+    <td>141 reviews (11.7%)</td>
+    <td>~12.0K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Swelling Reduction</strong></td>
+    <td>87 reviews (7.2%)</td>
+    <td>~12.0K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Post-Surgery Recovery</strong></td>
+    <td>74 reviews (6.2%)</td>
+    <td>~12.0K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Non-Greasy / Fast Absorbing</strong></td>
+    <td>72 reviews (6.0%)</td>
+    <td>~12.0K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Moisturizing / Hydrating</strong></td>
+    <td>66 reviews (5.5%)</td>
+    <td>~89.2K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Pain Relief</strong></td>
+    <td>64 reviews (5.3%)</td>
+    <td>~89.2K</td>
+    <td>&#9989; Well-Matched</td>
+</tr><tr>
+    <td><strong>Under-Eye / Face Use</strong></td>
+    <td>56 reviews (4.7%)</td>
+    <td>~89.2K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Gentle / Sensitive Skin Safe</strong></td>
+    <td>38 reviews (3.2%)</td>
+    <td>~12.0K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Natural / Organic Ingredients</strong></td>
+    <td>33 reviews (2.7%)</td>
+    <td>~12.0K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Thin Skin Specific</strong></td>
+    <td>33 reviews (2.7%)</td>
+    <td>871</td>
+    <td>&#128142; Hidden Differentiator</td>
+</tr><tr>
+    <td><strong>Extra Strength / High Concentration</strong></td>
+    <td>32 reviews (2.7%)</td>
+    <td>~89.2K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Fragrance-Free / Unscented</strong></td>
+    <td>30 reviews (2.5%)</td>
+    <td>~89.2K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Blood Thinner / Medication Related</strong></td>
+    <td>30 reviews (2.5%)</td>
+    <td>~12.0K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Fast Healing / Quick Results</strong></td>
+    <td>27 reviews (2.2%)</td>
+    <td>~12.0K</td>
+    <td>&#127919; Moderate Signal</td>
+</tr><tr>
+    <td><strong>Vitamin K</strong></td>
+    <td>15 reviews (1.2%)</td>
+    <td>~12.0K</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Spider Veins / Broken Capillaries</strong></td>
+    <td>15 reviews (1.2%)</td>
+    <td>0</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Senile Purpura</strong></td>
+    <td>11 reviews (0.9%)</td>
+    <td>250</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Homeopathic</strong></td>
+    <td>9 reviews (0.7%)</td>
+    <td>~1.8K</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Large / Value Size</strong></td>
+    <td>7 reviews (0.6%)</td>
+    <td>~89.2K</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Vitamin C &amp; E</strong></td>
+    <td>4 reviews (0.3%)</td>
+    <td>871</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Helichrysum</strong></td>
+    <td>4 reviews (0.3%)</td>
+    <td>~12.0K</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Coconut / Shea Butter</strong></td>
+    <td>2 reviews (0.2%)</td>
+    <td>~12.0K</td>
+    <td>&#128202; Low Signal</td>
+</tr><tr>
+    <td><strong>Bromelain / Pineapple Enzyme</strong></td>
+    <td>1 reviews (0.1%)</td>
+    <td>871</td>
+    <td>&#128202; Low Signal</td>
+</tr>
+</table>
+</div>
+<div class="insight-box">
+    <strong>&#128161; Key Insight:</strong> Arnica Montana (166 mentions, 13.8%), Discoloration / Color Fading (141 mentions), and Swelling Reduction (87 mentions) are the top purchase drivers. <strong>Hidden Differentiators</strong> include Thin Skin Specific — features with strong review presence but low search volume, representing untapped positioning opportunities.
+</div>
+        </section>
+
+        <section id="reddit-insights" class="section">
+    <div class="section-header">
+        <span class="section-label">Part 2</span>
+        <h2 class="section-title">Reddit Community Insights</h2>
+        <p class="section-subtitle">Real conversations from 46 subreddits analyzed via Perplexity AI</p>
+    </div>
+
+    <div class="reddit-stats-bar">
+        <div class="reddit-stat">
+            <div class="reddit-stat-number">15</div>
+            <div class="reddit-stat-label">Research Queries</div>
+        </div>
+        <div class="reddit-stat">
+            <div class="reddit-stat-number">46</div>
+            <div class="reddit-stat-label">Subreddits Analyzed</div>
+        </div>
+        <div class="reddit-stat">
+            <div class="reddit-stat-number">5</div>
+            <div class="reddit-stat-label">Categories</div>
+        </div>
+    </div>
+
+    <div class="reddit-category" id="reddit-by-persona">
+        <div class="reddit-category-header" onclick="toggleReddit('by-persona')">
+            <span class="reddit-category-title">&#128100; By Persona <span class="reddit-category-count">5 topics</span></span>
+            <span class="reddit-chevron">&#9660;</span>
+        </div>
+        <div class="reddit-category-body">
+            <div class="reddit-category-content">
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Seniors &amp; Caregivers</div>
+<div class="reddit-summary">Elderly people, caregivers, and family members frequently discuss senile purpura (also called actinic purpura)—those dark, stubborn bruises on thin, fragile aging skin—in subreddits like r/AgingParents, r/Caregivers, r/eldercare, r/Dementia, and r/AskOldPeople. Common themes include frustration with how slowly bruises heal on paper-thin skin (often due to reduced collagen, capillaries, and platele</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Bruising on thin skin</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/AgingParents</span> <span class="reddit-subreddit">r/Caregivers</span> <span class="reddit-subreddit">r/eldercare</span> <span class="reddit-subreddit">r/Dementia</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Senile purpura remedies</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/AgingParents</span> <span class="reddit-subreddit">r/Caregivers</span> <span class="reddit-subreddit">r/eldercare</span> <span class="reddit-subreddit">r/Dementia</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Creams for elderly bruises</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/AgingParents</span> <span class="reddit-subreddit">r/Caregivers</span> <span class="reddit-subreddit">r/eldercare</span> <span class="reddit-subreddit">r/Dementia</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Blood Thinner Users</div>
+<div class="reddit-summary">Reddit users on blood thinners like warfarin, Eliquis (apixaban), and Xarelto (rivaroxaban) frequently discuss easy bruising as a common side effect, often sharing anecdotal remedies in subs like r/ClotSurvivors, r/AFIB, r/Warfarin, r/PulmonaryEmbolism, r/DVT, and r/AskDocs. These are **not medical advice**—users emphasize consulting doctors, as blood thinners increase bleeding risk, and topical p</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">appearing without cause, especially on arms/legs. Warfarin users note vitamin K sensitivity worsens it; DOACs (Eliquis/Xarelto) users say it&#x27;s milder but persistent.
+- **Severity**: Some call it</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/ClotSurvivors</span> <span class="reddit-subreddit">r/AFIB</span> <span class="reddit-subreddit">r/Warfarin</span> <span class="reddit-subreddit">r/PulmonaryEmbolism</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Game-changer for Eliquis bruises</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/ClotSurvivors</span> <span class="reddit-subreddit">r/AFIB</span> <span class="reddit-subreddit">r/Warfarin</span> <span class="reddit-subreddit">r/PulmonaryEmbolism</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Arnica + elevation = bruises gone fast</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/ClotSurvivors</span> <span class="reddit-subreddit">r/AFIB</span> <span class="reddit-subreddit">r/Warfarin</span> <span class="reddit-subreddit">r/PulmonaryEmbolism</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Cosmetic Procedure Recovery</div>
+<div class="reddit-summary">Reddit users frequently discuss arnica cream (often brands like Boiron or Arnica Montana gels) and similar bruise creams (e.g., those with bromelain, vitamin K, or LED light therapy devices) in subs like r/30PlusSkinCare, r/PlasticSurgery, r/Botox, r/FillerReview, and r/SkincareAddiction. Opinions are mixed but lean positive for minor bruising from fillers, Botox, or light surgeries like blepharop</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Arnica gel + bromelain pills cleared my under-eye filler bruises in 3 days vs. usual 7–10</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/PlasticSurgery</span> <span class="reddit-subreddit">r/Botox</span> <span class="reddit-subreddit">r/FillerReview</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Bruises gone overnight after chin filler</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/PlasticSurgery</span> <span class="reddit-subreddit">r/Botox</span> <span class="reddit-subreddit">r/FillerReview</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Arnica cream was a game-changer for swelling post-bleph</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/PlasticSurgery</span> <span class="reddit-subreddit">r/Botox</span> <span class="reddit-subreddit">r/FillerReview</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Athletes &amp; Martial Artists</div>
+<div class="reddit-summary">Reddit communities like r/martialarts, r/bjj, r/MuayThai, r/MMA, r/bodyweightfitness, and r/weightlifting frequently discuss bruise recovery, especially from impacts in training/sparring. Users (often grapplers, strikers, boxers, and CrossFitters) emphasize **prevention first** (e.g., proper gear, tapering intensity), but for recovery, they share anecdotal experiences from high-impact sports. Key </div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">How do you deal with bruises?</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/martialarts</span> <span class="reddit-subreddit">r/bjj</span> <span class="reddit-subreddit">r/MuayThai</span> <span class="reddit-subreddit">r/MMA</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Fastest way to heal shin bruises?</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/martialarts</span> <span class="reddit-subreddit">r/bjj</span> <span class="reddit-subreddit">r/MuayThai</span> <span class="reddit-subreddit">r/MMA</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">products; recovery is mostly time + basics. Overuse of topicals can irritate skin.
+
+Evidence from threads (sorted by upvotes, spanning 2020-2026):
+- r/martialarts (2024 thread, 500+ upvotes)</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/martialarts</span> <span class="reddit-subreddit">r/bjj</span> <span class="reddit-subreddit">r/MuayThai</span> <span class="reddit-subreddit">r/MMA</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Parents &amp; Children</div>
+<div class="reddit-summary">Parents on subreddits like r/Parenting, r/beyondthebump, r/toddlers, and r/AskParents frequently share home remedies and product suggestions for minor bruises in children. These are based on anecdotal experiences, not medical advice—always consult a pediatrician for severe bruising, persistent pain, or signs of underlying issues like frequent unexplained bruises. Key themes from threads (e.g., &quot;Be</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Best bruise remedies for toddlers?</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/Parenting</span> <span class="reddit-subreddit">r/beyondthebump</span> <span class="reddit-subreddit">r/toddlers</span> <span class="reddit-subreddit">r/AskParents</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Arnica for kids?</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/Parenting</span> <span class="reddit-subreddit">r/beyondthebump</span> <span class="reddit-subreddit">r/toddlers</span> <span class="reddit-subreddit">r/AskParents</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Works better than anything</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/Parenting</span> <span class="reddit-subreddit">r/beyondthebump</span> <span class="reddit-subreddit">r/toddlers</span> <span class="reddit-subreddit">r/AskParents</span>
+    </div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reddit-category" id="reddit-feature-requests">
+        <div class="reddit-category-header" onclick="toggleReddit('feature-requests')">
+            <span class="reddit-category-title">&#10024; Feature Requests & Ingredients <span class="reddit-category-count">5 topics</span></span>
+            <span class="reddit-chevron">&#9660;</span>
+        </div>
+        <div class="reddit-category-body">
+            <div class="reddit-category-content">
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Brand Comparisons &amp; Rankings</div>
+<div class="reddit-summary">Reddit users frequently discuss bruise treatments in these subreddits (based on common threads up to early 2026): - Niche ones like **r/climbharder** or **r/martialarts** for activity-related bruising.</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Top Recommended Products &amp; Ingredients</div>
+<div class="reddit-summary">Reddit users across subs like r/LifeProTips, r/AskReddit, r/SkincareAddiction, and r/medicine frequently share anecdotal remedies for bruises (hematomas from minor trauma). These are not medically verified but popular based on upvoting and discussion volume (e.g., threads from 2020–2025 with 1K+ upvotes). Top recommendations: Users warn: See a doctor for large, painful, or non-fading bruises (&gt;2 w</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">bruises faster.
+
+- **Elevation and Rest (RICE Method)**: Raise the bruised area above heart level</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/LifeProTips</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/medicine</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">fades bruises in days</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/LifeProTips</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/medicine</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">miracle for legs</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/LifeProTips</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/medicine</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Vitamin K vs. Arnica vs. Bromelain</div>
+<div class="reddit-summary">Reddit users have **mixed opinions** on vitamin K cream&#x27;s effectiveness: - Some users report modest improvements in bruise appearance and healing speed</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">not worth the cost</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/Supplements</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Spider Veins &amp; Broken Capillaries</div>
+<div class="reddit-summary">Reddit discussions (primarily in subs like r/SkincareAddiction, r/30PlusSkinCare, r/SpiderVeins, r/VaricoseVeins, and r/beauty) show **mixed but mostly skeptical views** on bruise creams for these vascular issues. Users often distinguish between superficial bruising (where these creams shine) and chronic vein problems like spider veins (telangiectasia), broken capillaries (often from rosacea or tr</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Arnica gel cleared my shin bruise overnight</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/SpiderVeins</span> <span class="reddit-subreddit">r/VaricoseVeins</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Vitamin K cream made my cheeks look better short-term, but capillaries returned</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/SpiderVeins</span> <span class="reddit-subreddit">r/VaricoseVeins</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Bruise cream won&#x27;t fix spider veins—see a derm for sclerotherapy</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/SpiderVeins</span> <span class="reddit-subreddit">r/VaricoseVeins</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Vitamin K vs. Arnica vs. Bromelain</div>
+<div class="reddit-summary">Reddit users, particularly in subs like r/SkincareAddiction, r/30PlusSkinCare, r/AskReddit, and r/Herbalism, frequently discuss bruise creams for reducing bruising from injuries, surgery (e.g., rhinoplasty or fillers), or aging skin. Common ingredients mentioned include **arnica**, **vitamin K**, **bromelain**, **horse chestnut**, plus others like comfrey, calendula, witch hazel, and LED light the</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">it worked for my black eye in 3 days</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/Herbalism</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">faded my shin bruise overnight</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/Herbalism</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Low-quality evidence</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/Herbalism</span>
+    </div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reddit-category" id="reddit-pain-points-reddit">
+        <div class="reddit-category-header" onclick="toggleReddit('pain-points-reddit')">
+            <span class="reddit-category-title">&#9888;&#65039; Pain Points & Complaints <span class="reddit-category-count">1 topics</span></span>
+            <span class="reddit-chevron">&#9660;</span>
+        </div>
+        <div class="reddit-category-body">
+            <div class="reddit-category-content">
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Top Complaints About Bruise Creams</div>
+<div class="reddit-summary">Reddit users (primarily in subs like r/SkincareAddiction, r/beauty, r/AskReddit, r/30PlusSkinCare, and r/BeautyGuruChatter) frequently discuss bruise creams, often focusing on popular ones like those with arnica, bromelain, vitamin K, or horse chestnut. Complaints are drawn from thousands of threads and comments up to early 2026. Here&#x27;s a breakdown based on sentiment analysis from top posts (e.g.,</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Best bruise cream?</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/beauty</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/30PlusSkinCare</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Arnica cream did nothing for my shin bruise after a week</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/beauty</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/30PlusSkinCare</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Took 10 days instead of 7—placebo at best</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/beauty</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/30PlusSkinCare</span>
+    </div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reddit-category" id="reddit-brand-sentiment">
+        <div class="reddit-category-header" onclick="toggleReddit('brand-sentiment')">
+            <span class="reddit-category-title">&#127942; Brand Sentiment & Innovation <span class="reddit-category-count">3 topics</span></span>
+            <span class="reddit-chevron">&#9660;</span>
+        </div>
+        <div class="reddit-category-body">
+            <div class="reddit-category-content">
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Brand Comparisons &amp; Rankings</div>
+<div class="reddit-summary">Reddit users (primarily from subreddits like r/SkincareAddiction, r/30PlusSkinCare, r/AskWomenOver30, r/BuyItForLife, and r/Supplements) frequently discuss arnica creams for reducing bruising, swelling, and post-procedure recovery (e.g., after fillers, surgery, or accidents). Praise often centers on fast absorption, minimal greasiness, and visible results within 1-3 days. Evidence is anecdotal—use</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">in 100+ threads). Users love it for quick bruise fading (48-72 hours), non-greasy feel, and affordability (~$10-15/tube).
+- **Key Quotes**:
+  -</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/AskWomenOver30</span> <span class="reddit-subreddit">r/BuyItForLife</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">(r/SkincareAddiction, 2025 thread, 500+ upvotes).
+  -</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/AskWomenOver30</span> <span class="reddit-subreddit">r/BuyItForLife</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">(r/AskWomenOver30).
+- **Pros**: Fast-drying, odorless, widely available (Amazon, Walmart). Homeopathic (arnica 30C potency).
+- **Cons**: Some report no effect (</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/30PlusSkinCare</span> <span class="reddit-subreddit">r/AskWomenOver30</span> <span class="reddit-subreddit">r/BuyItForLife</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Brand Love vs. Hate Analysis</div>
+<div class="reddit-summary">Reddit users (primarily from subreddits like r/SkincareAddiction, r/beauty, r/AskReddit, r/30PlusSkinCare, and r/BeautyGuruChatter) frequently discuss bruise creams for post-procedure recovery (e.g., fillers, surgery), sports injuries, or general bruising. Opinions are anecdotal, based on personal experiences, and vary by skin type, bruise cause, and expectations. Common themes: fast fading (yello</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">in r/30PlusSkinCare) | Fastest bruise fader (users report 50-70% reduction in 48 hours); non-staining, lightweight lotion absorbs quickly. Stands out for surgical recovery (fillers, rhinoplasty)</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/beauty</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/30PlusSkinCare</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">(2025 thread, 500+ upvotes). Affordable ($20-30/tube). |
+| **Boiron Arnicare** (gel/cream) | Very High (top rec in r/SkincareAddiction) | Homeopathic arnica works</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/beauty</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/30PlusSkinCare</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">on fresh bruises/swelling; cooling sensation, no scent</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/beauty</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/30PlusSkinCare</span>
+    </div>
+</div>
+</div>
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Innovative &amp; Unconventional Treatments</div>
+<div class="reddit-summary">Reddit communities like r/LifeProTips, r/AskReddit, r/SkincareAddiction, and r/medicine frequently discuss bruise remedies. Most align with standard medical advice (e.g., RICE method: Rest, Ice, Compression, Elevation), but users share personal anecdotes on innovative or unconventional hacks. These are **not medically verified**—always consult a doctor for serious bruises. Here&#x27;s a curated summary</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Bruises gone in 2 days vs. week</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/LifeProTips</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/medicine</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Black eye cleared in 48hrs</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/LifeProTips</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/medicine</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">Smelly but free</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/LifeProTips</span> <span class="reddit-subreddit">r/AskReddit</span> <span class="reddit-subreddit">r/SkincareAddiction</span> <span class="reddit-subreddit">r/medicine</span>
+    </div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reddit-category" id="reddit-medical-perspective">
+        <div class="reddit-category-header" onclick="toggleReddit('medical-perspective')">
+            <span class="reddit-category-title">&#129658; Medical & Professional Views <span class="reddit-category-count">1 topics</span></span>
+            <span class="reddit-chevron">&#9660;</span>
+        </div>
+        <div class="reddit-category-body">
+            <div class="reddit-category-content">
+<div class="reddit-subcategory">
+<div class="reddit-subcategory-title">Top Recommended Products &amp; Ingredients</div>
+<div class="reddit-summary">Based on discussions in medical subreddits, healthcare professionals show **mixed but generally skeptical views on arnica**: Most doctors and dermatologists on Reddit acknowledge that:</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">it won&#x27;t hurt, but probably won&#x27;t help much either</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/AskDocs</span> <span class="reddit-subreddit">r/medicine</span> <span class="reddit-subreddit">r/Dermatology</span>
+    </div>
+</div>
+<div class="reddit-quote-card">
+    <div class="reddit-quote-text">If you want to try it, go ahead, but save your money</div>
+    <div class="reddit-quote-meta">
+        <span class="reddit-subreddit">r/AskDocs</span> <span class="reddit-subreddit">r/medicine</span> <span class="reddit-subreddit">r/Dermatology</span>
+    </div>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <section id="pain-points" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 3</span>
+                <h2 class="section-title">Customer Pain Points</h2>
+                <p class="section-subtitle">395 negative reviews analyzed — 11 recurring themes identified</p>
+            </div>
+            <div class="priority-section">
+    <div class="priority-header">
+        <span class="priority-dot critical"></span>
+        <span class="priority-title">Critical Priority (1)</span>
+    </div>
+    <div class="pain-grid">
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">No Visible Results / Doesn&#x27;t Work</span>
+        <span class="card-badge badge-critical">CRITICAL</span>
+    </div>
+    <span class="card-badge badge-count">166 mentions</span>
+    <div class="card-quote">Humm…This cream worked wonderfully at the beginning. Very effective. After a couple of months, though, does not seem to be as effective. Poss of building up a “tolerance”? I’m trying a new product thi</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Set clear timeline expectations (e.g., &#x27;Apply within 24 hours of bruise. Visible improvement in 2-5 days&#x27;). Include progress photos on listing showing realistic healing timeline.</div>
+</div>
+</div></div>
+
+<div class="priority-section">
+    <div class="priority-header">
+        <span class="priority-dot medium"></span>
+        <span class="priority-title">Medium Priority (10)</span>
+    </div>
+    <div class="pain-grid">
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Bad Smell / Strong Scent</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">24 mentions</span>
+    <div class="card-quote">Has a strange odor, leaves a strange off putting odor on skin. So off putting I can’t use it.</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Offer truly unscented formula. If herbal ingredients have natural odor, use micro-encapsulation. Clearly label &#x27;No artificial fragrance&#x27; on front of package.</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Too Expensive / Small Amount</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">22 mentions</span>
+    <div class="card-quote">Over rated and more expensive than other brands I have bought in the past. None seem to make a difference in reducing bruise size or appearance. More expensive doesn&#x27;t mean better results in this case</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Offer competitive multi-size options (travel 15g, standard 60g, value 120g). Show per-use cost on listing. For seniors who use daily, offer subscription option.</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Skin Irritation / Allergic Reaction</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">13 mentions</span>
+    <div class="card-quote">Gave me a rash Threw in garbage</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Patch test instructions on packaging. Hypoallergenic formula free of parabens, artificial dyes, and common allergens. List all ingredients prominently for allergy-prone users.</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Packaging / Tube Issues</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">11 mentions</span>
+    <div class="card-quote">Product is a pleasant gel which does nothing to reduce bruises. Manufacturer offers a &quot;satisfaction guarantee&quot; both on the Amazon description and on the product package. My contact with the manufactur</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Use sturdy tube with flip-cap, not screw-on. Consider airless pump for consistent dispensing. Reinforce tube walls to prevent crushing in shipping.</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Misleading Claims / Fake Reviews</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">11 mentions</span>
+    <div class="card-quote">Empty. I didn&#x27;t open it until today. I already had a bunch and just forgot about these. But I&#x27;m having surgery on a few days and wanted to start taking them. And I open up the plastic topping and the </div>
+    <div class="card-solution"><strong>Product Solution:</strong> Use evidence-based claims with clinical study references. Show realistic before/after timelines. Avoid &#x27;bruise removal&#x27; language — use &#x27;bruise appearance reduction.&#x27;</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Greasy / Sticky / Oily Texture</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">9 mentions</span>
+    <div class="card-quote">The gel feels like some kind of creepy Halloween goo that you don&#x27;t want on your skin. Slimy &amp; gross. Go for the cream.</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Develop lightweight gel formula that absorbs in under 60 seconds. Use dimethicone crosspolymer or silicone-free base for matte finish. Key selling point: &#x27;Dries clear in 30 seconds.&#x27;</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Slow Healing / Takes Too Long</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">8 mentions</span>
+    <div class="card-quote">It didn&#x27;t seem to help my bruise at all in fact it&#x27;s about 5 months later and I still have an outline of the bruise</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Combine fast-acting topical ingredients (menthol for immediate cooling, caffeine for vasoconstriction) with long-acting healing agents (arnica, vitamin K). Add bromelain for faster resolution.</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Doesn&#x27;t Work on Severe / Deep Bruises</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">8 mentions</span>
+    <div class="card-quote">I bought this because I had a big bruise and it never helped take it away put it on many days in a row.</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Offer &#x27;Extra Strength&#x27; variant with higher arnica concentration + bromelain for deep tissue bruises. Set expectations: &#x27;For severe bruises, apply every 4 hours for first 48 hours.&#x27;</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Doesn&#x27;t Help for Blood Thinner Bruises</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">4 mentions</span>
+    <div class="card-quote">I used the entire box as directed. This was for a post op tummy tuck with muscle repair procedure. I didn’t notice any difference taking this medication. Maybe it would have been worse , I don’t know.</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Be transparent: &#x27;Helps improve appearance of bruises but does not counteract blood thinner effects. Consult your doctor.&#x27; Focus claims on cosmetic improvement, not medical cure.</div>
+</div>
+<div class="pain-card">
+    <div class="card-header">
+        <span class="card-title">Staining Clothes / Sheets</span>
+        <span class="card-badge badge-medium">MEDIUM</span>
+    </div>
+    <span class="card-badge badge-count">3 mentions</span>
+    <div class="card-quote">Really like the lotion. Does what it is supposed to and works. The pump does not work therefore making it a mess to use and probably won’t get it all out.</div>
+    <div class="card-solution"><strong>Product Solution:</strong> Formulate to dry completely clear — no yellow tinting from arnica. Add &#x27;Fabric-safe, no staining&#x27; claim after validation testing. Include nighttime application guide.</div>
+</div>
+</div></div>
+        </section>
+
+        <section id="segments" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 4</span>
+                <h2 class="section-title">Customer Segments &amp; Jobs-to-be-Done</h2>
+                <p class="section-subtitle">9 distinct customer segments with Jobs-to-be-Done</p>
+            </div>
+            <div class="segment-grid">
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Blood Thinner Users</h4>
+        <span class="segment-badge">104 reviews (8.7%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Manage chronic bruising caused by blood-thinning medication; reduce appearance of frequent bruises</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Cope with frustration of constant bruising as side effect; feel in control of skin appearance</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Avoid alarming appearance of frequent/large bruises; prevent unwanted concern from others</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Post-Surgery Patients</h4>
+        <span class="segment-badge">67 reviews (5.6%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Speed up bruise healing after surgical procedures; reduce post-operative swelling and discoloration</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Feel proactive about recovery; reduce anxiety about healing timeline</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Return to normal appearance faster after cosmetic or medical procedures</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Elderly / Seniors</h4>
+        <span class="segment-badge">29 reviews (2.4%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Minimize frequent bruising from thin, fragile skin; heal arm and leg bruises from everyday bumps</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Feel less self-conscious about visible bruising; maintain dignity and independence</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Avoid concerned looks from family and friends; feel comfortable wearing short sleeves</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Skin Appearance / Anti-Aging Seekers</h4>
+        <span class="segment-badge">28 reviews (2.3%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Reduce dark circles, puffiness, and signs of aging alongside bruise treatment</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Feel younger and more vibrant; integrate bruise cream into beauty routine</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Present a well-maintained, healthy appearance; get compliments on skin</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Cosmetic Procedure Patients</h4>
+        <span class="segment-badge">17 reviews (1.4%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Reduce bruising from dermal filler injections and Botox; speed healing of injection-site bruises</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Minimize visible evidence of cosmetic procedures; feel confident about appearance during recovery</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Avoid questions about bruising at work or social events; keep cosmetic treatments private</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Easy Bruisers / Frequent Bruisers</h4>
+        <span class="segment-badge">15 reviews (1.2%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Find effective treatment for unexplained or frequent bruising; strengthen capillaries and skin resilience</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Understand why they bruise so easily; feel empowered with a solution</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Reduce embarrassment about constantly visible bruises; feel confident showing skin</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Athletes / Active Adults</h4>
+        <span class="segment-badge">14 reviews (1.2%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Recover quickly from sports-related bruises and impacts; maintain training schedule without extended downtime</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Feel resilient and proactive about recovery; not let bruises slow down fitness goals</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Look presentable despite active lifestyle; avoid excessive bruising visibility at work</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>Parents Treating Kids&#x27; Bruises</h4>
+        <span class="segment-badge">8 reviews (0.7%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Safely treat children&#x27;s bruises from play and sports; use gentle formula on young skin</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Feel like a caring parent addressing bumps and bruises; comfort child during healing</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Reduce visible bruising before school or events; avoid concerned questions from teachers</li></ul>
+        </div>
+    </div>
+</div>
+<div class="segment-card">
+    <div class="segment-header">
+        <h4>IV / Injection Site Bruisers</h4>
+        <span class="segment-badge">3 reviews (0.2%)</span>
+    </div>
+    <div class="segment-body">
+        <div class="segment-section">
+            <h5>Functional Job</h5>
+            <ul><li>Heal bruises from IV insertions, blood draws, and injection sites quickly</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Emotional Job</h5>
+            <ul><li>Reduce anxiety about visible evidence of medical treatments</li></ul>
+        </div>
+        <div class="segment-section">
+            <h5>Social Job</h5>
+            <ul><li>Minimize bruising visibility at injection sites; feel comfortable showing arms</li></ul>
+        </div>
+    </div>
+</div>
+</div>
+        </section>
+
+        <section id="features" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 5</span>
+                <h2 class="section-title">Feature Opportunities by Segment</h2>
+                <p class="section-subtitle">Targeted product features for each customer segment based on review and Reddit insights</p>
+            </div>
+            <div class="feature-grid">
+<div class="feature-card">
+    <div class="card-header">
+        <span class="card-title">Blood Thinner Users</span>
+    </div>
+    <div class="card-features">
+        <ul style="list-style:none; padding:0;">
+            <li>Transparent marketing: &quot;Improves bruise appearance, does not counteract blood thinner effects&quot;</li><li>Vitamin K cream formulation (promotes local clotting without systemic interaction)</li><li>Doctor consultation callout on packaging — builds trust with medically-aware segment</li><li>Non-staining, clear-drying formula for daily use on arms/legs</li>
+        </ul>
+    </div>
+</div>
+<div class="feature-card">
+    <div class="card-header">
+        <span class="card-title">Post-Surgery Patients</span>
+    </div>
+    <div class="card-features">
+        <ul style="list-style:none; padding:0;">
+            <li>Pre- and post-surgery recovery kit (oral bromelain + topical arnica + vitamin K)</li><li>&quot;Start 24 hours after surgery&quot; clear usage timeline on packaging</li><li>Cooling sensation (menthol) for immediate comfort post-procedure</li><li>Travel-size tube for hospital bag — recommended by plastic surgeons</li>
+        </ul>
+    </div>
+</div>
+<div class="feature-card">
+    <div class="card-header">
+        <span class="card-title">Elderly / Seniors with Thin Skin</span>
+    </div>
+    <div class="card-features">
+        <ul style="list-style:none; padding:0;">
+            <li>Skin-strengthening formula: collagen peptides + vitamin C to build resilience over time</li><li>Large-print, easy-open packaging (flip-cap, not screw-on)</li><li>Moisturizing base that doubles as daily skin care for fragile skin</li><li>Gentle, hypoallergenic formula — no fragrances, parabens, or common allergens</li>
+        </ul>
+    </div>
+</div>
+<div class="feature-card">
+    <div class="card-header">
+        <span class="card-title">Cosmetic Procedure Patients</span>
+    </div>
+    <div class="card-features">
+        <ul style="list-style:none; padding:0;">
+            <li>Under-eye safe formula for filler and Botox injection sites</li><li>Fast-absorbing gel that works under makeup (no pilling)</li><li>&quot;Bruise Recovery&quot; positioning for aesthetic market — premium packaging</li><li>Combo with vitamin K for faster capillary repair at injection sites</li>
+        </ul>
+    </div>
+</div>
+<div class="feature-card">
+    <div class="card-header">
+        <span class="card-title">Athletes &amp; Active Adults</span>
+    </div>
+    <div class="card-features">
+        <ul style="list-style:none; padding:0;">
+            <li>Sport-oriented branding with quick recovery messaging</li><li>Dual-action: pain relief (menthol/camphor) + bruise healing (arnica)</li><li>Stick or roll-on format for gym bag portability</li><li>Deep tissue penetration formula for muscle-level bruises</li>
+        </ul>
+    </div>
+</div>
+<div class="feature-card">
+    <div class="card-header">
+        <span class="card-title">Parents Treating Kids</span>
+    </div>
+    <div class="card-features">
+        <ul style="list-style:none; padding:0;">
+            <li>Pediatrician-endorsed, child-safe formula (ages 2+)</li><li>Fun, non-intimidating packaging that comforts children</li><li>Gentle enough for daily use on active kids</li><li>Calendula + arnica blend for sensitive young skin</li>
+        </ul>
+    </div>
+</div>
+</div>
+        </section>
+
+        <section id="innovations" class="section">
+            <div class="section-header">
+                <span class="section-label">Part 6</span>
+                <h2 class="section-title">Innovation Opportunities</h2>
+                <p class="section-subtitle">Blue ocean opportunities synthesized from reviews, search data, and Reddit research</p>
+            </div>
+            <div class="innovation-card">
+    <div class="innovation-number">1</div>
+    <div class="innovation-content">
+        <h4>Multi-Action Recovery System</h4>
+        <ul><li>Combine topical arnica + vitamin K + bromelain in one clinical-grade formula</li><li>Include oral bromelain supplement packet for systemic support</li><li>Position as &quot;complete bruise recovery&quot; — not just a cream but a system</li><li>Reddit data shows users already combine these manually; productize the combo</li></ul>
+    </div>
+</div>
+<div class="innovation-card">
+    <div class="innovation-number">2</div>
+    <div class="innovation-content">
+        <h4>Thin Skin Daily Defense Cream</h4>
+        <ul><li>Preventive daily moisturizer that strengthens capillaries over time</li><li>Collagen peptides + vitamin C + hesperidin for skin resilience</li><li>Treats existing bruises AND prevents new ones — unique positioning</li><li>&quot;Thin Skin Specific&quot; is a Hidden Differentiator (33 mentions, low keyword competition)</li></ul>
+    </div>
+</div>
+<div class="innovation-card light">
+    <div class="innovation-number">3</div>
+    <div class="innovation-content">
+        <h4>Post-Procedure Recovery Kit</h4>
+        <ul><li>Targeted at cosmetic/surgical patients — fastest growing segment</li><li>Kit includes: pre-procedure bromelain capsules + post-procedure arnica gel + vitamin K eye cream</li><li>Partner with plastic surgeons and medspas for professional endorsement</li><li>Premium price point ($40-60) justified by medical positioning</li></ul>
+    </div>
+</div>
+<div class="innovation-card light">
+    <div class="innovation-number">4</div>
+    <div class="innovation-content">
+        <h4>Truly Odorless, Fast-Dry Gel Formula</h4>
+        <ul><li>Address #2 complaint: bad smell (24 mentions) and #7: greasy texture (9 mentions)</li><li>Micro-encapsulated arnica eliminates herbal odor — &quot;Zero Scent Technology&quot;</li><li>Silicone-free base that absorbs in under 30 seconds, dries matte</li><li>&quot;Dries clear, no staining&quot; — addresses staining complaint (3 mentions)</li></ul>
+    </div>
+</div>
+<div class="innovation-card">
+    <div class="innovation-number">5</div>
+    <div class="innovation-content">
+        <h4>Blood Thinner-Friendly Bruise Care</h4>
+        <ul><li>Largest customer segment (104 reviews, 8.7%) with unmet needs</li><li>Transparent labeling: &quot;Safe for use alongside blood thinning medications&quot;</li><li>Focus on cosmetic improvement, not medical claims</li><li>Subscription model for daily users — warfarin/Eliquis patients bruise chronically</li></ul>
+    </div>
+</div>
+        </section>
+    </div>
+
+    <div class="footer">
+        <p><strong>Bruise Cream Market Analysis</strong> | Generated March 2026</p>
+<p>Data: 1201 Amazon reviews across 30 products | 15 Reddit research queries | 152 search keywords</p>
+<p>Analysis by Bender Brands Product Research Engine</p>
+    </div>
+
+    <script>
+    const clusterData = {"top_volume": [{"name": "cream", "total_volume": 190489, "count": 83, "keywords": [{"keyword": "arnica cream", "volume": 89167}, {"keyword": "bruise cream", "volume": 12027}, {"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "vitamin k cream", "volume": 8078}, {"keyword": "arnicare cream", "volume": 7969}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "arnicare cream pain relief", "volume": 3536}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "arnica cream for pain", "volume": 2327}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "arnica montana cream", "volume": 2162}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "arnica face cream", "volume": 1567}, {"keyword": "skintensive bruise cream", "volume": 1527}, {"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "arnica face cream for wrinkles", "volume": 1299}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "bruising cream fast healing", "volume": 1221}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "arnica cream for face", "volume": 927}, {"keyword": "cream for bruises", "volume": 744}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "organic arnica cream", "volume": 592}, {"keyword": "arnica k cream", "volume": 520}, {"keyword": "vitamin k cream for bruises", "volume": 517}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruises healing cream", "volume": 250}, {"keyword": "best bruise cream", "volume": 250}, {"keyword": "amicare bruise cream", "volume": 250}, {"keyword": "approved science bruise cream", "volume": 250}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "bruising cream", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "anti bruise cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}, {"keyword": "purpura bruise cream", "volume": 250}, {"keyword": "best cream to get rid of bruises", "volume": 250}, {"keyword": "highest rated bruise cream", "volume": 250}, {"keyword": "vitamedica arnica k cream", "volume": 250}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "hirudoid cream for bruises", "volume": 250}, {"keyword": "arnica-cream-sensitive", "volume": 250}, {"keyword": "der mend bruise formula cream", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "purpura cream", "volume": 250}, {"keyword": "research verified bruise cream", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}, {"keyword": "anti swelling cream", "volume": 250}, {"keyword": "best cream for purpura", "volume": 250}, {"keyword": "arnica 35 cream", "volume": 250}, {"keyword": "hematoma cream", "volume": 250}, {"keyword": "\u00e1rnica cream", "volume": 250}, {"keyword": "best cream for senile purpura", "volume": 250}, {"keyword": "cream arnica long lasting non greasy pleasant", "volume": 250}, {"keyword": "cream for purpura on arms", "volume": 250}, {"keyword": "arnicare - cream", "volume": 250}, {"keyword": "abarno arnica cream", "volume": 250}, {"keyword": "bromelain cream", "volume": 250}, {"keyword": "senile purpura cream", "volume": 250}, {"keyword": "cream-arnica-long-lasting-non-greasy-pleasant", "volume": 250}, {"keyword": "relief arnica cream", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}, {"keyword": "vit k cream", "volume": 250}, {"keyword": "arnica eye cream", "volume": 250}, {"keyword": "vitamin k cream for face", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "arnica", "total_volume": 139488, "count": 64, "keywords": [{"keyword": "arnica cream", "volume": 89167}, {"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "arnica gel topical", "volume": 3540}, {"keyword": "arnica cream for pain", "volume": 2327}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "arnica montana cream", "volume": 2162}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "crema de arnica para desinflamar", "volume": 1587}, {"keyword": "arnica face cream", "volume": 1567}, {"keyword": "arnica face cream for wrinkles", "volume": 1299}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "arnica for bruising", "volume": 1158}, {"keyword": "crema de arnica", "volume": 1046}, {"keyword": "crema arnica", "volume": 984}, {"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "arnica montana gel", "volume": 930}, {"keyword": "arnica cream for face", "volume": 927}, {"keyword": "arnica for face", "volume": 871}, {"keyword": "arnica bruise", "volume": 850}, {"keyword": "crema arnica antiinflamatoria", "volume": 848}, {"keyword": "gel arnica", "volume": 695}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "organic arnica cream", "volume": 592}, {"keyword": "arnica for bruising and swelling", "volume": 539}, {"keyword": "topical arnica", "volume": 533}, {"keyword": "arnica k cream", "volume": 520}, {"keyword": "arnica post surgery", "volume": 516}, {"keyword": "vita medica arnica", "volume": 498}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "arnica for bruises", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "strongest arnica for bruising", "volume": 250}, {"keyword": "vitamedica arnica k cream", "volume": 250}, {"keyword": "arnica ointment for bruising", "volume": 250}, {"keyword": "arnica-cream-sensitive", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "pomada de arnica para desinflamar", "volume": 250}, {"keyword": "arnica face", "volume": 250}, {"keyword": "arnica 35 cream", "volume": 250}, {"keyword": "arnica bruise supplement", "volume": 250}, {"keyword": "arnica highest strength", "volume": 250}, {"keyword": "arnica topical", "volume": 250}, {"keyword": "cream arnica long lasting non greasy pleasant", "volume": 250}, {"keyword": "abarno arnica cream", "volume": 250}, {"keyword": "arnica gel for face", "volume": 250}, {"keyword": "arnica 35", "volume": 250}, {"keyword": "cream-arnica-long-lasting-non-greasy-pleasant", "volume": 250}, {"keyword": "relief arnica cream", "volume": 250}, {"keyword": "arnica eye cream", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}, {"keyword": "strongest arnica montana", "volume": 250}, {"keyword": "arnica vitamin c", "volume": 250}, {"keyword": "arnica for lips after filler", "volume": 250}, {"keyword": "arnica. gel", "volume": 250}]}, {"name": "bruise", "total_volume": 91948, "count": 54, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "bruise cream", "volume": 12027}, {"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "instant bruise remover", "volume": 2073}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "bruise remedy", "volume": 1780}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "skintensive bruise cream", "volume": 1527}, {"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "black eye bruise treatment fast", "volume": 1122}, {"keyword": "bruise md", "volume": 1097}, {"keyword": "bruise gel", "volume": 948}, {"keyword": "dermend moisturizing bruise formula", "volume": 910}, {"keyword": "bruise", "volume": 871}, {"keyword": "arnica bruise", "volume": 850}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "black eye bruise treatment", "volume": 508}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnicare bruise", "volume": 458}, {"keyword": "best bruise cream", "volume": 250}, {"keyword": "amicare bruise cream", "volume": 250}, {"keyword": "approved science bruise cream", "volume": 250}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "anti bruise cream", "volume": 250}, {"keyword": "bruise remover", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "bruise eliminator", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "blood bruise remover", "volume": 250}, {"keyword": "purpura bruise cream", "volume": 250}, {"keyword": "procure bruise remedy", "volume": 250}, {"keyword": "dermend bruise", "volume": 250}, {"keyword": "highest rated bruise cream", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise formula", "volume": 250}, {"keyword": "best bruise healer", "volume": 250}, {"keyword": "der mend bruise formula cream", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "research verified bruise cream", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "arnicare bruise ointment", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}, {"keyword": "arnica bruise supplement", "volume": 250}]}, {"name": "gel", "total_volume": 43101, "count": 18, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnica gel topical", "volume": 3540}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "bruise gel", "volume": 948}, {"keyword": "arnica montana gel", "volume": 930}, {"keyword": "gel arnica", "volume": 695}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "arnica gel for face", "volume": 250}, {"keyword": "arnica. gel", "volume": 250}]}, {"name": "arnicare", "total_volume": 41061, "count": 10, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "arnicare cream", "volume": 7969}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnicare cream pain relief", "volume": 3536}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnicare bruise", "volume": 458}, {"keyword": "arnicare bruise ointment", "volume": 250}, {"keyword": "arnicare - cream", "volume": 250}]}, {"name": "strength", "total_volume": 27789, "count": 15, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica highest strength", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "extra", "total_volume": 27539, "count": 14, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "bruising", "total_volume": 18656, "count": 20, "keywords": [{"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "bruising cream fast healing", "volume": 1221}, {"keyword": "arnica for bruising", "volume": 1158}, {"keyword": "arnica for bruising and swelling", "volume": 539}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "bruising cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}, {"keyword": "strongest arnica for bruising", "volume": 250}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "arnica ointment for bruising", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "dermend bruising", "volume": 250}, {"keyword": "vitamin k for bruising", "volume": 250}, {"keyword": "best supplement for bruising", "volume": 250}]}, {"name": "skin", "total_volume": 14583, "count": 14, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "dermend fragile skin", "volume": 489}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}, {"name": "thin", "total_volume": 13594, "count": 11, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}, {"name": "vitamin", "total_volume": 13568, "count": 7, "keywords": [{"keyword": "vitamin k cream", "volume": 8078}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "vitamin k cream for bruises", "volume": 517}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "vitamin k for bruising", "volume": 250}, {"keyword": "vitamin k cream for face", "volume": 250}, {"keyword": "arnica vitamin c", "volume": 250}]}, {"name": "dermend", "total_volume": 12519, "count": 10, "keywords": [{"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "dermend moisturizing bruise formula", "volume": 910}, {"keyword": "dermend fragile skin", "volume": 489}, {"keyword": "dermend bruise", "volume": 250}, {"keyword": "dermend bruise formula", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend bruising", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}]}], "top_count": [{"name": "cream", "total_volume": 190489, "count": 83, "keywords": [{"keyword": "arnica cream", "volume": 89167}, {"keyword": "bruise cream", "volume": 12027}, {"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "vitamin k cream", "volume": 8078}, {"keyword": "arnicare cream", "volume": 7969}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "arnicare cream pain relief", "volume": 3536}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "arnica cream for pain", "volume": 2327}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "arnica montana cream", "volume": 2162}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "arnica face cream", "volume": 1567}, {"keyword": "skintensive bruise cream", "volume": 1527}, {"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "arnica face cream for wrinkles", "volume": 1299}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "bruising cream fast healing", "volume": 1221}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "arnica cream for face", "volume": 927}, {"keyword": "cream for bruises", "volume": 744}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "organic arnica cream", "volume": 592}, {"keyword": "arnica k cream", "volume": 520}, {"keyword": "vitamin k cream for bruises", "volume": 517}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruises healing cream", "volume": 250}, {"keyword": "best bruise cream", "volume": 250}, {"keyword": "amicare bruise cream", "volume": 250}, {"keyword": "approved science bruise cream", "volume": 250}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "bruising cream", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "anti bruise cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}, {"keyword": "purpura bruise cream", "volume": 250}, {"keyword": "best cream to get rid of bruises", "volume": 250}, {"keyword": "highest rated bruise cream", "volume": 250}, {"keyword": "vitamedica arnica k cream", "volume": 250}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "hirudoid cream for bruises", "volume": 250}, {"keyword": "arnica-cream-sensitive", "volume": 250}, {"keyword": "der mend bruise formula cream", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "purpura cream", "volume": 250}, {"keyword": "research verified bruise cream", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}, {"keyword": "anti swelling cream", "volume": 250}, {"keyword": "best cream for purpura", "volume": 250}, {"keyword": "arnica 35 cream", "volume": 250}, {"keyword": "hematoma cream", "volume": 250}, {"keyword": "\u00e1rnica cream", "volume": 250}, {"keyword": "best cream for senile purpura", "volume": 250}, {"keyword": "cream arnica long lasting non greasy pleasant", "volume": 250}, {"keyword": "cream for purpura on arms", "volume": 250}, {"keyword": "arnicare - cream", "volume": 250}, {"keyword": "abarno arnica cream", "volume": 250}, {"keyword": "bromelain cream", "volume": 250}, {"keyword": "senile purpura cream", "volume": 250}, {"keyword": "cream-arnica-long-lasting-non-greasy-pleasant", "volume": 250}, {"keyword": "relief arnica cream", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}, {"keyword": "vit k cream", "volume": 250}, {"keyword": "arnica eye cream", "volume": 250}, {"keyword": "vitamin k cream for face", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "arnica", "total_volume": 139488, "count": 64, "keywords": [{"keyword": "arnica cream", "volume": 89167}, {"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "arnica gel topical", "volume": 3540}, {"keyword": "arnica cream for pain", "volume": 2327}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "arnica montana cream", "volume": 2162}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "crema de arnica para desinflamar", "volume": 1587}, {"keyword": "arnica face cream", "volume": 1567}, {"keyword": "arnica face cream for wrinkles", "volume": 1299}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "arnica for bruising", "volume": 1158}, {"keyword": "crema de arnica", "volume": 1046}, {"keyword": "crema arnica", "volume": 984}, {"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "arnica montana gel", "volume": 930}, {"keyword": "arnica cream for face", "volume": 927}, {"keyword": "arnica for face", "volume": 871}, {"keyword": "arnica bruise", "volume": 850}, {"keyword": "crema arnica antiinflamatoria", "volume": 848}, {"keyword": "gel arnica", "volume": 695}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "organic arnica cream", "volume": 592}, {"keyword": "arnica for bruising and swelling", "volume": 539}, {"keyword": "topical arnica", "volume": 533}, {"keyword": "arnica k cream", "volume": 520}, {"keyword": "arnica post surgery", "volume": 516}, {"keyword": "vita medica arnica", "volume": 498}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "arnica for bruises", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "strongest arnica for bruising", "volume": 250}, {"keyword": "vitamedica arnica k cream", "volume": 250}, {"keyword": "arnica ointment for bruising", "volume": 250}, {"keyword": "arnica-cream-sensitive", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "pomada de arnica para desinflamar", "volume": 250}, {"keyword": "arnica face", "volume": 250}, {"keyword": "arnica 35 cream", "volume": 250}, {"keyword": "arnica bruise supplement", "volume": 250}, {"keyword": "arnica highest strength", "volume": 250}, {"keyword": "arnica topical", "volume": 250}, {"keyword": "cream arnica long lasting non greasy pleasant", "volume": 250}, {"keyword": "abarno arnica cream", "volume": 250}, {"keyword": "arnica gel for face", "volume": 250}, {"keyword": "arnica 35", "volume": 250}, {"keyword": "cream-arnica-long-lasting-non-greasy-pleasant", "volume": 250}, {"keyword": "relief arnica cream", "volume": 250}, {"keyword": "arnica eye cream", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}, {"keyword": "strongest arnica montana", "volume": 250}, {"keyword": "arnica vitamin c", "volume": 250}, {"keyword": "arnica for lips after filler", "volume": 250}, {"keyword": "arnica. gel", "volume": 250}]}, {"name": "bruise", "total_volume": 91948, "count": 54, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "bruise cream", "volume": 12027}, {"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "instant bruise remover", "volume": 2073}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "bruise remedy", "volume": 1780}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "skintensive bruise cream", "volume": 1527}, {"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "black eye bruise treatment fast", "volume": 1122}, {"keyword": "bruise md", "volume": 1097}, {"keyword": "bruise gel", "volume": 948}, {"keyword": "dermend moisturizing bruise formula", "volume": 910}, {"keyword": "bruise", "volume": 871}, {"keyword": "arnica bruise", "volume": 850}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "black eye bruise treatment", "volume": 508}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnicare bruise", "volume": 458}, {"keyword": "best bruise cream", "volume": 250}, {"keyword": "amicare bruise cream", "volume": 250}, {"keyword": "approved science bruise cream", "volume": 250}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "anti bruise cream", "volume": 250}, {"keyword": "bruise remover", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "bruise eliminator", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "blood bruise remover", "volume": 250}, {"keyword": "purpura bruise cream", "volume": 250}, {"keyword": "procure bruise remedy", "volume": 250}, {"keyword": "dermend bruise", "volume": 250}, {"keyword": "highest rated bruise cream", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise formula", "volume": 250}, {"keyword": "best bruise healer", "volume": 250}, {"keyword": "der mend bruise formula cream", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "research verified bruise cream", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "arnicare bruise ointment", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}, {"keyword": "arnica bruise supplement", "volume": 250}]}, {"name": "bruising", "total_volume": 18656, "count": 20, "keywords": [{"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "bruising cream fast healing", "volume": 1221}, {"keyword": "arnica for bruising", "volume": 1158}, {"keyword": "arnica for bruising and swelling", "volume": 539}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "bruising cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}, {"keyword": "strongest arnica for bruising", "volume": 250}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "arnica ointment for bruising", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "dermend bruising", "volume": 250}, {"keyword": "vitamin k for bruising", "volume": 250}, {"keyword": "best supplement for bruising", "volume": 250}]}, {"name": "gel", "total_volume": 43101, "count": 18, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnica gel topical", "volume": 3540}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "bruise gel", "volume": 948}, {"keyword": "arnica montana gel", "volume": 930}, {"keyword": "gel arnica", "volume": 695}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "arnica gel for face", "volume": 250}, {"keyword": "arnica. gel", "volume": 250}]}, {"name": "strength", "total_volume": 27789, "count": 15, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica highest strength", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "extra", "total_volume": 27539, "count": 14, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "skin", "total_volume": 14583, "count": 14, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "dermend fragile skin", "volume": 489}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}, {"name": "bruises", "total_volume": 4492, "count": 12, "keywords": [{"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "cream for bruises", "volume": 744}, {"keyword": "vitamin k cream for bruises", "volume": 517}, {"keyword": "bruises healing cream", "volume": 250}, {"keyword": "arnica for bruises", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "best cream to get rid of bruises", "volume": 250}, {"keyword": "hirudoid cream for bruises", "volume": 250}, {"keyword": "bruises", "volume": 250}]}, {"name": "thin", "total_volume": 13594, "count": 11, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}, {"name": "arnicare", "total_volume": 41061, "count": 10, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "arnicare cream", "volume": 7969}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnicare cream pain relief", "volume": 3536}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnicare bruise", "volume": 458}, {"keyword": "arnicare bruise ointment", "volume": 250}, {"keyword": "arnicare - cream", "volume": 250}]}, {"name": "dermend", "total_volume": 12519, "count": 10, "keywords": [{"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "dermend moisturizing bruise formula", "volume": 910}, {"keyword": "dermend fragile skin", "volume": 489}, {"keyword": "dermend bruise", "volume": 250}, {"keyword": "dermend bruise formula", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend bruising", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}]}], "identity": [{"name": "seniors", "total_volume": 5041, "count": 3, "keywords": [{"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}]}, {"name": "elderly", "total_volume": 2666, "count": 4, "keywords": [{"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}], "feature": [{"name": "cream", "total_volume": 190489, "count": 83, "keywords": [{"keyword": "arnica cream", "volume": 89167}, {"keyword": "bruise cream", "volume": 12027}, {"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "vitamin k cream", "volume": 8078}, {"keyword": "arnicare cream", "volume": 7969}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "arnicare cream pain relief", "volume": 3536}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "arnica cream for pain", "volume": 2327}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "arnica montana cream", "volume": 2162}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "arnica face cream", "volume": 1567}, {"keyword": "skintensive bruise cream", "volume": 1527}, {"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "arnica face cream for wrinkles", "volume": 1299}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "bruising cream fast healing", "volume": 1221}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "arnica cream for face", "volume": 927}, {"keyword": "cream for bruises", "volume": 744}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "organic arnica cream", "volume": 592}, {"keyword": "arnica k cream", "volume": 520}, {"keyword": "vitamin k cream for bruises", "volume": 517}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruises healing cream", "volume": 250}, {"keyword": "best bruise cream", "volume": 250}, {"keyword": "amicare bruise cream", "volume": 250}, {"keyword": "approved science bruise cream", "volume": 250}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "bruising cream", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "anti bruise cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}, {"keyword": "purpura bruise cream", "volume": 250}, {"keyword": "best cream to get rid of bruises", "volume": 250}, {"keyword": "highest rated bruise cream", "volume": 250}, {"keyword": "vitamedica arnica k cream", "volume": 250}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "hirudoid cream for bruises", "volume": 250}, {"keyword": "arnica-cream-sensitive", "volume": 250}, {"keyword": "der mend bruise formula cream", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "purpura cream", "volume": 250}, {"keyword": "research verified bruise cream", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}, {"keyword": "anti swelling cream", "volume": 250}, {"keyword": "best cream for purpura", "volume": 250}, {"keyword": "arnica 35 cream", "volume": 250}, {"keyword": "hematoma cream", "volume": 250}, {"keyword": "\u00e1rnica cream", "volume": 250}, {"keyword": "best cream for senile purpura", "volume": 250}, {"keyword": "cream arnica long lasting non greasy pleasant", "volume": 250}, {"keyword": "cream for purpura on arms", "volume": 250}, {"keyword": "arnicare - cream", "volume": 250}, {"keyword": "abarno arnica cream", "volume": 250}, {"keyword": "bromelain cream", "volume": 250}, {"keyword": "senile purpura cream", "volume": 250}, {"keyword": "cream-arnica-long-lasting-non-greasy-pleasant", "volume": 250}, {"keyword": "relief arnica cream", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}, {"keyword": "vit k cream", "volume": 250}, {"keyword": "arnica eye cream", "volume": 250}, {"keyword": "vitamin k cream for face", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "arnica", "total_volume": 139488, "count": 64, "keywords": [{"keyword": "arnica cream", "volume": 89167}, {"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "arnica gel topical", "volume": 3540}, {"keyword": "arnica cream for pain", "volume": 2327}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "arnica montana cream", "volume": 2162}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "crema de arnica para desinflamar", "volume": 1587}, {"keyword": "arnica face cream", "volume": 1567}, {"keyword": "arnica face cream for wrinkles", "volume": 1299}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "arnica for bruising", "volume": 1158}, {"keyword": "crema de arnica", "volume": 1046}, {"keyword": "crema arnica", "volume": 984}, {"keyword": "arnica cream for bruises", "volume": 981}, {"keyword": "arnica montana gel", "volume": 930}, {"keyword": "arnica cream for face", "volume": 927}, {"keyword": "arnica for face", "volume": 871}, {"keyword": "arnica bruise", "volume": 850}, {"keyword": "crema arnica antiinflamatoria", "volume": 848}, {"keyword": "gel arnica", "volume": 695}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "organic arnica cream", "volume": 592}, {"keyword": "arnica for bruising and swelling", "volume": 539}, {"keyword": "topical arnica", "volume": 533}, {"keyword": "arnica k cream", "volume": 520}, {"keyword": "arnica post surgery", "volume": 516}, {"keyword": "vita medica arnica", "volume": 498}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "arnica for bruises", "volume": 250}, {"keyword": "arnica bruises cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "strongest arnica for bruising", "volume": 250}, {"keyword": "vitamedica arnica k cream", "volume": 250}, {"keyword": "arnica ointment for bruising", "volume": 250}, {"keyword": "arnica-cream-sensitive", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "pomada de arnica para desinflamar", "volume": 250}, {"keyword": "arnica face", "volume": 250}, {"keyword": "arnica 35 cream", "volume": 250}, {"keyword": "arnica bruise supplement", "volume": 250}, {"keyword": "arnica highest strength", "volume": 250}, {"keyword": "arnica topical", "volume": 250}, {"keyword": "cream arnica long lasting non greasy pleasant", "volume": 250}, {"keyword": "abarno arnica cream", "volume": 250}, {"keyword": "arnica gel for face", "volume": 250}, {"keyword": "arnica 35", "volume": 250}, {"keyword": "cream-arnica-long-lasting-non-greasy-pleasant", "volume": 250}, {"keyword": "relief arnica cream", "volume": 250}, {"keyword": "arnica eye cream", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}, {"keyword": "strongest arnica montana", "volume": 250}, {"keyword": "arnica vitamin c", "volume": 250}, {"keyword": "arnica for lips after filler", "volume": 250}, {"keyword": "arnica. gel", "volume": 250}]}, {"name": "bruise", "total_volume": 91948, "count": 54, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "bruise cream", "volume": 12027}, {"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnica bruise cream", "volume": 4627}, {"keyword": "bruise cream for seniors", "volume": 4541}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "instant bruise remover", "volume": 2073}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "bruise remedy", "volume": 1780}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "skintensive bruise cream", "volume": 1527}, {"keyword": "best bruise cream for elderly", "volume": 1452}, {"keyword": "black eye bruise treatment fast", "volume": 1122}, {"keyword": "bruise md", "volume": 1097}, {"keyword": "bruise gel", "volume": 948}, {"keyword": "dermend moisturizing bruise formula", "volume": 910}, {"keyword": "bruise", "volume": 871}, {"keyword": "arnica bruise", "volume": 850}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "black eye bruise treatment", "volume": 508}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnicare bruise", "volume": 458}, {"keyword": "best bruise cream", "volume": 250}, {"keyword": "amicare bruise cream", "volume": 250}, {"keyword": "approved science bruise cream", "volume": 250}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "anti bruise cream", "volume": 250}, {"keyword": "bruise remover", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "bruise eliminator", "volume": 250}, {"keyword": "miracle plus arnica bruise cream", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best bruise cream for seniors", "volume": 250}, {"keyword": "blood bruise remover", "volume": 250}, {"keyword": "purpura bruise cream", "volume": 250}, {"keyword": "procure bruise remedy", "volume": 250}, {"keyword": "dermend bruise", "volume": 250}, {"keyword": "highest rated bruise cream", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise formula", "volume": 250}, {"keyword": "best bruise healer", "volume": 250}, {"keyword": "der mend bruise formula cream", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "research verified bruise cream", "volume": 250}, {"keyword": "dr luke arnica bruise cream", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "arnicare bruise ointment", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}, {"keyword": "arnica bruise supplement", "volume": 250}]}, {"name": "gel", "total_volume": 43101, "count": 18, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnica gel topical", "volume": 3540}, {"keyword": "arnica bruise gel", "volume": 1587}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "bruise gel", "volume": 948}, {"keyword": "arnica montana gel", "volume": 930}, {"keyword": "gel arnica", "volume": 695}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "arnica gel for bruises", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "pro cure bruise remedy arnica gel", "volume": 250}, {"keyword": "procure bruise remedy gel arnica", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "arnica gel bruise", "volume": 250}, {"keyword": "arnica gel for face", "volume": 250}, {"keyword": "arnica. gel", "volume": 250}]}, {"name": "arnicare", "total_volume": 41061, "count": 10, "keywords": [{"keyword": "arnicare bruise gel", "volume": 20584}, {"keyword": "arnicare cream", "volume": 7969}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "arnicare cream pain relief", "volume": 3536}, {"keyword": "arnicare bruise cream", "volume": 1805}, {"keyword": "boiron arnicare bruise gel", "volume": 567}, {"keyword": "arnicare cream bruise", "volume": 490}, {"keyword": "arnicare bruise", "volume": 458}, {"keyword": "arnicare bruise ointment", "volume": 250}, {"keyword": "arnicare - cream", "volume": 250}]}, {"name": "strength", "total_volume": 27789, "count": 15, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica highest strength", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "extra", "total_volume": 27539, "count": 14, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "arnicare bruise gel extra strength", "volume": 5152}, {"keyword": "t-relief arnica 12 extra strength cream", "volume": 1223}, {"keyword": "anicare gel extra strength", "volume": 1137}, {"keyword": "arnica arthritis cream extra strength", "volume": 676}, {"keyword": "anicare cream extra strength", "volume": 514}, {"keyword": "arnica cream extra strength", "volume": 473}, {"keyword": "bruise cream extra strength", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "anicare gel extra strength bruise", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "arnica extra strength", "volume": 250}, {"keyword": "arnica cream pain relief extra strength", "volume": 250}]}, {"name": "bruising", "total_volume": 18656, "count": 20, "keywords": [{"keyword": "arnica gel for bruising", "volume": 5961}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "arnica cream for bruising", "volume": 2304}, {"keyword": "bruising cream fast healing", "volume": 1221}, {"keyword": "arnica for bruising", "volume": 1158}, {"keyword": "arnica for bruising and swelling", "volume": 539}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "bruising cream", "volume": 250}, {"keyword": "arnica cream for bruising and swelling", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "bruising cream for seniors", "volume": 250}, {"keyword": "strongest arnica for bruising", "volume": 250}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "arnica ointment for bruising", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "arnica for bruising gel", "volume": 250}, {"keyword": "dermend bruising", "volume": 250}, {"keyword": "vitamin k for bruising", "volume": 250}, {"keyword": "best supplement for bruising", "volume": 250}]}, {"name": "skin", "total_volume": 14583, "count": 14, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "dermend fragile skin", "volume": 489}, {"keyword": "elderly skin bruising treatment", "volume": 250}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "dermaka cream for skin bruising", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}, {"name": "thin", "total_volume": 13594, "count": 11, "keywords": [{"keyword": "bruise cream extra strength fast healing thin skin", "volume": 9852}, {"keyword": "cream to thicken thin skin on arms", "volume": 1028}, {"keyword": "thin skin treatment elderly", "volume": 714}, {"keyword": "bruise cream for thin skin", "volume": 250}, {"keyword": "arnica bruise cream extra strength fast healing thin skin", "volume": 250}, {"keyword": "best cream for thin skin bruising", "volume": 250}, {"keyword": "how to get rid of thin skin bruises", "volume": 250}, {"keyword": "cream for bruises and thin skin", "volume": 250}, {"keyword": "cream for thin skin and bruising", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "thin skin cream for elderly", "volume": 250}]}, {"name": "vitamin", "total_volume": 13568, "count": 7, "keywords": [{"keyword": "vitamin k cream", "volume": 8078}, {"keyword": "vitamin k cream for bruising", "volume": 3973}, {"keyword": "vitamin k cream for bruises", "volume": 517}, {"keyword": "best vitamin k cream for bruising", "volume": 250}, {"keyword": "vitamin k for bruising", "volume": 250}, {"keyword": "vitamin k cream for face", "volume": 250}, {"keyword": "arnica vitamin c", "volume": 250}]}, {"name": "dermend", "total_volume": 12519, "count": 10, "keywords": [{"keyword": "dermend bruise cream extra strength", "volume": 7012}, {"keyword": "dermend bruise cream", "volume": 2608}, {"keyword": "dermend moisturizing bruise formula", "volume": 910}, {"keyword": "dermend fragile skin", "volume": 489}, {"keyword": "dermend bruise", "volume": 250}, {"keyword": "dermend bruise formula", "volume": 250}, {"keyword": "dermend bruise thin skin cream extra strength", "volume": 250}, {"keyword": "dermend bruise cream 4.5 oz", "volume": 250}, {"keyword": "dermend bruising", "volume": 250}, {"keyword": "dermend moisturizing bruise formula cream", "volume": 250}]}], "total_keywords": 152, "total_clusters_found": 52};
+
+    function formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(0) + 'K';
+        return num.toString();
+    }
+
+    function renderChart(containerId, data, valueKey, barClass, maxItems) {
+        maxItems = maxItems || 12;
+        const container = document.getElementById(containerId);
+        if (!container || !data || data.length === 0) return;
+        const displayData = data.slice(0, maxItems);
+        const maxValue = Math.max(...displayData.map(d => d[valueKey]));
+        container.innerHTML = displayData.map(item => {
+            const percentage = (item[valueKey] / maxValue) * 100;
+            const displayValue = valueKey === 'total_volume' ? formatNumber(item[valueKey]) : item[valueKey];
+            return `<div class="bar-row"><div class="bar-label" onclick="showKeywords('${item.name}', ${JSON.stringify(item.keywords).replace(/"/g, '&quot;')}, ${item.total_volume}, ${item.count})">${item.name}</div><div class="bar-wrapper"><div class="bar ${barClass}" style="width: ${percentage}%">${displayValue}</div></div></div>`;
+        }).join('');
+    }
+
+    function showKeywords(name, keywords, totalVolume, count) {
+        const modal = document.getElementById('keywords-modal');
+        document.getElementById('modal-title').textContent = name + ' Keywords';
+        document.getElementById('modal-stats').innerHTML = `<div class="modal-stat"><div class="modal-stat-value">${formatNumber(totalVolume)}</div><div class="modal-stat-label">Total Search Volume</div></div><div class="modal-stat"><div class="modal-stat-value">${count}</div><div class="modal-stat-label">Keywords</div></div>`;
+        document.getElementById('modal-keywords').innerHTML = keywords.map(kw => `<div class="keyword-item"><span class="keyword-text">${kw.keyword}</span><span class="keyword-volume">${formatNumber(kw.volume)}</span></div>`).join('');
+        modal.style.display = 'block';
+    }
+
+    document.querySelector('.modal-close').onclick = function() { document.getElementById('keywords-modal').style.display = 'none'; };
+    window.onclick = function(event) { if (event.target === document.getElementById('keywords-modal')) { document.getElementById('keywords-modal').style.display = 'none'; } };
+
+    if (clusterData.top_volume) renderChart('chart-volume', clusterData.top_volume, 'total_volume', 'bar-volume');
+    if (clusterData.top_count) renderChart('chart-count', clusterData.top_count, 'count', 'bar-count');
+    if (clusterData.identity) renderChart('chart-identity', clusterData.identity, 'total_volume', 'bar-identity', 2);
+    if (clusterData.feature) renderChart('chart-feature', clusterData.feature, 'total_volume', 'bar-feature', 12);
+
+    function toggleReddit(slug) {
+        const el = document.getElementById('reddit-' + slug);
+        if (el) el.classList.toggle('open');
+    }
+    </script>
+</body>
+</html>
